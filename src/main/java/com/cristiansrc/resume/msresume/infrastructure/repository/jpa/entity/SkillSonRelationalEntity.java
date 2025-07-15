@@ -26,4 +26,8 @@ public class SkillSonRelationalEntity extends AuditBasicEntity {
     @ManyToOne
     @JoinColumn(name = "function_son_id", nullable = false)
     private SkillSonEntity skillSon;
+
+    @ManyToOne
+    @JoinColumn(name = "experience_id", nullable = false)
+    private ExperienceEntity experience;
 }
