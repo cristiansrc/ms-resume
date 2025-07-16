@@ -31,19 +31,11 @@ public class FuturedProjectEntity extends AuditBasicEntity {
     @NotNull
     private String description;
 
-    @Column(nullable = false)
-    @NotNull
-    private String imageListUrl;
+    @ManyToOne
+    @JoinColumn(name = "image_list_url_id", nullable = false)
+    private ImageUrlEntity imageListUrl;
 
-    @Column(nullable = false)
-    @NotNull
-    private String imageUrl;
-
-    @ManyToMany
-    @JoinTable(
-            name="futured_project_skill_relational",
-            joinColumns=@JoinColumn(name="futured_project_id"),
-            inverseJoinColumns=@JoinColumn(name="skill_son_id")
-    )
-    private List<SkillSonEntity> skillSons;
+    @ManyToOne
+    @JoinColumn(name = "image_url_id", nullable = false)
+    private ImageUrlEntity imageUrl;
 }

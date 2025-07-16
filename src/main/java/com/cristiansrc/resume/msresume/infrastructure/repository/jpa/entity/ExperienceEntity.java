@@ -30,7 +30,4 @@ public class ExperienceEntity extends AuditBasicEntity {
     @Column(nullable = false)
     @NotNull
     private String description;
-
-    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SkillSonRelationalEntity> skillSons;
 }

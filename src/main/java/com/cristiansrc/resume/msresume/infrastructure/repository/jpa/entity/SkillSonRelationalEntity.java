@@ -15,7 +15,7 @@ import lombok.*;
 @Builder
 @Table(
     name = "skill_son_relational",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"skill_id", "function_son_id"})
+    uniqueConstraints = @UniqueConstraint(columnNames = {"skill_id", "skill_son_id"})
 )
 public class SkillSonRelationalEntity extends AuditBasicEntity {
 
@@ -24,10 +24,6 @@ public class SkillSonRelationalEntity extends AuditBasicEntity {
     private SkillEntity skill;
 
     @ManyToOne
-    @JoinColumn(name = "function_son_id", nullable = false)
+    @JoinColumn(name = "skill_son_id", nullable = false)
     private SkillSonEntity skillSon;
-
-    @ManyToOne
-    @JoinColumn(name = "experience_id", nullable = false)
-    private ExperienceEntity experience;
 }

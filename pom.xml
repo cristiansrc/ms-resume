@@ -12,7 +12,7 @@
 	<artifactId>ms-resume</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ms-resume</name>
-	<description>Servicio encargado de gestionar la información de mi curriculum</description>
+	<description>API RESTful para gestionar la información personal, experiencia laboral, habilidades, proyectos y blog de la página cristiansrc.com. Incluye endpoints para la administración de datos básicos, recursos multimedia, etiquetas, habilidades y descarga de curriculum en formato PDF.</description>
 	<url/>
 	<licenses>
 		<license>

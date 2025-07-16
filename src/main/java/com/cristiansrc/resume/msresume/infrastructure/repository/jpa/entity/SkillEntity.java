@@ -23,7 +23,7 @@ public class SkillEntity extends AuditBasicEntity {
     @JoinTable(
             name="skill_son_relational",
             joinColumns=@JoinColumn(name="skill_id"),
-            inverseJoinColumns=@JoinColumn(name="function_son_id")
+            inverseJoinColumns=@JoinColumn(name="skill_son_id")
     )
     private List<SkillSonEntity> skillSons;
 }

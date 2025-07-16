@@ -8,10 +8,16 @@ CREATE TABLE futured_project
     experience_id     BIGINT                                  NOT NULL,
     description_short VARCHAR(255)                            NOT NULL,
     description       VARCHAR(255)                            NOT NULL,
-    image_list_url    VARCHAR(255)                            NOT NULL,
-    image_url         VARCHAR(255)                            NOT NULL,
+    image_list_url_id BIGINT                                  NOT NULL,
+    image_url_id      BIGINT                                  NOT NULL,
     CONSTRAINT pk_futured_project PRIMARY KEY (id)
 );
 
 ALTER TABLE futured_project
     ADD CONSTRAINT FK_FUTURED_PROJECT_ON_EXPERIENCE FOREIGN KEY (experience_id) REFERENCES experience (id);
+
+ALTER TABLE futured_project
+    ADD CONSTRAINT FK_FUTURED_PROJECT_ON_IMAGE_LIST_URL FOREIGN KEY (image_list_url_id) REFERENCES image_url (id);
+
+ALTER TABLE futured_project
+    ADD CONSTRAINT FK_FUTURED_PROJECT_ON_IMAGE_URL FOREIGN KEY (image_url_id) REFERENCES image_url (id);

@@ -1,1559 +1,1437 @@
 openapi: 3.1.0
 info:
-  title: Product Service API
-  description: API de microservicios para gestionar productos, categorías, colores, tipos, tallas e imágenes en un e-commerce.
+  title: API Curriculum cristiansrc.com
+  description: >
+    API RESTful para gestionar la información personal, experiencia laboral, habilidades, proyectos y blog de la página cristiansrc.com.
+    Incluye endpoints para la administración de datos básicos, recursos multimedia, etiquetas, habilidades y descarga de curriculum en formato PDF.
   version: 1.0.0
 servers:
-  - url: http://localhost:8080
-    description: Servidor local de desarrollo
-tags:
-  - name: Category
-    description: Operaciones sobre categorías de productos
-  - name: Color
-    description: Operaciones sobre colores de productos
-  - name: Type
-    description: Operaciones sobre tipos de productos
-  - name: Size
-    description: Operaciones sobre tallas de productos
-  - name: Image
-    description: Operaciones sobre imágenes de productos
-  - name: Product
-    description: Operaciones sobre productos genéricos
-  - name: ProductClothing
-    description: Operaciones sobre productos de ropa
-  - name: ProductShoes
-    description: Operaciones sobre productos de zapatos
-  - name: ProductGeneric
-    description: Operaciones sobre productos genéricos
-
-paths:
-  /category:
-    post:
-      tags: [Category]
-      summary: Crear una nueva categoría
-      operationId: createCategory
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CategoryRequest'
-      responses:
-        '200':
-          description: Categoría creada
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostResponse'
-        '400':
-          description: Petición inválida
-        '422':
-          description: Error de validación
-
-    get:
-      tags: [Category]
-      summary: Obtener todas las categorías
-      operationId: listCategories
-      responses:
-        '200':
-          description: Lista de categorías
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CategoryResponse'
-
-  /category/{id}:
-    get:
-      tags: [Category]
-      summary: Obtener categoría por id
-      operationId: getCategoryById
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Categoría encontrada
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CategoryResponse'
-        '404':
-          description: Categoría no encontrada
-
-    put:
-      tags: [Category]
-      summary: Actualizar categoría por id
-      operationId: updateCategory
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CategoryRequest'
-      responses:
-        '204':
-          description: Categoría actualizada correctamente
-        '400':
-          description: Petición inválida
-        '404':
-          description: Categoría no encontrada
-        '422':
-          description: Error de validación
-
-    delete:
-      tags: [Category]
-      summary: Eliminar categoría por id
-      operationId: deleteCategory
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Categoría eliminada correctamente
-        '404':
-          description: Categoría no encontrada
-
-  /color:
-    get:
-      tags: [Color]
-      summary: Obtener lista de colores
-      operationId: getColors
-      responses:
-        '200':
-          description: Lista de colores
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ColorResponse'
-
-  /color/generic/{idProduct}:
-    get:
-      tags: [Color]
-      summary: Obtener lista de colores
-      operationId: getColorsByProductGeneric
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Lista de colores para productos genericos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ColorResponse'
-
-  /type:
-    get:
-      tags: [Type]
-      summary: Obtener lista de tipos de producto
-      operationId: getTypes
-      responses:
-        '200':
-          description: Lista de tipos de producto
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TypeResponse'
-
-  /size/clothing/{idProduct}/{idColor}:
-    get:
-      tags: [Size]
-      summary: Obtener lista de tallas de ropa
-      operationId: getSizeClothing
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: idColor
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Lista de tallas de ropa
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SizeClothingResponse'
-
-  /size/shoes/{idProduct}/{idColor}:
-    get:
-      tags: [Size]
-      summary: Obtener lista de tallas de zapatos
-      operationId: getSizeShoes
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: idColor
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Lista de tallas de zapatos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SizeShoesResponse'
-
-  /image:
-    post:
-      tags: [Image]
-      summary: Subir una imagen de producto
-      operationId: uploadImage
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ImageRequest'
-      responses:
-        '201':
-          description: Imagen subida exitosamente
-          headers:
-            Location:
-              description: URI de la imagen creada
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ImageResponse'
-        '400':
-          description: Petición inválida
-        '422':
-          description: Error de validación
-
-  /image/{id}:
-    delete:
-      tags: [ Image ]
-      summary: Eliminar una imagen de producto
-      operationId: deleteImage
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Imagen eliminada correctamente
-        '404':
-          description: Imagen no encontrada
-    get:
-      tags: [ Image ]
-      summary: Obtener una imagen por si id
-      operationId: getImage
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Imagen encontrada
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ImageResponse'
-        '404':
-          description: Imagen no encontrada
-
-  /product:
-    post:
-      tags: [Product]
-      summary: Crear un producto genérico
-      operationId: createProduct
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductRequest'
-      responses:
-        '200':
-          description: Producto creado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostResponse'
-        '400':
-          description: Petición inválida
-        '422':
-          description: Error de validación
-
-    get:
-      tags: [Product]
-      summary: Obtener todos los productos
-      operationId: listProducts
-      responses:
-        '200':
-          description: Lista de productos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductResponse'
-
-  /product/{id}:
-    get:
-      tags: [Product]
-      summary: Obtener producto genérico por id
-      operationId: getProductById
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Producto encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductResponse'
-        '404':
-          description: Producto no encontrado
-
-    put:
-      tags: [Product]
-      summary: Actualizar producto genérico por id
-      operationId: updateProduct
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductRequest'
-      responses:
-        '204':
-          description: Producto actualizado
-        '400':
-          description: Petición inválida
-        '404':
-          description: Producto no encontrado
-        '422':
-          description: Error de validación
-
-    delete:
-      tags: [Product]
-      summary: Eliminar producto genérico por id
-      operationId: deleteProduct
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Producto eliminado
-        '404':
-          description: Producto no encontrado
-
-  /product/clothing/{idProduct}:
-    post:
-      tags: [ProductClothing]
-      summary: Crear producto de ropa
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-      operationId: createProductClothing
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductClothingRequest'
-      responses:
-        '200':
-          description: Producto de ropa creado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostResponse'
-        '400':
-          description: Petición inválida
-        '422':
-          description: Error de validación
-
-    get:
-      tags: [ProductClothing]
-      summary: Obtener lista de productos de ropa
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-      operationId: listProductClothing
-      responses:
-        '200':
-          description: Lista de productos de ropa
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductClothingResponse'
-
-  /product/clothing/{idProduct}/{id}:
-    get:
-      tags: [ProductClothing]
-      summary: Obtener producto de ropa por id
-      operationId: getProductClothingById
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Producto de ropa encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductClothingResponse'
-        '404':
-          description: Producto de ropa no encontrado
-
-    put:
-      tags: [ProductClothing]
-      summary: Actualizar producto de ropa por id
-      operationId: updateProductClothing
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductClothingRequest'
-      responses:
-        '204':
-          description: Producto de ropa actualizado
-        '400':
-          description: Petición inválida
-        '404':
-          description: Producto de ropa no encontrado
-        '422':
-          description: Error de validación
-
-    delete:
-      tags: [ProductClothing]
-      summary: Eliminar producto de ropa por id
-      operationId: deleteProductClothing
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Producto de ropa eliminado
-        '404':
-          description: Producto de ropa no encontrado
-
-  /product/shoes/{idProduct}:
-    post:
-      tags: [ProductShoes]
-      summary: Crear producto de zapatos
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-      operationId: createProductShoes
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductShoesRequest'
-      responses:
-        '200':
-          description: Producto de zapatos creado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostResponse'
-        '400':
-          description: Petición inválida
-        '422':
-          description: Error de validación
-
-    get:
-      tags: [ProductShoes]
-      summary: Obtener lista de productos de zapatos
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-      operationId: listProductShoes
-      responses:
-        '200':
-          description: Lista de productos de zapatos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductShoesResponse'
-
-  /product/shoes/{idProduct}/{id}:
-    get:
-      tags: [ProductShoes]
-      summary: Obtener producto de zapatos por id
-      operationId: getProductShoesById
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Producto de zapatos encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductShoesResponse'
-        '404':
-          description: Producto de zapatos no encontrado
-
-    put:
-      tags: [ProductShoes]
-      summary: Actualizar producto de zapatos por id
-      operationId: updateProductShoes
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductShoesRequest'
-      responses:
-        '204':
-          description: Producto de zapatos actualizado
-        '400':
-          description: Petición inválida
-        '404':
-          description: Producto de zapatos no encontrado
-        '422':
-          description: Error de validación
-
-    delete:
-      tags: [ProductShoes]
-      summary: Eliminar producto de zapatos por id
-      operationId: deleteProductShoes
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Producto de zapatos eliminado
-        '404':
-          description: Producto de zapatos no encontrado
-
-  /product/generic/{idProduct}:
-    post:
-      tags: [ProductGeneric]
-      summary: Crear producto genérico
-      operationId: createProductGeneric
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductGenericRequest'
-      responses:
-        '200':
-          description: Producto genérico creado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostResponse'
-        '400':
-          description: Petición inválida
-        '422':
-          description: Error de validación
-
-    get:
-      tags: [ProductGeneric]
-      summary: Obtener lista de productos genéricos
-      operationId: listProductGeneric
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Lista de productos genéricos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductGenericResponse'
-
-  /product/generic/{idProduct}/{id}:
-    get:
-      tags: [ProductGeneric]
-      summary: Obtener producto genérico por id
-      operationId: getProductGenericById
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Producto genérico encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductGenericResponse'
-        '404':
-          description: Producto genérico no encontrado
-
-    put:
-      tags: [ProductGeneric]
-      summary: Actualizar producto genérico por id
-      operationId: updateProductGeneric
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductGenericRequest'
-      responses:
-        '204':
-          description: Producto genérico actualizado
-        '400':
-          description: Petición inválida
-        '404':
-          description: Producto genérico no encontrado
-        '422':
-          description: Error de validación
-
-    delete:
-      tags: [ProductGeneric]
-      summary: Eliminar producto genérico por id
-      operationId: deleteProductGeneric
-      parameters:
-        - in: path
-          name: idProduct
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Producto genérico eliminado
-        '404':
-          description: Producto genérico no encontrado
-
-  /shopping/product/{shopId}:
-    post:
-      tags: [ShoppingProduct]
-      summary: Obtener productos completos de una tienda
-      operationId: getFullProductsByShop
-      parameters:
-        - in: path
-          name: shopId
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ShopingProductFilterRequest'
-      responses:
-        '200':
-          description: Lista de productos completos de la tienda
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductFullResponse'
-        '404':
-          description: Tienda no encontrada
-
-  /shopping/product/clothing/{shopId}/{id}:
-    get:
-      tags: [ShoppingProduct]
-      summary: Obtener producto de ropa por id dfe una tienda
-      operationId: getShoppingProductClothingById
-      parameters:
-        - in: path
-          name: shopId
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Producto de ropa encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductFullClothingResponse'
-        '404':
-          description: Producto de ropa no encontrado
-
-  /shopping/product/shoes/{shopId}/{id}:
-    get:
-      tags: [ShoppingProduct]
-      summary: Obtener producto de zapatos por id
-      operationId: getShoppingProductShoesById
-      parameters:
-        - in: path
-          name: shopId
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Producto de zapatos encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductFullShoesResponse'
-        '404':
-          description: Producto de zapatos no encontrado
-
-  /shopping/product/generic/{shopId}/{id}:
-    get:
-      tags: [ShoppingProduct]
-      summary: Obtener producto genérico por id
-      operationId: getShoppingProductGenericById
-      parameters:
-        - in: path
-          name: shopId
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Producto genérico encontrado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductFullGenericResponse'
-        '404':
-          description: Producto genérico no encontrado
+  - url: https://api.cristiansrc.com/ms-resume/v1
+    description: API principal
 
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
   schemas:
-    PostResponse:
+    # --- BASIC DATA ---
+    BasicDataRequest:
       type: object
+      description: >
+        Solicitud para gestionar los datos personales básicos, redes sociales y resumen del perfil profesional del usuario.
       properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 1
-
-    CategoryRequest:
-      type: object
-      required: [name, description, icon]
-      properties:
-        name:
+        firstName:
           type: string
-          minLength: 3
-          maxLength: 50
-          examples:
-            - "Camisetas"
-        description:
-          type: string
-          minLength: 5
-          maxLength: 255
-          examples:
-            - "Categoría para camisetas y t-shirts"
-        icon:
-          type: string
+          description: Primer nombre del usuario.
           minLength: 1
           maxLength: 50
-          examples:
-            - "tshirt"
-
-    CategoryResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 1
-        name:
+        othersName:
           type: string
-          examples:
-            - "Camisetas"
+          description: Otros nombres del usuario (opcional).
+          maxLength: 100
+        firstSurName:
+          type: string
+          description: Primer apellido del usuario.
+          minLength: 1
+          maxLength: 50
+        othersSurName:
+          type: string
+          description: Otros apellidos del usuario (opcional).
+          maxLength: 100
+        dateBirth:
+          type: string
+          format: date
+          description: Fecha de nacimiento del usuario (yyyy-MM-dd).
+        located:
+          type: string
+          description: Ubicación geográfica principal del usuario.
+          maxLength: 150
+        startWorkingDate:
+          type: string
+          format: date
+          description: Fecha de inicio de la vida laboral (yyyy-MM-dd).
+        greeting:
+          type: string
+          description: Frase de saludo o presentación breve.
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          description: Correo electrónico de contacto.
+        instagram:
+          type: string
+          description: URL del perfil de Instagram.
+          format: uri
+          maxLength: 200
+        linkedin:
+          type: string
+          description: URL del perfil de LinkedIn.
+          format: uri
+          maxLength: 200
+        x:
+          type: string
+          description: URL del perfil de X (Twitter).
+          format: uri
+          maxLength: 200
+        github:
+          type: string
+          description: URL del perfil de GitHub.
+          format: uri
+          maxLength: 200
         description:
           type: string
-          examples:
-            - "Categoría para camisetas y t-shirts"
-        icon:
-          type: string
-          examples:
-            - "tshirt"
+          description: Descripción general del perfil profesional.
+          maxLength: 2000
+      required: [firstName, firstSurName, dateBirth, located, startWorkingDate, greeting, email, description]
 
-    ColorResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 5
-        name:
-          type: string
-          examples:
-            - "Rojo"
-        hexa:
-          type: string
-          pattern: "^#[A-Fa-f0-9]{6}$"
-          examples:
-            - "#FF0000"
+    BasicDataResponse:
+      allOf:
+        - $ref: '#/components/schemas/BasicDataRequest'
+        - type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              description: Identificador único de los datos básicos.
 
-    TypeResponse:
+    # --- IMAGE URL ---
+    ImageUrlRequest:
       type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 2
-        name:
-          type: string
-          examples:
-            - "Accesorio"
-
-    SizeClothingResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 10
-        name:
-          type: string
-          examples:
-            - "L"
-        description:
-          type: string
-          examples:
-            - "Talla grande"
-
-    SizeShoesResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 15
-        cm:
-          type: string
-          examples:
-            - "28"
-        eu:
-          type: string
-          examples:
-            - "44"
-        us:
-          type: string
-          examples:
-            - "11"
-        uk:
-          type: string
-          examples:
-            - "10"
-
-    ImageRequest:
-      type: object
-      required: [name, base64Image]
+      description: >
+        Solicitud para registrar la URL de una imagen utilizada en el portal, persistida en base de datos.
       properties:
         name:
           type: string
-          minLength: 3
-          maxLength: 255
-          examples:
-            - "camiseta-1.jpg"
-        base64Image:
+          description: Nombre descriptivo de la imagen.
+          minLength: 1
+          maxLength: 150
+        file:
           type: string
-          minLength: 50
-          examples:
-            - "iVBORw0KGgoAAAANSUhEUgAAAAUA..."
+          description: Nombre del archivo o identificador de recurso de imagen (puede ser nombre temporal o hash).
+          minLength: 1
+          maxLength: 300
+      required: [name, file]
 
-    ImageResponse:
+    ImageUrlResponse:
       type: object
+      description: >
+        Representa la URL de una imagen utilizada en el portal y consultada desde la base de datos.
       properties:
         id:
           type: integer
           format: int64
-          examples:
-            - 100
-        nameOriginal:
+          description: Identificador único de la imagen.
+        name:
           type: string
-          examples:
-            - "original_camiseta.jpg"
+          description: Nombre descriptivo de la imagen.
         url:
           type: string
-          examples:
-            - "img_100.jpg"
+          format: uri
+          description: URL pública de acceso a la imagen.
 
-    ProductRequest:
+    # --- VIDEO URL ---
+    VideoUrlRequest:
       type: object
-      required: [name, description, descriptionShort, categoryId, imageId, typeId, disabled]
+      description: >
+        Solicitud para registrar la URL de un video utilizado en el portal y almacenado en YouTube, persistido en base de datos.
       properties:
         name:
           type: string
-          minLength: 3
+          description: Nombre descriptivo del video.
+          minLength: 1
+          maxLength: 150
+        url:
+          type: string
+          format: uri
+          description: URL pública del video (YouTube).
+          maxLength: 400
+      required: [name, url]
+
+    VideoUrlResponse:
+      type: object
+      description: >
+        Representa la URL de un video utilizado en el portal y consultado desde la base de datos.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único del video.
+        name:
+          type: string
+          description: Nombre descriptivo del video.
+        url:
+          type: string
+          format: uri
+          description: URL pública del video (YouTube).
+
+    # --- LABEL ---
+    LabelRequest:
+      type: object
+      description: >
+        Solicitud para crear o actualizar una etiqueta visualizada en la página principal.
+      properties:
+        name:
+          type: string
+          description: Nombre de la etiqueta.
+          minLength: 1
+          maxLength: 50
+      required: [name]
+
+    LabelResponse:
+      type: object
+      description: >
+        Representa una etiqueta visualizada en la página principal, consultada desde la base de datos.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único de la etiqueta.
+        name:
+          type: string
+          description: Nombre de la etiqueta.
+
+    # --- HOME ---
+    HomeRequest:
+      type: object
+      description: >
+        Solicitud para actualizar la información principal del home, incluyendo saludo, imagen y etiquetas asociadas.
+      properties:
+        greeting:
+          type: string
+          description: Mensaje de bienvenida o presentación.
+          minLength: 1
+          maxLength: 300
+        imageUrl:
+          type: string
+          description: URL de la imagen principal del home.
+          format: uri
+          maxLength: 400
+        buttonWorkLabel:
+          type: string
+          description: Texto del botón para sección laboral.
+          minLength: 1
           maxLength: 80
-          examples:
-            - "Camiseta Sonic"
-        description:
+        buttonContactLabel:
           type: string
-          minLength: 10
-          maxLength: 1000
-          examples:
-            - "Camiseta original inspirada en Sonic, 100% algodón"
+          description: Texto del botón para sección de contacto.
+          minLength: 1
+          maxLength: 80
+        labelIds:
+          type: array
+          description: IDs de las etiquetas asociadas al home.
+          items:
+            type: integer
+            format: int64
+          minItems: 0
+          uniqueItems: true
+      required: [greeting, imageUrl, buttonWorkLabel, buttonContactLabel, labelIds]
+
+    HomeResponse:
+      type: object
+      description: >
+        Información principal del home de la página, incluyendo etiquetas asociadas.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único del home.
+        greeting:
+          type: string
+          description: Mensaje de bienvenida o presentación.
+        imageUrl:
+          type: string
+          format: uri
+          description: URL de la imagen principal.
+        buttonWorkLabel:
+          type: string
+          description: Texto del botón para sección laboral.
+        buttonContactLabel:
+          type: string
+          description: Texto del botón para sección de contacto.
+        labels:
+          type: array
+          description: Lista de etiquetas asociadas al home.
+          items:
+            $ref: '#/components/schemas/LabelResponse'
+
+    # --- BLOG ---
+    BlogRequest:
+      type: object
+      description: >
+        Solicitud para crear o actualizar un artículo del blog tecnológico.
+      properties:
+        title:
+          type: string
+          description: Título del artículo del blog.
+          minLength: 1
+          maxLength: 200
+        cleanUrlTitle:
+          type: string
+          description: URL amigable para el artículo (slug).
+          minLength: 1
+          maxLength: 200
         descriptionShort:
           type: string
-          minLength: 5
-          maxLength: 255
-          examples:
-            - "Camiseta Sonic color azul"
-        categoryId:
-          type: integer
-          format: int64
-          examples:
-            - 1
-        imageId:
-          type: integer
-          format: int64
-          examples:
-            - 100
-        typeId:
-          type: integer
-          format: int64
-          examples:
-            - 2
-        shopIds:
-          type: array
-          items:
-            type: integer
-            format: int64
-          examples:
-            - [ 100, 101, 102 ]
-            - null
-        disabled:
-          type: boolean
-          examples:
-            - false
+          description: Descripción breve del artículo.
+          minLength: 1
+          maxLength: 400
+        description:
+          type: string
+          description: Contenido completo del artículo.
+          minLength: 1
+          maxLength: 4000
+      required: [title, cleanUrlTitle, descriptionShort, description]
 
-    ProductResponse:
+    BlogResponse:
       type: object
+      description: >
+        Representa un artículo del blog tecnológico consultado desde la base de datos.
       properties:
         id:
           type: integer
           format: int64
-          examples:
-            - 1
-        name:
+          description: Identificador único del artículo.
+        title:
           type: string
-          examples:
-            - "Camiseta Sonic"
-        description:
+          description: Título del artículo del blog.
+        cleanUrlTitle:
           type: string
-          examples:
-            - "Camiseta original inspirada en Sonic, 100% algodón"
+          description: URL amigable para el artículo.
         descriptionShort:
           type: string
-          examples:
-            - "Camiseta Sonic color azul"
-        shopIds:
-          type: array
-          items:
-            type: integer
-            format: int64
-          examples:
-            - [ 100, 101, 102 ]
-        category:
-          $ref: '#/components/schemas/CategoryResponse'
-        image:
-          $ref: '#/components/schemas/ImageResponse'
-        type:
-          $ref: '#/components/schemas/TypeResponse'
-        disabled:
-          type: boolean
-          examples:
-            - false
-
-    ProductClothingRequest:
-      type: object
-      required: [colorId, sizeClothingId, units, price, imageList, disabled]
-      properties:
-        colorId:
-          type: integer
-          format: int64
-          examples:
-            - 5
-        sizeClothingId:
-          type: integer
-          format: int64
-          examples:
-            - 10
-        units:
-          type: integer
-          minimum: 0
-          examples:
-            - 100
-        price:
-          type: number
-          format: double
-          minimum: 0
-          examples:
-            - 59.99
-        imageList:
-          type: array
-          items:
-            type: integer
-            format: int64
-          examples:
-            - [100, 101, 102]
-        disabled:
-          type: boolean
-          examples:
-            - false
-
-    ProductClothingResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 55
-        color:
-          $ref: '#/components/schemas/ColorResponse'
-        sizeClothing:
-          $ref: '#/components/schemas/SizeClothingResponse'
-        units:
-          type: integer
-          examples:
-            - 100
-        price:
-          type: number
-          format: double
-          examples:
-            - 59.99
-        imageList:
-          type: array
-          items:
-            $ref: '#/components/schemas/ImageResponse'
-        disabled:
-          type: boolean
-          examples:
-            - false
-
-    ProductShoesRequest:
-      type: object
-      required: [colorId, sizeShoesId, units, price, imageList, disabled]
-      properties:
-        colorId:
-          type: integer
-          format: int64
-          examples:
-            - 6
-        sizeShoesId:
-          type: integer
-          format: int64
-          examples:
-            - 15
-        units:
-          type: integer
-          minimum: 0
-          examples:
-            - 80
-        price:
-          type: number
-          format: double
-          minimum: 0
-          examples:
-            - 89.99
-        imageList:
-          type: array
-          items:
-            type: integer
-            format: int64
-          examples:
-            - [110, 111]
-        disabled:
-          type: boolean
-          examples:
-            - false
-
-    ProductShoesResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 77
-        color:
-          $ref: '#/components/schemas/ColorResponse'
-        sizeShoes:
-          $ref: '#/components/schemas/SizeShoesResponse'
-        units:
-          type: integer
-          examples:
-            - 80
-        price:
-          type: number
-          format: double
-          examples:
-            - 89.99
-        imageList:
-          type: array
-          items:
-            $ref: '#/components/schemas/ImageResponse'
-        disabled:
-          type: boolean
-          examples:
-            - false
-
-    ProductGenericRequest:
-      type: object
-      required: [colorId, units, price, imageList, disabled]
-      properties:
-        colorId:
-          type: integer
-          format: int64
-          examples:
-            - 8
-        units:
-          type: integer
-          minimum: 0
-          examples:
-            - 10
-        price:
-          type: number
-          format: double
-          minimum: 0
-          examples:
-            - 29.99
-        imageList:
-          type: array
-          items:
-            type: integer
-            format: int64
-          examples:
-            - [120]
-        disabled:
-          type: boolean
-          examples:
-            - false
-
-    ShopingProductFilterRequest:
-      type: object
-      properties:
-        typeId:
-          type: integer
-          format: int64
-          examples:
-            - 8
-            - null
-        categoriesIds:
-          type: array
-          items:
-            type: integer
-            format: int64
-          examples:
-            - [ 100, 101, 102 ]
-            - null
-        colorsIds:
-          type: array
-          items:
-            type: integer
-            format: int64
-          examples:
-            - [ 100, 101, 102 ]
-            - null
-        sizesIds:
-          type: array
-          items:
-            type: integer
-            format: int64
-          examples:
-            - [ 100, 101, 102 ]
-            - null
-        name:
-          type: string
-          examples:
-            - cristiansrc
-            - null
+          description: Descripción breve del artículo.
         description:
           type: string
-          examples:
-            - descr
-            - null
-        minPrice:
-          type: number
-          format: double
-          examples:
-            - 29.99
-            - null
-        maxPrice:
-          type: number
-          format: double
-          examples:
-            - 29.99
-            - null
+          description: Contenido completo del artículo.
 
-    ProductGenericResponse:
+    BlogPageResponse:
       type: object
+      description: >
+        Respuesta paginada para la consulta de artículos del blog.
       properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 88
-        color:
-          $ref: '#/components/schemas/ColorResponse'
-        units:
-          type: integer
-          examples:
-            - 10
-        price:
-          type: number
-          format: double
-          examples:
-            - 29.99
-        imageList:
+        content:
           type: array
+          description: Lista paginada de artículos.
           items:
-            $ref: '#/components/schemas/ImageResponse'
-        disabled:
-          type: boolean
-          examples:
-            - false
+            $ref: '#/components/schemas/BlogResponse'
+        page:
+          type: integer
+          description: Página actual.
+        size:
+          type: integer
+          description: Cantidad de elementos por página.
+        totalElements:
+          type: integer
+          description: Total de elementos encontrados.
+        totalPages:
+          type: integer
+          description: Total de páginas disponibles.
 
-    ProductFullResponse:
+    # --- SKILL TYPE ---
+    SkillTypeRequest:
       type: object
+      description: >
+        Solicitud para crear o actualizar un tipo de habilidad.
+      properties:
+        name:
+          type: string
+          description: Nombre del tipo de habilidad.
+          minLength: 1
+          maxLength: 100
+        skillIds:
+          type: array
+          description: Lista de IDs de habilidades asociadas.
+          items:
+            type: integer
+            format: int64
+          minItems: 0
+          uniqueItems: true
+      required: [name, skillIds]
+
+    SkillTypeResponse:
+      type: object
+      description: >
+        Representa un tipo de habilidad consultado desde la base de datos, con habilidades asociadas anidadas.
       properties:
         id:
           type: integer
           format: int64
+          description: Identificador único del tipo de habilidad.
         name:
           type: string
-        typeId:
-          type: integer
-          format: int64
-        typeName:
-          type: string
-        categoryId:
-          type: integer
-          format: int64
-        categoryName:
-          type: string
-        units:
-          type: integer
-        minPrice:
-          type: number
-          format: double
-        maxPrice:
-          type: number
-          format: double
-        colors:
-          type: string
-        colorsHexa:
-          type: string
-        sizes:
-          type: string
-        disabled:
-          type: boolean
+          description: Nombre del tipo de habilidad.
+        skills:
+          type: array
+          description: Habilidades asociadas al tipo de habilidad.
+          items:
+            $ref: '#/components/schemas/SkillResponse'
 
-    ProductFullClothingResponse:
+    # --- SKILL ---
+    SkillRequest:
       type: object
+      description: >
+        Solicitud para crear o actualizar una habilidad.
+      properties:
+        name:
+          type: string
+          description: Nombre de la habilidad.
+          minLength: 1
+          maxLength: 100
+        skillSonIds:
+          type: array
+          description: Lista de IDs de especializaciones o tecnologías asociadas.
+          items:
+            type: integer
+            format: int64
+          minItems: 0
+          uniqueItems: true
+      required: [name, skillSonIds]
+
+    SkillResponse:
+      type: object
+      description: >
+        Representa una habilidad consultada desde la base de datos, incluyendo especializaciones anidadas.
       properties:
         id:
           type: integer
           format: int64
+          description: Identificador único de la habilidad.
         name:
           type: string
-        description:
+          description: Nombre de la habilidad.
+        skillSons:
+          type: array
+          description: Especializaciones o tecnologías asociadas.
+          items:
+            $ref: '#/components/schemas/SkillSonResponse'
+
+    # --- SKILL SON ---
+    SkillSonRequest:
+      type: object
+      description: >
+        Solicitud para crear o actualizar una especialización o tecnología asociada a una habilidad.
+      properties:
+        name:
           type: string
+          description: Nombre de la especialización.
+          minLength: 1
+          maxLength: 100
+      required: [name]
+
+    SkillSonResponse:
+      type: object
+      description: >
+        Representa una especialización o tecnología asociada a una habilidad.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único de la especialización.
+        name:
+          type: string
+          description: Nombre de la especialización.
+
+    # --- FUTURED PROJECT ---
+    FuturedProjectRequest:
+      type: object
+      description: >
+        Solicitud para crear o actualizar la información de un proyecto destacado.
+      properties:
+        name:
+          type: string
+          description: Nombre del proyecto.
+          minLength: 1
+          maxLength: 200
+        experienceId:
+          type: integer
+          format: int64
+          description: ID de la experiencia laboral asociada al proyecto.
         descriptionShort:
           type: string
-        minPrice:
-          type: number
-          format: double
-        maxPrice:
-          type: number
-          format: double
-        image:
-          $ref: '#/components/schemas/ImageResponse'
-        disabled:
-          type: boolean
-        type:
-          $ref: '#/components/schemas/TypeResponse'
-        category:
-          $ref: '#/components/schemas/CategoryResponse'
-        ProductClothingResponses:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductClothingResponse'
+          description: Descripción breve del proyecto.
+          minLength: 1
+          maxLength: 400
+        description:
+          type: string
+          description: Descripción completa del proyecto.
+          minLength: 1
+          maxLength: 4000
+        imageListUrlId:
+          type: integer
+          format: int64
+          description: ID de la imagen representativa del listado de proyectos.
+        imageUrlId:
+          type: integer
+          format: int64
+          description: ID de la imagen principal del proyecto.
+      required: [name, experienceId, descriptionShort, description, imageListUrlId, imageUrlId]
 
-    ProductFullShoesResponse:
+    FuturedProjectResponse:
       type: object
+      description: >
+        Representa la información de un proyecto destacado consultado desde la base de datos.
       properties:
         id:
           type: integer
           format: int64
+          description: Identificador único del proyecto.
         name:
           type: string
-        description:
-          type: string
-        descriptionShort:
-          type: string
-        minPrice:
-          type: number
-          format: double
-        maxPrice:
-          type: number
-          format: double
-        image:
-          $ref: '#/components/schemas/ImageResponse'
-        disabled:
-          type: boolean
-        type:
-          $ref: '#/components/schemas/TypeResponse'
-        category:
-          $ref: '#/components/schemas/CategoryResponse'
-        ProductShoesResponses:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductShoesResponse'
-
-    ProductFullGenericResponse:
-      type: object
-      properties:
-        id:
+          description: Nombre del proyecto.
+        experienceId:
           type: integer
           format: int64
-        name:
-          type: string
-        description:
-          type: string
+          description: ID de la experiencia laboral asociada.
         descriptionShort:
           type: string
-        minPrice:
-          type: number
-          format: double
-        maxPrice:
-          type: number
-          format: double
-        image:
-          $ref: '#/components/schemas/ImageResponse'
-        disabled:
-          type: boolean
-        type:
-          $ref: '#/components/schemas/TypeResponse'
-        category:
-          $ref: '#/components/schemas/CategoryResponse'
-        ProductGenericResponses:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductGenericResponse'
+          description: Descripción breve del proyecto.
+        description:
+          type: string
+          description: Descripción completa del proyecto.
+        imageListUrl:
+          $ref: '#/components/schemas/ImageUrlResponse'
+        imageUrl:
+          $ref: '#/components/schemas/ImageUrlResponse'
+
+    # --- ERROR RESPONSE ---
+    ErrorResponse:
+      type: object
+      description: Estructura estándar para el manejo de errores de negocio y validación.
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Fecha y hora del error.
+        status:
+          type: integer
+          description: Código de estado HTTP.
+        error:
+          type: string
+          description: Mensaje breve del error.
+        message:
+          type: string
+          description: Descripción detallada del error.
+        path:
+          type: string
+          description: Ruta del endpoint donde ocurrió el error.
+
+  parameters:
+    idParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Identificador único del recurso.
+
+    pageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Número de página para paginación (inicia en 0).
+
+    sizeParam:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Cantidad de elementos por página.
+
+  responses:
+    Error:
+      description: Respuesta de error estándar.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+paths:
+  # --- BASIC DATA ---
+  /basic-data/{id}:
+    get:
+      tags: [BasicData]
+      summary: Consultar los datos básicos del usuario.
+      description: Retorna la información personal y de contacto.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Datos básicos consultados correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicDataResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    put:
+      tags: [BasicData]
+      summary: Actualizar completamente los datos básicos del usuario.
+      description: Actualiza la información personal y de contacto del usuario.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasicDataRequest'
+      responses:
+        '204':
+          description: Datos básicos actualizados exitosamente.
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- IMAGE URL ---
+  /image-url:
+    get:
+      tags: [ImageUrl]
+      summary: Listar todas las imágenes disponibles.
+      description: Retorna la lista de todas las imágenes registradas en el sistema.
+      responses:
+        '200':
+          description: Lista de imágenes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImageUrlResponse'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [ImageUrl]
+      summary: Registrar una nueva imagen.
+      description: Registra una nueva imagen en el sistema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageUrlRequest'
+      responses:
+        '201':
+          description: Imagen creada exitosamente.
+          headers:
+            Location:
+              description: URL del recurso creado.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Identificador único generado.
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /image-url/{id}:
+    get:
+      tags: [ImageUrl]
+      summary: Consultar la información de una imagen.
+      description: Obtiene los detalles de una imagen por su identificador.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Información de la imagen.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageUrlResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    delete:
+      tags: [ImageUrl]
+      summary: Eliminar una imagen registrada.
+      description: Elimina una imagen por su identificador.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Imagen eliminada exitosamente.
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- VIDEO URL ---
+  /video-url:
+    get:
+      tags: [VideoUrl]
+      summary: Listar todos los videos registrados.
+      description: Retorna la lista de videos disponibles en el sistema.
+      responses:
+        '200':
+          description: Lista de videos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VideoUrlResponse'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [VideoUrl]
+      summary: Registrar un nuevo video.
+      description: Registra un nuevo video en el sistema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VideoUrlRequest'
+      responses:
+        '201':
+          description: Video creado exitosamente.
+          headers:
+            Location:
+              description: URL del recurso creado.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Identificador único generado.
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /video-url/{id}:
+    get:
+      tags: [VideoUrl]
+      summary: Consultar un video por ID.
+      description: Obtiene los detalles de un video registrado.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Información del video.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoUrlResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    delete:
+      tags: [VideoUrl]
+      summary: Eliminar un video.
+      description: Elimina un video registrado por ID.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Video eliminado exitosamente.
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- LABEL ---
+  /label:
+    get:
+      tags: [Label]
+      summary: Listar todas las etiquetas.
+      description: Retorna la lista de etiquetas disponibles.
+      responses:
+        '200':
+          description: Lista de etiquetas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LabelResponse'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [Label]
+      summary: Registrar una nueva etiqueta.
+      description: Registra una etiqueta que será visualizada en el home.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabelRequest'
+      responses:
+        '201':
+          description: Etiqueta creada exitosamente.
+          headers:
+            Location:
+              description: URL del recurso creado.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Identificador único generado.
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /label/{id}:
+    get:
+      tags: [Label]
+      summary: Consultar una etiqueta por ID.
+      description: Obtiene los detalles de una etiqueta.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Información de la etiqueta.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    delete:
+      tags: [Label]
+      summary: Eliminar una etiqueta.
+      description: Elimina una etiqueta por su ID.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Etiqueta eliminada exitosamente.
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- HOME ---
+  /home/{id}:
+    get:
+      tags: [Label]
+      summary: Consultar información del home.
+      description: Obtiene la información principal del home.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Información del home consultada correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomeResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    put:
+      tags: [Label]
+      summary: Actualizar información del home.
+      description: Actualiza completamente la información principal del home.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HomeRequest'
+      responses:
+        '204':
+          description: Home actualizado exitosamente.
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- BLOG ---
+  /blog:
+    get:
+      tags: [Blog]
+      summary: Listar artículos del blog (paginado).
+      description: Retorna una lista paginada de artículos del blog tecnológico.
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/sizeParam'
+      responses:
+        '200':
+          description: Artículos del blog listados exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPageResponse'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [Blog]
+      summary: Crear un nuevo artículo de blog.
+      description: Registra un nuevo artículo en el blog.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogRequest'
+      responses:
+        '201':
+          description: Artículo de blog creado exitosamente.
+          headers:
+            Location:
+              description: URL del recurso creado.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Identificador único generado.
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /blog/{id}:
+    get:
+      tags: [Blog]
+      summary: Consultar un artículo del blog por ID.
+      description: Obtiene los detalles de un artículo del blog.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Artículo consultado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    put:
+      tags: [Blog]
+      summary: Actualizar un artículo de blog.
+      description: Actualiza completamente un artículo del blog.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogRequest'
+      responses:
+        '204':
+          description: Artículo actualizado exitosamente.
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    delete:
+      tags: [Blog]
+      summary: Eliminar un artículo de blog.
+      description: Elimina un artículo del blog por su ID.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Artículo eliminado exitosamente.
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- SKILL TYPE ---
+  /skill-type:
+    get:
+      tags: [SkillType]
+      summary: Listar tipos de habilidad.
+      description: Retorna la lista de tipos de habilidad registrados.
+      responses:
+        '200':
+          description: Lista de tipos de habilidad.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SkillTypeResponse'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [SkillType]
+      summary: Registrar un nuevo tipo de habilidad.
+      description: Crea un nuevo tipo de habilidad.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillTypeRequest'
+      responses:
+        '201':
+          description: Tipo de habilidad creado exitosamente.
+          headers:
+            Location:
+              description: URL del recurso creado.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Identificador único generado.
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /skill-type/{id}:
+    get:
+      tags: [SkillType]
+      summary: Consultar un tipo de habilidad por ID.
+      description: Obtiene los detalles de un tipo de habilidad.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Información del tipo de habilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillTypeResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    put:
+      tags: [SkillType]
+      summary: Actualizar un tipo de habilidad.
+      description: Actualiza completamente un tipo de habilidad.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillTypeRequest'
+      responses:
+        '204':
+          description: Tipo de habilidad actualizado exitosamente.
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    delete:
+      tags: [SkillType]
+      summary: Eliminar un tipo de habilidad.
+      description: Elimina un tipo de habilidad por su ID.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Tipo de habilidad eliminado exitosamente.
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- SKILL ---
+  /skill:
+    get:
+      tags: [Skill]
+      summary: Listar habilidades.
+      description: Retorna la lista de habilidades registradas.
+      responses:
+        '200':
+          description: Lista de habilidades.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SkillResponse'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [Skill]
+      summary: Registrar una nueva habilidad.
+      description: Crea una nueva habilidad.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillRequest'
+      responses:
+        '201':
+          description: Habilidad creada exitosamente.
+          headers:
+            Location:
+              description: URL del recurso creado.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Identificador único generado.
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /skill/{id}:
+    get:
+      tags: [Skill]
+      summary: Consultar una habilidad por ID.
+      description: Obtiene los detalles de una habilidad.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Información de la habilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    put:
+      tags: [Skill]
+      summary: Actualizar una habilidad.
+      description: Actualiza completamente una habilidad.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillRequest'
+      responses:
+        '204':
+          description: Habilidad actualizada exitosamente.
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    delete:
+      tags: [Skill]
+      summary: Eliminar una habilidad.
+      description: Elimina una habilidad por su ID.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Habilidad eliminada exitosamente.
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- SKILL SON ---
+  /skill-son:
+    get:
+      tags: [SkillSon]
+      summary: Listar especializaciones de habilidad.
+      description: Retorna la lista de especializaciones o tecnologías asociadas a habilidades.
+      responses:
+        '200':
+          description: Lista de especializaciones.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SkillSonResponse'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [SkillSon]
+      summary: Registrar una nueva especialización.
+      description: Crea una nueva especialización o tecnología.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillSonRequest'
+      responses:
+        '201':
+          description: Especialización creada exitosamente.
+          headers:
+            Location:
+              description: URL del recurso creado.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Identificador único generado.
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /skill-son/{id}:
+    get:
+      tags: [SkillSon]
+      summary: Consultar una especialización por ID.
+      description: Obtiene los detalles de una especialización.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Información de la especialización.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillSonResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    put:
+      tags: [SkillSon]
+      summary: Actualizar una especialización.
+      description: Actualiza completamente una especialización.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkillSonRequest'
+      responses:
+        '204':
+          description: Especialización actualizada exitosamente.
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    delete:
+      tags: [SkillSon]
+      summary: Eliminar una especialización.
+      description: Elimina una especialización por su ID.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Especialización eliminada exitosamente.
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- FUTURED PROJECT ---
+  /futured-project:
+    get:
+      tags: [FeaturedProject]
+      summary: Listar proyectos destacados.
+      description: Retorna la lista de proyectos destacados.
+      responses:
+        '200':
+          description: Lista de proyectos destacados.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FuturedProjectResponse'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [FeaturedProject]
+      summary: Registrar un nuevo proyecto destacado.
+      description: Crea un nuevo proyecto destacado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FuturedProjectRequest'
+      responses:
+        '201':
+          description: Proyecto destacado creado exitosamente.
+          headers:
+            Location:
+              description: URL del recurso creado.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Identificador único generado.
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /futured-project/{id}:
+    get:
+      tags: [FeaturedProject]
+      summary: Consultar un proyecto destacado por ID.
+      description: Obtiene los detalles de un proyecto destacado.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Información del proyecto destacado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FuturedProjectResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    put:
+      tags: [FeaturedProject]
+      summary: Actualizar un proyecto destacado.
+      description: Actualiza completamente un proyecto destacado.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FuturedProjectRequest'
+      responses:
+        '204':
+          description: Proyecto destacado actualizado exitosamente.
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    delete:
+      tags: [FeaturedProject]
+      summary: Eliminar un proyecto destacado.
+      description: Elimina un proyecto destacado por su ID.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Proyecto destacado eliminado exitosamente.
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  # --- CURRICULUM (PDF) ---
+  /curriculum:
+    get:
+      tags: [Curriculum]
+      summary: Descargar el curriculum del usuario en formato PDF.
+      description: Descarga el archivo PDF generado a partir de la información laboral registrada.
+      responses:
+        '200':
+          description: Curriculum descargado correctamente.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '500':
+          $ref: '#/components/responses/Error'
