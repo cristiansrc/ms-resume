@@ -98,7 +98,7 @@ git clone https://github.com/tuusuario/cristiansrc-api.git
 cd cristiansrc-api
 ```
 
-### **Configuración de base de datos**
+### **Configuración del proyecto en AWS**
 
 Edita el archivo `src/main/resources/application.properties`:
 
@@ -116,6 +116,46 @@ spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.show-sql=false
 spring.datasource.hikari.maximum-pool-size=10
 spring.datasource.hikari.minimum-idle=2
+```
+
+### **Configuración del proyecto para desarrollo local**
+
+Edita el archivo `src/main/resources/application-local.properties`:
+
+```properties
+spring.application.name=ms-resume
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration,classpath:db/callback
+spring.datasource.url=jdbc:postgresql://localhost:5432/ms-resume
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.username=postgres
+spring.datasource.password=1234
+spring.jpa.open-in-view=false
+logging.level.root=info
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+### **Configuración del proyecto para ejcutar las pruebas unitarias*
+
+Edita el archivo `src/main/resources/application-test.properties`:
+
+```properties
+spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.flyway.enabled=false
+logging.level.root=ERROR
+spring.main.allow-bean-definition-overriding=true
+spring.datasource.hikari.maximum-pool-size=2
+spring.datasource.hikari.minimum-idle=1
+spring.test.database.replace=NONE
 ```
 
 ### **Ejecutar migraciones (Flyway)**
