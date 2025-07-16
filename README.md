@@ -1,4 +1,7 @@
 # API ms-resume – cristiansrc.com
+[![Build Status](https://github.com/cristiansrc/ms-resume/actions/workflows/maven.yml/badge.svg)](https://github.com/cristiansrc/ms-resume/actions)
+[![Coverage](https://coveralls.io/repos/github/cristiansrc/ms-resume/badge.svg)](https://coveralls.io/github/cristiansrc/ms-resume)
+[![Version](https://img.shields.io/maven-central/v/com.cristiansrc.shop/ms-resume)](https://search.maven.org/artifact/com.cristiansrc.shop/ms-resume)
 
 Backend Java Spring Boot para la gestión y exposición del currículum, experiencia profesional, habilidades, proyectos y blog tecnológico del sitio [cristiansrc.com](https://cristiansrc.com).
 
@@ -23,63 +26,59 @@ La arquitectura y el diseño siguen las mejores prácticas REST, OpenAPI 3.1.0 y
 
 ## Estructura de carpetas
 
-```
+```plaintext
 src/
   main/
     java/
       com/
         cristiansrc/
-          api/
-            controller/
-            model/
-            dto/
-            service/
-            repository/
-            exception/
-            config/
-    resources/
-      application.properties
-      db/
-        migration/
-          V1__CREATE-basic_data.sql
-          V2__CREATE-blog.sql
-          V3__CREATE-image_url.sql
-          V4__CREATE-video_url.sql
-          V5__CREATE-label.sql
-          V6__CREATE-skill_type.sql
-          V7__CREATE-skill.sql
-          V8__CREATE-skill_son.sql
-          V9__CREATE-futured_project.sql
-          V10__CREATE-home.sql
-          V11__CREATE-curriculum.sql
-          V12__CREATE-curriculum_pdf.sql
-          V13__CREATE-curriculum_pdf_content.sql
-          V14__CREATE-curriculum_pdf_content_image.sql
-          V15__CREATE-curriculum_pdf_content_video.sql
-      application.properties
-      application-local.properties
-      application-test.properties
-      openapi.yaml
-  test/
+          resume/
+            msresume/
+              MsResumeApplication.java
+              infrastructure/
+                repository/
+                controller/
+                service/
+                model/
+  // ...otros paquetes que se agreguen en el futuro según avance el desarrollo...
 ```
 
 ---
 
-## Endpoints principales
+## Prefijo de los endpoints
+Todos los endpoints están bajo el contexto base `/v1/ms-resume`.
+Por ejemplo, para datos básicos:
+```
+GET http://localhost:8080/v1/ms-resume/basic-data/{id}
+```
 
-| Entidad          | Método(s)    | Endpoint                       | Descripción                                   |
-|------------------|-------------|-------------------------------|-----------------------------------------------|
-| Basic Data       | GET, PUT     | `/basic-data/{id}`            | Consultar o actualizar datos personales       |
-| ImageUrl         | GET, POST, GET(id), DELETE | `/image-url`, `/image-url/{id}` | Gestión de imágenes del portal                |
-| VideoUrl         | GET, POST, GET(id), DELETE | `/video-url`, `/video-url/{id}` | Gestión de videos (YouTube)                   |
-| Label            | GET, POST, GET(id), DELETE | `/label`, `/label/{id}`           | Gestión de etiquetas                          |
-| Home             | GET, PUT     | `/home/{id}`                  | Gestión de la información del home            |
-| Blog             | GET(pag), POST, GET(id), PUT, DELETE | `/blog`, `/blog/{id}` | Artículos de blog con paginación              |
-| SkillType        | GET, POST, GET(id), PUT, DELETE | `/skill-type`, `/skill-type/{id}` | Tipos de habilidad y sus habilidades          |
-| Skill            | GET, POST, GET(id), PUT, DELETE | `/skill`, `/skill/{id}` | Habilidades y especializaciones               |
-| SkillSon         | GET, POST, GET(id), PUT, DELETE | `/skill-son`, `/skill-son/{id}` | Especializaciones de habilidades              |
-| FuturedProject   | GET, POST, GET(id), PUT, DELETE | `/futured-project`, `/futured-project/{id}` | Proyectos destacados                          |
-| Curriculum (PDF) | GET         | `/curriculum`                 | Descargar CV en formato PDF                   |
+---
+
+## Generar controladores y modelos
+Este proyecto incluye el plugin OpenAPI Generator configurado en el `pom.xml`. Cada vez que compiles el proyecto con Maven, los controladores y modelos se generan automáticamente a partir de `src/main/resources/openapi.yml`:
+
+```sh
+mvn clean compile
+# o de forma explícita
+mvn openapi-generator:generate
+```
+
+---
+
+## Tabla de Endpoints principales
+| Entidad          | Métodos         | Endpoint                                  | Descripción                                   |
+|------------------|-----------------|-------------------------------------------|-----------------------------------------------|
+| Basic Data       | GET, PUT        | `/v1/ms-resume/basic-data/{id}`           | Consultar o actualizar datos personales       |
+| ImageUrl         | GET, POST, GET(id), DELETE | `/v1/ms-resume/image-url`, `/v1/ms-resume/image-url/{id}` | Gestión de URLs de imágenes                    |
+| VideoUrl         | GET, POST, GET(id), DELETE | `/v1/ms-resume/video-url`, `/v1/ms-resume/video-url/{id}` | Gestión de URLs de videos                      |
+| Label            | GET, POST, GET(id), DELETE | `/v1/ms-resume/label`, `/v1/ms-resume/label/{id}`           | Gestión de etiquetas                          |
+| Home             | GET, PUT        | `/v1/ms-resume/home/{id}`                  | Gestión de la información del home            |
+| Blog             | GET(pag), POST, GET(id), PUT, DELETE | `/v1/ms-resume/blog`, `/v1/ms-resume/blog/{id}` | Artículos de blog con paginación              |
+| SkillType        | GET, POST, GET(id), PUT, DELETE | `/v1/ms-resume/skill-type`, `/v1/ms-resume/skill-type/{id}` | Tipos de habilidad                             |
+| Skill            | GET, POST, GET(id), PUT, DELETE | `/v1/ms-resume/skill`, `/v1/ms-resume/skill/{id}` | Habilidades y especializaciones               |
+| SkillSon         | GET, POST, GET(id), PUT, DELETE | `/v1/ms-resume/skill-son`, `/v1/ms-resume/skill-son/{id}` | Especializaciones de habilidades              |
+| FuturedProject   | GET, POST, GET(id), PUT, DELETE | `/v1/ms-resume/futured-project`, `/v1/ms-resume/futured-project/{id}` | Proyectos destacados                          |
+| Curriculum (PDF) | GET             | `/v1/ms-resume/curriculum`                | Descargar CV en formato PDF                   |
 
 ---
 
@@ -94,8 +93,8 @@ src/
 ### **Clonar el repositorio**
 
 ```sh
-git clone https://github.com/tuusuario/cristiansrc-api.git
-cd cristiansrc-api
+git clone https://github.com/cristiansrc/ms-resume.git
+cd ms-resume
 ```
 
 ### **Configuración del proyecto en AWS**
@@ -171,6 +170,38 @@ mvn spring-boot:run
 
 El API estará disponible en `http://localhost:8080`.
 
+### Docker
+Este servicio incluye un Dockerfile para crear una imagen del contenedor:
+```dockerfile
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+COPY target/ms-resume-0.0.1-SNAPSHOT.jar app.jar
+ENTRYPOINT ["java","-jar","/app/app.jar"]
+```
+
+Con docker-compose:
+```yaml
+version: '3.8'
+services:
+  ms-resume:
+    image: cristiansrc/ms-resume:latest
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+```
+
+---
+
+## CI/CD
+Se incluye flujo de trabajo de GitHub Actions (`.github/workflows/maven.yml`) que ejecuta:
+- Compilación y tests unitarios
+- Análisis de cobertura
+- Publicación de artefactos en Maven Central (on tag)
+
 ---
 
 ## Documentación y pruebas
@@ -213,6 +244,17 @@ Las respuestas de error siguen el siguiente formato JSON:
 
 ---
 
+## Variables de entorno
+| Nombre         | Descripción                             | Ejemplo                   |
+|---------------|-----------------------------------------|---------------------------|
+| DB_URL        | URL de conexión a PostgreSQL            | jdbc:postgresql://...     |
+| DB_USER       | Usuario de la base de datos             | postgres                  |
+| DB_PASS       | Contraseña de la base de datos          | ********                  |
+| AWS_S3_BUCKET | Nombre del bucket S3 para assets        | my-portfolio-bucket       |
+| SPRING_PROFILES_ACTIVE | Perfil de Spring (local/test/prod) | local                     |
+
+---
+
 ## Contribuir
 
 1. Haz un fork del repositorio
@@ -235,3 +277,13 @@ Desarrollado por [Cristhiam Reina](https://cristiansrc.com)
 Email: cristiansrc@gmail.com
 
 ---
+
+## Ejemplos de peticiones cURL
+```bash
+# Obtener datos básicos
+curl -X GET "http://localhost:8080/v1/ms-resume/basic-data/1" -H 'Accept: application/json'
+
+# Crear nueva etiqueta
+curl -X POST "http://localhost:8080/v1/ms-resume/label" \
+     -H 'Content-Type: application/json' \
+     -d '{"name":"Java"}'

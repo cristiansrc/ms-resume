@@ -1,583 +1,60 @@
 openapi: 3.1.0
 info:
-  title: API Curriculum cristiansrc.com
-  description: >
-    API RESTful para gestionar la información personal, experiencia laboral, habilidades, proyectos y blog de la página cristiansrc.com.
-    Incluye endpoints para la administración de datos básicos, recursos multimedia, etiquetas, habilidades y descarga de curriculum en formato PDF.
+  title: MS-Resume API - cristiansrc.com
+  description: Microservicio REST para gestionar la información del portfolio personal, incluyendo datos básicos, experiencia laboral, habilidades, blog y contenido multimedia.
   version: 1.0.0
+  contact:
+    name: Cristian SRC
+    url: https://cristiansrc.com
+    email: contacto@cristiansrc.com
+
 servers:
-  - url: https://api.cristiansrc.com/ms-resume/v1
-    description: API principal
+  - url: http://localhost:8080/v1/ms-resume
+    description: Servidor local para desarrollo y pruebas
+  - url: https://api.cristiansrc.com/v1/ms-resume
+    description: Servidor de producción
+  - url: https://dev-api.cristiansrc.com/v1/ms-resume
+    description: Servidor de desarrollo
 
-components:
-  schemas:
-    # --- BASIC DATA ---
-    BasicDataRequest:
-      type: object
-      description: >
-        Solicitud para gestionar los datos personales básicos, redes sociales y resumen del perfil profesional del usuario.
-      properties:
-        firstName:
-          type: string
-          description: Primer nombre del usuario.
-          minLength: 1
-          maxLength: 50
-        othersName:
-          type: string
-          description: Otros nombres del usuario (opcional).
-          maxLength: 100
-        firstSurName:
-          type: string
-          description: Primer apellido del usuario.
-          minLength: 1
-          maxLength: 50
-        othersSurName:
-          type: string
-          description: Otros apellidos del usuario (opcional).
-          maxLength: 100
-        dateBirth:
-          type: string
-          format: date
-          description: Fecha de nacimiento del usuario (yyyy-MM-dd).
-        located:
-          type: string
-          description: Ubicación geográfica principal del usuario.
-          maxLength: 150
-        startWorkingDate:
-          type: string
-          format: date
-          description: Fecha de inicio de la vida laboral (yyyy-MM-dd).
-        greeting:
-          type: string
-          description: Frase de saludo o presentación breve.
-          maxLength: 200
-        email:
-          type: string
-          format: email
-          description: Correo electrónico de contacto.
-        instagram:
-          type: string
-          description: URL del perfil de Instagram.
-          format: uri
-          maxLength: 200
-        linkedin:
-          type: string
-          description: URL del perfil de LinkedIn.
-          format: uri
-          maxLength: 200
-        x:
-          type: string
-          description: URL del perfil de X (Twitter).
-          format: uri
-          maxLength: 200
-        github:
-          type: string
-          description: URL del perfil de GitHub.
-          format: uri
-          maxLength: 200
-        description:
-          type: string
-          description: Descripción general del perfil profesional.
-          maxLength: 2000
-      required: [firstName, firstSurName, dateBirth, located, startWorkingDate, greeting, email, description]
-
-    BasicDataResponse:
-      allOf:
-        - $ref: '#/components/schemas/BasicDataRequest'
-        - type: object
-          properties:
-            id:
-              type: integer
-              format: int64
-              description: Identificador único de los datos básicos.
-
-    # --- IMAGE URL ---
-    ImageUrlRequest:
-      type: object
-      description: >
-        Solicitud para registrar la URL de una imagen utilizada en el portal, persistida en base de datos.
-      properties:
-        name:
-          type: string
-          description: Nombre descriptivo de la imagen.
-          minLength: 1
-          maxLength: 150
-        file:
-          type: string
-          description: Nombre del archivo o identificador de recurso de imagen (puede ser nombre temporal o hash).
-          minLength: 1
-          maxLength: 300
-      required: [name, file]
-
-    ImageUrlResponse:
-      type: object
-      description: >
-        Representa la URL de una imagen utilizada en el portal y consultada desde la base de datos.
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identificador único de la imagen.
-        name:
-          type: string
-          description: Nombre descriptivo de la imagen.
-        url:
-          type: string
-          format: uri
-          description: URL pública de acceso a la imagen.
-
-    # --- VIDEO URL ---
-    VideoUrlRequest:
-      type: object
-      description: >
-        Solicitud para registrar la URL de un video utilizado en el portal y almacenado en YouTube, persistido en base de datos.
-      properties:
-        name:
-          type: string
-          description: Nombre descriptivo del video.
-          minLength: 1
-          maxLength: 150
-        url:
-          type: string
-          format: uri
-          description: URL pública del video (YouTube).
-          maxLength: 400
-      required: [name, url]
-
-    VideoUrlResponse:
-      type: object
-      description: >
-        Representa la URL de un video utilizado en el portal y consultado desde la base de datos.
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identificador único del video.
-        name:
-          type: string
-          description: Nombre descriptivo del video.
-        url:
-          type: string
-          format: uri
-          description: URL pública del video (YouTube).
-
-    # --- LABEL ---
-    LabelRequest:
-      type: object
-      description: >
-        Solicitud para crear o actualizar una etiqueta visualizada en la página principal.
-      properties:
-        name:
-          type: string
-          description: Nombre de la etiqueta.
-          minLength: 1
-          maxLength: 50
-      required: [name]
-
-    LabelResponse:
-      type: object
-      description: >
-        Representa una etiqueta visualizada en la página principal, consultada desde la base de datos.
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identificador único de la etiqueta.
-        name:
-          type: string
-          description: Nombre de la etiqueta.
-
-    # --- HOME ---
-    HomeRequest:
-      type: object
-      description: >
-        Solicitud para actualizar la información principal del home, incluyendo saludo, imagen y etiquetas asociadas.
-      properties:
-        greeting:
-          type: string
-          description: Mensaje de bienvenida o presentación.
-          minLength: 1
-          maxLength: 300
-        imageUrl:
-          type: string
-          description: URL de la imagen principal del home.
-          format: uri
-          maxLength: 400
-        buttonWorkLabel:
-          type: string
-          description: Texto del botón para sección laboral.
-          minLength: 1
-          maxLength: 80
-        buttonContactLabel:
-          type: string
-          description: Texto del botón para sección de contacto.
-          minLength: 1
-          maxLength: 80
-        labelIds:
-          type: array
-          description: IDs de las etiquetas asociadas al home.
-          items:
-            type: integer
-            format: int64
-          minItems: 0
-          uniqueItems: true
-      required: [greeting, imageUrl, buttonWorkLabel, buttonContactLabel, labelIds]
-
-    HomeResponse:
-      type: object
-      description: >
-        Información principal del home de la página, incluyendo etiquetas asociadas.
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identificador único del home.
-        greeting:
-          type: string
-          description: Mensaje de bienvenida o presentación.
-        imageUrl:
-          type: string
-          format: uri
-          description: URL de la imagen principal.
-        buttonWorkLabel:
-          type: string
-          description: Texto del botón para sección laboral.
-        buttonContactLabel:
-          type: string
-          description: Texto del botón para sección de contacto.
-        labels:
-          type: array
-          description: Lista de etiquetas asociadas al home.
-          items:
-            $ref: '#/components/schemas/LabelResponse'
-
-    # --- BLOG ---
-    BlogRequest:
-      type: object
-      description: >
-        Solicitud para crear o actualizar un artículo del blog tecnológico.
-      properties:
-        title:
-          type: string
-          description: Título del artículo del blog.
-          minLength: 1
-          maxLength: 200
-        cleanUrlTitle:
-          type: string
-          description: URL amigable para el artículo (slug).
-          minLength: 1
-          maxLength: 200
-        descriptionShort:
-          type: string
-          description: Descripción breve del artículo.
-          minLength: 1
-          maxLength: 400
-        description:
-          type: string
-          description: Contenido completo del artículo.
-          minLength: 1
-          maxLength: 4000
-      required: [title, cleanUrlTitle, descriptionShort, description]
-
-    BlogResponse:
-      type: object
-      description: >
-        Representa un artículo del blog tecnológico consultado desde la base de datos.
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identificador único del artículo.
-        title:
-          type: string
-          description: Título del artículo del blog.
-        cleanUrlTitle:
-          type: string
-          description: URL amigable para el artículo.
-        descriptionShort:
-          type: string
-          description: Descripción breve del artículo.
-        description:
-          type: string
-          description: Contenido completo del artículo.
-
-    BlogPageResponse:
-      type: object
-      description: >
-        Respuesta paginada para la consulta de artículos del blog.
-      properties:
-        content:
-          type: array
-          description: Lista paginada de artículos.
-          items:
-            $ref: '#/components/schemas/BlogResponse'
-        page:
-          type: integer
-          description: Página actual.
-        size:
-          type: integer
-          description: Cantidad de elementos por página.
-        totalElements:
-          type: integer
-          description: Total de elementos encontrados.
-        totalPages:
-          type: integer
-          description: Total de páginas disponibles.
-
-    # --- SKILL TYPE ---
-    SkillTypeRequest:
-      type: object
-      description: >
-        Solicitud para crear o actualizar un tipo de habilidad.
-      properties:
-        name:
-          type: string
-          description: Nombre del tipo de habilidad.
-          minLength: 1
-          maxLength: 100
-        skillIds:
-          type: array
-          description: Lista de IDs de habilidades asociadas.
-          items:
-            type: integer
-            format: int64
-          minItems: 0
-          uniqueItems: true
-      required: [name, skillIds]
-
-    SkillTypeResponse:
-      type: object
-      description: >
-        Representa un tipo de habilidad consultado desde la base de datos, con habilidades asociadas anidadas.
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identificador único del tipo de habilidad.
-        name:
-          type: string
-          description: Nombre del tipo de habilidad.
-        skills:
-          type: array
-          description: Habilidades asociadas al tipo de habilidad.
-          items:
-            $ref: '#/components/schemas/SkillResponse'
-
-    # --- SKILL ---
-    SkillRequest:
-      type: object
-      description: >
-        Solicitud para crear o actualizar una habilidad.
-      properties:
-        name:
-          type: string
-          description: Nombre de la habilidad.
-          minLength: 1
-          maxLength: 100
-        skillSonIds:
-          type: array
-          description: Lista de IDs de especializaciones o tecnologías asociadas.
-          items:
-            type: integer
-            format: int64
-          minItems: 0
-          uniqueItems: true
-      required: [name, skillSonIds]
-
-    SkillResponse:
-      type: object
-      description: >
-        Representa una habilidad consultada desde la base de datos, incluyendo especializaciones anidadas.
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identificador único de la habilidad.
-        name:
-          type: string
-          description: Nombre de la habilidad.
-        skillSons:
-          type: array
-          description: Especializaciones o tecnologías asociadas.
-          items:
-            $ref: '#/components/schemas/SkillSonResponse'
-
-    # --- SKILL SON ---
-    SkillSonRequest:
-      type: object
-      description: >
-        Solicitud para crear o actualizar una especialización o tecnología asociada a una habilidad.
-      properties:
-        name:
-          type: string
-          description: Nombre de la especialización.
-          minLength: 1
-          maxLength: 100
-      required: [name]
-
-    SkillSonResponse:
-      type: object
-      description: >
-        Representa una especialización o tecnología asociada a una habilidad.
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identificador único de la especialización.
-        name:
-          type: string
-          description: Nombre de la especialización.
-
-    # --- FUTURED PROJECT ---
-    FuturedProjectRequest:
-      type: object
-      description: >
-        Solicitud para crear o actualizar la información de un proyecto destacado.
-      properties:
-        name:
-          type: string
-          description: Nombre del proyecto.
-          minLength: 1
-          maxLength: 200
-        experienceId:
-          type: integer
-          format: int64
-          description: ID de la experiencia laboral asociada al proyecto.
-        descriptionShort:
-          type: string
-          description: Descripción breve del proyecto.
-          minLength: 1
-          maxLength: 400
-        description:
-          type: string
-          description: Descripción completa del proyecto.
-          minLength: 1
-          maxLength: 4000
-        imageListUrlId:
-          type: integer
-          format: int64
-          description: ID de la imagen representativa del listado de proyectos.
-        imageUrlId:
-          type: integer
-          format: int64
-          description: ID de la imagen principal del proyecto.
-      required: [name, experienceId, descriptionShort, description, imageListUrlId, imageUrlId]
-
-    FuturedProjectResponse:
-      type: object
-      description: >
-        Representa la información de un proyecto destacado consultado desde la base de datos.
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identificador único del proyecto.
-        name:
-          type: string
-          description: Nombre del proyecto.
-        experienceId:
-          type: integer
-          format: int64
-          description: ID de la experiencia laboral asociada.
-        descriptionShort:
-          type: string
-          description: Descripción breve del proyecto.
-        description:
-          type: string
-          description: Descripción completa del proyecto.
-        imageListUrl:
-          $ref: '#/components/schemas/ImageUrlResponse'
-        imageUrl:
-          $ref: '#/components/schemas/ImageUrlResponse'
-
-    # --- ERROR RESPONSE ---
-    ErrorResponse:
-      type: object
-      description: Estructura estándar para el manejo de errores de negocio y validación.
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-          description: Fecha y hora del error.
-        status:
-          type: integer
-          description: Código de estado HTTP.
-        error:
-          type: string
-          description: Mensaje breve del error.
-        message:
-          type: string
-          description: Descripción detallada del error.
-        path:
-          type: string
-          description: Ruta del endpoint donde ocurrió el error.
-
-  parameters:
-    idParam:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: integer
-        format: int64
-      description: Identificador único del recurso.
-
-    pageParam:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Número de página para paginación (inicia en 0).
-
-    sizeParam:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-      description: Cantidad de elementos por página.
-
-  responses:
-    Error:
-      description: Respuesta de error estándar.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
 
 paths:
-  # --- BASIC DATA ---
+  # Basic Data Endpoints
   /basic-data/{id}:
     get:
-      tags: [BasicData]
-      summary: Consultar los datos básicos del usuario.
-      description: Retorna la información personal y de contacto.
+      tags:
+        - Basic Data
+      summary: Obtener datos básicos por ID
+      description: Recupera la información básica del perfil profesional
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Datos básicos consultados correctamente.
+          description: Datos básicos obtenidos exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BasicDataResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     put:
-      tags: [BasicData]
-      summary: Actualizar completamente los datos básicos del usuario.
-      description: Actualiza la información personal y de contacto del usuario.
+      tags:
+        - Basic Data
+      summary: Actualizar datos básicos
+      description: Actualiza la información básica del perfil profesional
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -586,23 +63,24 @@ paths:
               $ref: '#/components/schemas/BasicDataRequest'
       responses:
         '204':
-          description: Datos básicos actualizados exitosamente.
+          description: Datos básicos actualizados exitosamente
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
-  # --- IMAGE URL ---
+  # Image URL Endpoints
   /image-url:
     get:
-      tags: [ImageUrl]
-      summary: Listar todas las imágenes disponibles.
-      description: Retorna la lista de todas las imágenes registradas en el sistema.
+      tags:
+        - Image URL
+      summary: Obtener todas las URLs de imágenes
+      description: Recupera la lista completa de URLs de imágenes utilizadas en el portal
       responses:
         '200':
-          description: Lista de imágenes.
+          description: Lista de URLs de imágenes obtenida exitosamente
           content:
             application/json:
               schema:
@@ -610,12 +88,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/ImageUrlResponse'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     post:
-      tags: [ImageUrl]
-      summary: Registrar una nueva imagen.
-      description: Registra una nueva imagen en el sistema.
+      tags:
+        - Image URL
+      summary: Crear nueva URL de imagen
+      description: Registra una nueva URL de imagen en el sistema
       requestBody:
         required: true
         content:
@@ -624,13 +102,7 @@ paths:
               $ref: '#/components/schemas/ImageUrlRequest'
       responses:
         '201':
-          description: Imagen creada exitosamente.
-          headers:
-            Location:
-              description: URL del recurso creado.
-              schema:
-                type: string
-                format: uri
+          description: URL de imagen creada exitosamente
           content:
             application/json:
               schema:
@@ -639,54 +111,65 @@ paths:
                   id:
                     type: integer
                     format: int64
-                    description: Identificador único generado.
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
   /image-url/{id}:
     get:
-      tags: [ImageUrl]
-      summary: Consultar la información de una imagen.
-      description: Obtiene los detalles de una imagen por su identificador.
+      tags:
+        - Image URL
+      summary: Obtener URL de imagen por ID
+      description: Recupera una URL de imagen específica por su identificador
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Información de la imagen.
+          description: URL de imagen obtenida exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ImageUrlResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     delete:
-      tags: [ImageUrl]
-      summary: Eliminar una imagen registrada.
-      description: Elimina una imagen por su identificador.
+      tags:
+        - Image URL
+      summary: Eliminar URL de imagen
+      description: Elimina una URL de imagen del sistema
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '204':
-          description: Imagen eliminada exitosamente.
+          description: URL de imagen eliminada exitosamente
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
-  # --- VIDEO URL ---
+  # Video URL Endpoints
   /video-url:
     get:
-      tags: [VideoUrl]
-      summary: Listar todos los videos registrados.
-      description: Retorna la lista de videos disponibles en el sistema.
+      tags:
+        - Video URL
+      summary: Obtener todas las URLs de videos
+      description: Recupera la lista completa de URLs de videos almacenados en YouTube
       responses:
         '200':
-          description: Lista de videos.
+          description: Lista de URLs de videos obtenida exitosamente
           content:
             application/json:
               schema:
@@ -694,12 +177,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/VideoUrlResponse'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     post:
-      tags: [VideoUrl]
-      summary: Registrar un nuevo video.
-      description: Registra un nuevo video en el sistema.
+      tags:
+        - Video URL
+      summary: Crear nueva URL de video
+      description: Registra una nueva URL de video en el sistema
       requestBody:
         required: true
         content:
@@ -708,13 +191,7 @@ paths:
               $ref: '#/components/schemas/VideoUrlRequest'
       responses:
         '201':
-          description: Video creado exitosamente.
-          headers:
-            Location:
-              description: URL del recurso creado.
-              schema:
-                type: string
-                format: uri
+          description: URL de video creada exitosamente
           content:
             application/json:
               schema:
@@ -723,54 +200,65 @@ paths:
                   id:
                     type: integer
                     format: int64
-                    description: Identificador único generado.
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
   /video-url/{id}:
     get:
-      tags: [VideoUrl]
-      summary: Consultar un video por ID.
-      description: Obtiene los detalles de un video registrado.
+      tags:
+        - Video URL
+      summary: Obtener URL de video por ID
+      description: Recupera una URL de video específica por su identificador
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Información del video.
+          description: URL de video obtenida exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VideoUrlResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     delete:
-      tags: [VideoUrl]
-      summary: Eliminar un video.
-      description: Elimina un video registrado por ID.
+      tags:
+        - Video URL
+      summary: Eliminar URL de video
+      description: Elimina una URL de video del sistema
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '204':
-          description: Video eliminado exitosamente.
+          description: URL de video eliminada exitosamente
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
-  # --- LABEL ---
+  # Label Endpoints
   /label:
     get:
-      tags: [Label]
-      summary: Listar todas las etiquetas.
-      description: Retorna la lista de etiquetas disponibles.
+      tags:
+        - Label
+      summary: Obtener todas las etiquetas
+      description: Recupera la lista completa de etiquetas que se visualizan en el home
       responses:
         '200':
-          description: Lista de etiquetas.
+          description: Lista de etiquetas obtenida exitosamente
           content:
             application/json:
               schema:
@@ -778,12 +266,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/LabelResponse'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     post:
-      tags: [Label]
-      summary: Registrar una nueva etiqueta.
-      description: Registra una etiqueta que será visualizada en el home.
+      tags:
+        - Label
+      summary: Crear nueva etiqueta
+      description: Registra una nueva etiqueta en el sistema
       requestBody:
         required: true
         content:
@@ -792,13 +280,7 @@ paths:
               $ref: '#/components/schemas/LabelRequest'
       responses:
         '201':
-          description: Etiqueta creada exitosamente.
-          headers:
-            Location:
-              description: URL del recurso creado.
-              schema:
-                type: string
-                format: uri
+          description: Etiqueta creada exitosamente
           content:
             application/json:
               schema:
@@ -807,71 +289,92 @@ paths:
                   id:
                     type: integer
                     format: int64
-                    description: Identificador único generado.
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
   /label/{id}:
     get:
-      tags: [Label]
-      summary: Consultar una etiqueta por ID.
-      description: Obtiene los detalles de una etiqueta.
+      tags:
+        - Label
+      summary: Obtener etiqueta por ID
+      description: Recupera una etiqueta específica por su identificador
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Información de la etiqueta.
+          description: Etiqueta obtenida exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LabelResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     delete:
-      tags: [Label]
-      summary: Eliminar una etiqueta.
-      description: Elimina una etiqueta por su ID.
+      tags:
+        - Label
+      summary: Eliminar etiqueta
+      description: Elimina una etiqueta del sistema
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '204':
-          description: Etiqueta eliminada exitosamente.
+          description: Etiqueta eliminada exitosamente
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
-  # --- HOME ---
+  # Home Endpoints
   /home/{id}:
     get:
-      tags: [Label]
-      summary: Consultar información del home.
-      description: Obtiene la información principal del home.
+      tags:
+        - Home
+      summary: Obtener información del home
+      description: Recupera la información configurada para la página de inicio
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Información del home consultada correctamente.
+          description: Información del home obtenida exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HomeResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     put:
-      tags: [Label]
-      summary: Actualizar información del home.
-      description: Actualiza completamente la información principal del home.
+      tags:
+        - Home
+      summary: Actualizar información del home
+      description: Actualiza la configuración de la página de inicio
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -880,37 +383,62 @@ paths:
               $ref: '#/components/schemas/HomeRequest'
       responses:
         '204':
-          description: Home actualizado exitosamente.
+          description: Información del home actualizada exitosamente
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
-  # --- BLOG ---
+  # Blog Endpoints
   /blog:
     get:
-      tags: [Blog]
-      summary: Listar artículos del blog (paginado).
-      description: Retorna una lista paginada de artículos del blog tecnológico.
+      tags:
+        - Blog
+      summary: Obtener artículos del blog con paginación
+      description: Recupera la lista paginada de artículos del blog tecnológico
       parameters:
-        - $ref: '#/components/parameters/pageParam'
-        - $ref: '#/components/parameters/sizeParam'
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Número de página (comenzando desde 0)
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+          description: Cantidad de elementos por página
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            default: "id,desc"
+          description: Campo y dirección de ordenamiento (ej. "title,asc" o "id,desc")
       responses:
         '200':
-          description: Artículos del blog listados exitosamente.
+          description: Lista paginada de artículos obtenida exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlogPageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     post:
-      tags: [Blog]
-      summary: Crear un nuevo artículo de blog.
-      description: Registra un nuevo artículo en el blog.
+      tags:
+        - Blog
+      summary: Crear nuevo artículo del blog
+      description: Registra un nuevo artículo en el blog
       requestBody:
         required: true
         content:
@@ -919,13 +447,7 @@ paths:
               $ref: '#/components/schemas/BlogRequest'
       responses:
         '201':
-          description: Artículo de blog creado exitosamente.
-          headers:
-            Location:
-              description: URL del recurso creado.
-              schema:
-                type: string
-                format: uri
+          description: Artículo del blog creado exitosamente
           content:
             application/json:
               schema:
@@ -934,37 +456,47 @@ paths:
                   id:
                     type: integer
                     format: int64
-                    description: Identificador único generado.
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
   /blog/{id}:
     get:
-      tags: [Blog]
-      summary: Consultar un artículo del blog por ID.
-      description: Obtiene los detalles de un artículo del blog.
+      tags:
+        - Blog
+      summary: Obtener artículo del blog por ID
+      description: Recupera un artículo específico del blog por su identificador
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Artículo consultado exitosamente.
+          description: Artículo del blog obtenido exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlogResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     put:
-      tags: [Blog]
-      summary: Actualizar un artículo de blog.
-      description: Actualiza completamente un artículo del blog.
+      tags:
+        - Blog
+      summary: Actualizar artículo del blog
+      description: Actualiza un artículo existente del blog
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -973,37 +505,43 @@ paths:
               $ref: '#/components/schemas/BlogRequest'
       responses:
         '204':
-          description: Artículo actualizado exitosamente.
+          description: Artículo del blog actualizado exitosamente
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     delete:
-      tags: [Blog]
-      summary: Eliminar un artículo de blog.
-      description: Elimina un artículo del blog por su ID.
+      tags:
+        - Blog
+      summary: Eliminar artículo del blog
+      description: Elimina un artículo del blog del sistema
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '204':
-          description: Artículo eliminado exitosamente.
+          description: Artículo del blog eliminado exitosamente
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
-  # --- SKILL TYPE ---
+  # Skill Type Endpoints
   /skill-type:
     get:
-      tags: [SkillType]
-      summary: Listar tipos de habilidad.
-      description: Retorna la lista de tipos de habilidad registrados.
+      tags:
+        - Skill Type
+      summary: Obtener todos los tipos de habilidades
+      description: Recupera la lista completa de categorías de habilidades técnicas
       responses:
         '200':
-          description: Lista de tipos de habilidad.
+          description: Lista de tipos de habilidades obtenida exitosamente
           content:
             application/json:
               schema:
@@ -1011,12 +549,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/SkillTypeResponse'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     post:
-      tags: [SkillType]
-      summary: Registrar un nuevo tipo de habilidad.
-      description: Crea un nuevo tipo de habilidad.
+      tags:
+        - Skill Type
+      summary: Crear nuevo tipo de habilidad
+      description: Registra una nueva categoría de habilidad en el sistema
       requestBody:
         required: true
         content:
@@ -1025,13 +563,7 @@ paths:
               $ref: '#/components/schemas/SkillTypeRequest'
       responses:
         '201':
-          description: Tipo de habilidad creado exitosamente.
-          headers:
-            Location:
-              description: URL del recurso creado.
-              schema:
-                type: string
-                format: uri
+          description: Tipo de habilidad creado exitosamente
           content:
             application/json:
               schema:
@@ -1040,37 +572,47 @@ paths:
                   id:
                     type: integer
                     format: int64
-                    description: Identificador único generado.
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
   /skill-type/{id}:
     get:
-      tags: [SkillType]
-      summary: Consultar un tipo de habilidad por ID.
-      description: Obtiene los detalles de un tipo de habilidad.
+      tags:
+        - Skill Type
+      summary: Obtener tipo de habilidad por ID
+      description: Recupera un tipo de habilidad específico por su identificador
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Información del tipo de habilidad.
+          description: Tipo de habilidad obtenido exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SkillTypeResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     put:
-      tags: [SkillType]
-      summary: Actualizar un tipo de habilidad.
-      description: Actualiza completamente un tipo de habilidad.
+      tags:
+        - Skill Type
+      summary: Actualizar tipo de habilidad
+      description: Actualiza un tipo de habilidad existente
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -1079,37 +621,43 @@ paths:
               $ref: '#/components/schemas/SkillTypeRequest'
       responses:
         '204':
-          description: Tipo de habilidad actualizado exitosamente.
+          description: Tipo de habilidad actualizado exitosamente
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     delete:
-      tags: [SkillType]
-      summary: Eliminar un tipo de habilidad.
-      description: Elimina un tipo de habilidad por su ID.
+      tags:
+        - Skill Type
+      summary: Eliminar tipo de habilidad
+      description: Elimina un tipo de habilidad del sistema
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '204':
-          description: Tipo de habilidad eliminado exitosamente.
+          description: Tipo de habilidad eliminado exitosamente
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
-  # --- SKILL ---
+  # Skill Endpoints
   /skill:
     get:
-      tags: [Skill]
-      summary: Listar habilidades.
-      description: Retorna la lista de habilidades registradas.
+      tags:
+        - Skill
+      summary: Obtener todas las habilidades
+      description: Recupera la lista completa de habilidades técnicas registradas
       responses:
         '200':
-          description: Lista de habilidades.
+          description: Lista de habilidades obtenida exitosamente
           content:
             application/json:
               schema:
@@ -1117,12 +665,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/SkillResponse'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     post:
-      tags: [Skill]
-      summary: Registrar una nueva habilidad.
-      description: Crea una nueva habilidad.
+      tags:
+        - Skill
+      summary: Crear nueva habilidad
+      description: Registra una nueva habilidad técnica en el sistema
       requestBody:
         required: true
         content:
@@ -1131,13 +679,7 @@ paths:
               $ref: '#/components/schemas/SkillRequest'
       responses:
         '201':
-          description: Habilidad creada exitosamente.
-          headers:
-            Location:
-              description: URL del recurso creado.
-              schema:
-                type: string
-                format: uri
+          description: Habilidad creada exitosamente
           content:
             application/json:
               schema:
@@ -1146,37 +688,47 @@ paths:
                   id:
                     type: integer
                     format: int64
-                    description: Identificador único generado.
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
   /skill/{id}:
     get:
-      tags: [Skill]
-      summary: Consultar una habilidad por ID.
-      description: Obtiene los detalles de una habilidad.
+      tags:
+        - Skill
+      summary: Obtener habilidad por ID
+      description: Recupera una habilidad específica por su identificador
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Información de la habilidad.
+          description: Habilidad obtenida exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SkillResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     put:
-      tags: [Skill]
-      summary: Actualizar una habilidad.
-      description: Actualiza completamente una habilidad.
+      tags:
+        - Skill
+      summary: Actualizar habilidad
+      description: Actualiza una habilidad existente
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -1185,37 +737,43 @@ paths:
               $ref: '#/components/schemas/SkillRequest'
       responses:
         '204':
-          description: Habilidad actualizada exitosamente.
+          description: Habilidad actualizada exitosamente
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     delete:
-      tags: [Skill]
-      summary: Eliminar una habilidad.
-      description: Elimina una habilidad por su ID.
+      tags:
+        - Skill
+      summary: Eliminar habilidad
+      description: Elimina una habilidad del sistema
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '204':
-          description: Habilidad eliminada exitosamente.
+          description: Habilidad eliminada exitosamente
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
-  # --- SKILL SON ---
+  # Skill Son Endpoints
   /skill-son:
     get:
-      tags: [SkillSon]
-      summary: Listar especializaciones de habilidad.
-      description: Retorna la lista de especializaciones o tecnologías asociadas a habilidades.
+      tags:
+        - Skill Son
+      summary: Obtener todas las especializaciones de habilidades
+      description: Recupera la lista completa de especializaciones y tecnologías específicas
       responses:
         '200':
-          description: Lista de especializaciones.
+          description: Lista de especializaciones obtenida exitosamente
           content:
             application/json:
               schema:
@@ -1223,12 +781,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/SkillSonResponse'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     post:
-      tags: [SkillSon]
-      summary: Registrar una nueva especialización.
-      description: Crea una nueva especialización o tecnología.
+      tags:
+        - Skill Son
+      summary: Crear nueva especialización de habilidad
+      description: Registra una nueva especialización o tecnología específica
       requestBody:
         required: true
         content:
@@ -1237,13 +795,7 @@ paths:
               $ref: '#/components/schemas/SkillSonRequest'
       responses:
         '201':
-          description: Especialización creada exitosamente.
-          headers:
-            Location:
-              description: URL del recurso creado.
-              schema:
-                type: string
-                format: uri
+          description: Especialización creada exitosamente
           content:
             application/json:
               schema:
@@ -1252,37 +804,47 @@ paths:
                   id:
                     type: integer
                     format: int64
-                    description: Identificador único generado.
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
   /skill-son/{id}:
     get:
-      tags: [SkillSon]
-      summary: Consultar una especialización por ID.
-      description: Obtiene los detalles de una especialización.
+      tags:
+        - Skill Son
+      summary: Obtener especialización por ID
+      description: Recupera una especialización específica por su identificador
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Información de la especialización.
+          description: Especialización obtenida exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SkillSonResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     put:
-      tags: [SkillSon]
-      summary: Actualizar una especialización.
-      description: Actualiza completamente una especialización.
+      tags:
+        - Skill Son
+      summary: Actualizar especialización
+      description: Actualiza una especialización existente
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -1291,37 +853,140 @@ paths:
               $ref: '#/components/schemas/SkillSonRequest'
       responses:
         '204':
-          description: Especialización actualizada exitosamente.
+          description: Especialización actualizada exitosamente
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     delete:
-      tags: [SkillSon]
-      summary: Eliminar una especialización.
-      description: Elimina una especialización por su ID.
+      tags:
+        - Skill Son
+      summary: Eliminar especialización
+      description: Elimina una especialización del sistema
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '204':
-          description: Especialización eliminada exitosamente.
+          description: Especialización eliminada exitosamente
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
-  # --- FUTURED PROJECT ---
-  /futured-project:
+  # Experience Endpoints
+  /experience:
     get:
-      tags: [FeaturedProject]
-      summary: Listar proyectos destacados.
-      description: Retorna la lista de proyectos destacados.
+      tags:
+        - Experience
+      summary: Obtener todas las experiencias laborales
+      description: Recupera la lista completa de experiencias laborales registradas
       responses:
         '200':
-          description: Lista de proyectos destacados.
+          description: Lista de experiencias laborales obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExperienceResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Experience
+      summary: Crear nueva experiencia laboral
+      description: Registra una nueva experiencia laboral en el sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExperienceRequest'
+      responses:
+        '201':
+          description: Experiencia laboral creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /experience/{id}:
+    get:
+      tags:
+        - Experience
+      summary: Obtener experiencia laboral por ID
+      description: Recupera una experiencia laboral específica por su identificador
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Experiencia laboral obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExperienceResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Experience
+      summary: Actualizar experiencia laboral
+      description: Actualiza una experiencia laboral existente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExperienceRequest'
+      responses:
+        '204':
+          description: Experiencia laboral actualizada exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Futured Project Endpoints
+  /futured-project:
+    get:
+      tags:
+        - Futured Project
+      summary: Obtener todos los proyectos destacados
+      description: Recupera la lista completa de proyectos destacados del portfolio
+      responses:
+        '200':
+          description: Lista de proyectos destacados obtenida exitosamente
           content:
             application/json:
               schema:
@@ -1329,12 +994,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/FuturedProjectResponse'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     post:
-      tags: [FeaturedProject]
-      summary: Registrar un nuevo proyecto destacado.
-      description: Crea un nuevo proyecto destacado.
+      tags:
+        - Futured Project
+      summary: Crear nuevo proyecto destacado
+      description: Registra un nuevo proyecto destacado en el portfolio
       requestBody:
         required: true
         content:
@@ -1343,13 +1008,7 @@ paths:
               $ref: '#/components/schemas/FuturedProjectRequest'
       responses:
         '201':
-          description: Proyecto destacado creado exitosamente.
-          headers:
-            Location:
-              description: URL del recurso creado.
-              schema:
-                type: string
-                format: uri
+          description: Proyecto destacado creado exitosamente
           content:
             application/json:
               schema:
@@ -1358,37 +1017,47 @@ paths:
                   id:
                     type: integer
                     format: int64
-                    description: Identificador único generado.
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
 
   /futured-project/{id}:
     get:
-      tags: [FeaturedProject]
-      summary: Consultar un proyecto destacado por ID.
-      description: Obtiene los detalles de un proyecto destacado.
+      tags:
+        - Futured Project
+      summary: Obtener proyecto destacado por ID
+      description: Recupera un proyecto destacado específico por su identificador
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Información del proyecto destacado.
+          description: Proyecto destacado obtenido exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FuturedProjectResponse'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     put:
-      tags: [FeaturedProject]
-      summary: Actualizar un proyecto destacado.
-      description: Actualiza completamente un proyecto destacado.
+      tags:
+        - Futured Project
+      summary: Actualizar proyecto destacado
+      description: Actualiza un proyecto destacado existente
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -1397,41 +1066,748 @@ paths:
               $ref: '#/components/schemas/FuturedProjectRequest'
       responses:
         '204':
-          description: Proyecto destacado actualizado exitosamente.
+          description: Proyecto destacado actualizado exitosamente
         '400':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/BadRequest'
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
+          $ref: '#/components/responses/InternalServerError'
     delete:
-      tags: [FeaturedProject]
-      summary: Eliminar un proyecto destacado.
-      description: Elimina un proyecto destacado por su ID.
+      tags:
+        - Futured Project
+      summary: Eliminar proyecto destacado
+      description: Elimina un proyecto destacado del portfolio
       parameters:
-        - $ref: '#/components/parameters/idParam'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '204':
-          description: Proyecto destacado eliminado exitosamente.
+          description: Proyecto destacado eliminado exitosamente
         '404':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          $ref: '#/components/responses/Error'
-
-  # --- CURRICULUM (PDF) ---
+          $ref: '#/components/responses/InternalServerError'
+  # Curriculum Endpoints
   /curriculum:
     get:
-      tags: [Curriculum]
-      summary: Descargar el curriculum del usuario en formato PDF.
-      description: Descarga el archivo PDF generado a partir de la información laboral registrada.
+      tags:
+        - Curriculum
+      summary: Descargar curriculum en PDF
+      description: Genera y descarga el curriculum vitae en formato PDF basado en la información almacenada en la base de datos
       responses:
         '200':
-          description: Curriculum descargado correctamente.
+          description: Curriculum PDF generado y descargado exitosamente
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
+                description: Archivo PDF del curriculum vitae
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              description: Encabezado para forzar la descarga del archivo
+            Content-Type:
+              schema:
+                type: string
+              description: Tipo de contenido del archivo
+            Content-Length:
+              schema:
+                type: integer
+              description: Tamaño del archivo en bytes
         '500':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    # Request Schemas
+    BasicDataRequest:
+      type: object
+      description: Estructura de datos básicos del perfil profesional incluyendo información personal y redes sociales
+      required:
+        - firstName
+        - firstSurName
+        - dateBirth
+        - email
+      properties:
+        firstName:
+          type: string
+          description: Nombre principal
+          minLength: 2
+          maxLength: 50
+        othersName:
+          type: string
+          description: Nombres adicionales
+          maxLength: 100
+        firstSurName:
+          type: string
+          description: Primer apellido
+          minLength: 2
+          maxLength: 50
+        othersSurName:
+          type: string
+          description: Apellidos adicionales
+          maxLength: 100
+        dateBirth:
+          type: string
+          format: date
+          description: Fecha de nacimiento
+        located:
+          type: string
+          description: Ubicación actual
+          maxLength: 100
+        startWorkingDate:
+          type: string
+          format: date
+          description: Fecha de inicio laboral
+        greeting:
+          type: string
+          description: Saludo personalizado
+          maxLength: 500
+        email:
+          type: string
+          format: email
+          description: Correo electrónico de contacto
+        instagram:
+          type: string
+          description: Usuario de Instagram
+          maxLength: 100
+        linkedin:
+          type: string
+          description: Perfil de LinkedIn
+          maxLength: 200
+        x:
+          type: string
+          description: Usuario de X (Twitter)
+          maxLength: 100
+        github:
+          type: string
+          description: Usuario de GitHub
+          maxLength: 100
+        description:
+          type: string
+          description: Descripción profesional
+          maxLength: 1000
+
+    ImageUrlRequest:
+      type: object
+      description: Estructura para registrar URLs de imágenes utilizadas en el portal
+      required:
+        - name
+        - file
+      properties:
+        name:
+          type: string
+          description: Nombre identificador de la imagen
+          minLength: 1
+          maxLength: 100
+        file:
+          type: string
+          description: Ruta o identificador del archivo de imagen
+          minLength: 1
+          maxLength: 500
+
+    VideoUrlRequest:
+      type: object
+      description: Estructura para registrar URLs de videos almacenados en YouTube
+      required:
+        - name
+        - url
+      properties:
+        name:
+          type: string
+          description: Nombre identificador del video
+          minLength: 1
+          maxLength: 100
+        url:
+          type: string
+          format: uri
+          description: URL del video en YouTube
+          minLength: 1
+          maxLength: 500
+
+    LabelRequest:
+      type: object
+      description: Estructura para registrar etiquetas que se visualizan en el home
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Texto de la etiqueta
+          minLength: 1
+          maxLength: 50
+
+    HomeRequest:
+      type: object
+      description: Estructura de configuración para la página de inicio
+      required:
+        - greeting
+        - buttonWorkLabel
+        - buttonContactLabel
+      properties:
+        greeting:
+          type: string
+          description: Mensaje de bienvenida
+          minLength: 1
+          maxLength: 200
+        imageUrl:
+          type: string
+          description: URL de la imagen principal
+          maxLength: 500
+        buttonWorkLabel:
+          type: string
+          description: Texto del botón de trabajo
+          minLength: 1
+          maxLength: 50
+        buttonContactLabel:
+          type: string
+          description: Texto del botón de contacto
+          minLength: 1
+          maxLength: 50
+        labelIds:
+          type: array
+          description: IDs de las etiquetas asociadas
+          items:
+            type: integer
+            format: int64
+
+    BlogRequest:
+      type: object
+      description: Estructura para registrar artículos del blog tecnológico
+      required:
+        - title
+        - cleanUrlTitle
+        - descriptionShort
+        - description
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador del artículo (para actualizaciones)
+        title:
+          type: string
+          description: Título del artículo
+          minLength: 1
+          maxLength: 200
+        cleanUrlTitle:
+          type: string
+          description: Título limpio para URL amigable
+          minLength: 1
+          maxLength: 200
+        descriptionShort:
+          type: string
+          description: Descripción corta del artículo
+          minLength: 1
+          maxLength: 300
+        description:
+          type: string
+          description: Contenido completo del artículo
+          minLength: 1
+
+    SkillTypeRequest:
+      type: object
+      description: Estructura para registrar categorías de habilidades técnicas
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Nombre del tipo de habilidad
+          minLength: 1
+          maxLength: 100
+        skillIds:
+          type: array
+          description: IDs de las habilidades asociadas
+          items:
+            type: integer
+            format: int64
+
+    SkillRequest:
+      type: object
+      description: Estructura para registrar habilidades técnicas específicas
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Nombre de la habilidad
+          minLength: 1
+          maxLength: 100
+        skillSonIds:
+          type: array
+          description: IDs de las especializaciones asociadas
+          items:
+            type: integer
+            format: int64
+
+    SkillSonRequest:
+      type: object
+      description: Estructura para registrar especializaciones de habilidades o tecnologías específicas
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Nombre de la especialización
+          minLength: 1
+          maxLength: 100
+
+    ExperienceRequest:
+      type: object
+      description: Estructura para registrar experiencias laborales profesionales
+      required:
+        - yearStart
+        - company
+        - description
+      properties:
+        yearStart:
+          type: string
+          format: date
+          description: Fecha de inicio de la experiencia
+        yearEnd:
+          type: string
+          format: date
+          description: Fecha de finalización de la experiencia
+        company:
+          type: string
+          description: Nombre de la empresa
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          description: Descripción de las responsabilidades y logros
+          minLength: 1
+          maxLength: 1000
+        skillSonIds:
+          type: array
+          description: IDs de las tecnologías utilizadas
+          items:
+            type: integer
+            format: int64
+
+    FuturedProjectRequest:
+      type: object
+      description: Estructura para registrar proyectos destacados del portfolio
+      required:
+        - name
+        - descriptionShort
+        - description
+      properties:
+        name:
+          type: string
+          description: Nombre del proyecto
+          minLength: 1
+          maxLength: 100
+        experienceId:
+          type: integer
+          format: int64
+          description: ID de la experiencia laboral asociada
+        descriptionShort:
+          type: string
+          description: Descripción breve del proyecto
+          minLength: 1
+          maxLength: 300
+        description:
+          type: string
+          description: Descripción detallada del proyecto
+          minLength: 1
+          maxLength: 2000
+        imageListUrlId:
+          type: integer
+          format: int64
+          description: ID de la imagen de lista
+        imageUrlId:
+          type: integer
+          format: int64
+          description: ID de la imagen principal
+
+    # Response Schemas
+    BasicDataResponse:
+      type: object
+      description: Datos básicos del perfil profesional incluyendo información personal y redes sociales consultados
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        firstName:
+          type: string
+          description: Nombre principal
+        othersName:
+          type: string
+          description: Nombres adicionales
+        firstSurName:
+          type: string
+          description: Primer apellido
+        othersSurName:
+          type: string
+          description: Apellidos adicionales
+        dateBirth:
+          type: string
+          format: date
+          description: Fecha de nacimiento
+        located:
+          type: string
+          description: Ubicación actual
+        startWorkingDate:
+          type: string
+          format: date
+          description: Fecha de inicio laboral
+        greeting:
+          type: string
+          description: Saludo personalizado
+        email:
+          type: string
+          format: email
+          description: Correo electrónico de contacto
+        instagram:
+          type: string
+          description: Usuario de Instagram
+        linkedin:
+          type: string
+          description: Perfil de LinkedIn
+        x:
+          type: string
+          description: Usuario de X (Twitter)
+        github:
+          type: string
+          description: Usuario de GitHub
+        description:
+          type: string
+          description: Descripción profesional
+
+    ImageUrlResponse:
+      type: object
+      description: URLs de imágenes utilizadas en el portal consultadas desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        name:
+          type: string
+          description: Nombre identificador de la imagen
+        url:
+          type: string
+          description: URL de la imagen
+
+    VideoUrlResponse:
+      type: object
+      description: URLs de videos almacenados en YouTube consultadas desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        name:
+          type: string
+          description: Nombre identificador del video
+        url:
+          type: string
+          format: uri
+          description: URL del video en YouTube
+
+    LabelResponse:
+      type: object
+      description: Etiquetas que se visualizan en el home consultadas desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        name:
+          type: string
+          description: Texto de la etiqueta
+
+    HomeResponse:
+      type: object
+      description: Información de configuración de la página de inicio
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        greeting:
+          type: string
+          description: Mensaje de bienvenida
+        imageUrl:
+          type: string
+          description: URL de la imagen principal
+        buttonWorkLabel:
+          type: string
+          description: Texto del botón de trabajo
+        buttonContactLabel:
+          type: string
+          description: Texto del botón de contacto
+        labels:
+          type: array
+          description: Etiquetas asociadas
+          items:
+            $ref: '#/components/schemas/LabelResponse'
+
+    BlogResponse:
+      type: object
+      description: Artículos del blog tecnológico consultados desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        title:
+          type: string
+          description: Título del artículo
+        cleanUrlTitle:
+          type: string
+          description: Título limpio para URL amigable
+        descriptionShort:
+          type: string
+          description: Descripción corta del artículo
+        description:
+          type: string
+          description: Contenido completo del artículo
+
+    BlogPageResponse:
+      type: object
+      description: Respuesta paginada de artículos del blog
+      properties:
+        content:
+          type: array
+          description: Lista de artículos en la página actual
+          items:
+            $ref: '#/components/schemas/BlogResponse'
+        pageable:
+          type: object
+          description: Información de paginación
+          properties:
+            sort:
+              type: object
+              properties:
+                empty:
+                  type: boolean
+                sorted:
+                  type: boolean
+                unsorted:
+                  type: boolean
+            offset:
+              type: integer
+              format: int64
+            pageSize:
+              type: integer
+            pageNumber:
+              type: integer
+            paged:
+              type: boolean
+            unpaged:
+              type: boolean
+        last:
+          type: boolean
+          description: Indica si es la última página
+        totalPages:
+          type: integer
+          description: Total de páginas disponibles
+        totalElements:
+          type: integer
+          format: int64
+          description: Total de elementos
+        size:
+          type: integer
+          description: Tamaño de la página
+        number:
+          type: integer
+          description: Número de página actual
+        sort:
+          type: object
+          description: Información de ordenamiento
+          properties:
+            empty:
+              type: boolean
+            sorted:
+              type: boolean
+            unsorted:
+              type: boolean
+        first:
+          type: boolean
+          description: Indica si es la primera página
+        numberOfElements:
+          type: integer
+          description: Número de elementos en la página actual
+        empty:
+          type: boolean
+          description: Indica si la página está vacía
+
+    SkillTypeResponse:
+      type: object
+      description: Categorías de habilidades técnicas consultadas desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        name:
+          type: string
+          description: Nombre del tipo de habilidad
+        skills:
+          type: array
+          description: Habilidades asociadas
+          items:
+            $ref: '#/components/schemas/SkillResponse'
+
+    SkillResponse:
+      type: object
+      description: Habilidades técnicas específicas consultadas desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        name:
+          type: string
+          description: Nombre de la habilidad
+        skillSons:
+          type: array
+          description: Especializaciones asociadas
+          items:
+            $ref: '#/components/schemas/SkillSonResponse'
+
+    SkillSonResponse:
+      type: object
+      description: Especializaciones de habilidades o tecnologías específicas consultadas desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        name:
+          type: string
+          description: Nombre de la especialización
+
+    ExperienceResponse:
+      type: object
+      description: Experiencias laborales profesionales consultadas desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        yearStart:
+          type: string
+          format: date
+          description: Fecha de inicio de la experiencia
+        yearEnd:
+          type: string
+          format: date
+          description: Fecha de finalización de la experiencia
+        company:
+          type: string
+          description: Nombre de la empresa
+        description:
+          type: string
+          description: Descripción de las responsabilidades y logros
+        skillSons:
+          type: array
+          description: Tecnologías utilizadas
+          items:
+            $ref: '#/components/schemas/SkillSonResponse'
+
+    FuturedProjectResponse:
+      type: object
+      description: Proyectos destacados del portfolio consultados desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        name:
+          type: string
+          description: Nombre del proyecto
+        experienceId:
+          type: integer
+          format: int64
+          description: ID de la experiencia laboral asociada
+        descriptionShort:
+          type: string
+          description: Descripción breve del proyecto
+        description:
+          type: string
+          description: Descripción detallada del proyecto
+        imageListUrl:
+          $ref: '#/components/schemas/ImageUrlResponse'
+        imageUrl:
+          $ref: '#/components/schemas/ImageUrlResponse'
+
+    # Error Response Schema
+    ErrorResponse:
+      type: object
+      description: Estructura genérica para respuestas de error
+      required:
+        - timestamp
+        - status
+        - error
+        - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Fecha y hora del error
+        status:
+          type: integer
+          description: Código de estado HTTP
+        error:
+          type: string
+          description: Descripción del tipo de error
+        message:
+          type: string
+          description: Mensaje detallado del error
+        path:
+          type: string
+          description: Ruta donde ocurrió el error
+        validationErrors:
+          type: array
+          description: Errores de validación específicos (solo para error 400)
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: Campo que causó el error
+              message:
+                type: string
+                description: Mensaje de error del campo
+
+  responses:
+    BadRequest:
+      description: Solicitud incorrecta - Error de validación en los datos enviados
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
