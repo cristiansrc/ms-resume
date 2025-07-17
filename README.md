@@ -230,15 +230,29 @@ Accept: application/pdf
 
 ## Estándar de respuestas de error
 
-Las respuestas de error siguen el siguiente formato JSON:
+El API define los siguientes componentes de respuesta de error disponibles en `components.responses`:
+
+| Código HTTP | Nombre               | Descripción                                                      | Esquema        |
+|-------------|----------------------|------------------------------------------------------------------|----------------|
+| 400         | BadRequest           | Solicitud incorrecta - Error de validación en los datos enviados | ErrorResponse  |
+| 404         | NotFound             | Recurso no encontrado                                            | ErrorResponse  |
+| 500         | InternalServerError  | Error interno del servidor                                       | ErrorResponse  |
+
+El esquema `ErrorResponse` se define en `components.schemas.ErrorResponse`:
 
 ```json
 {
-  "timestamp": "2025-07-15T12:00:00Z",
+  "timestamp": "2025-07-16T09:00:00Z",
   "status": 400,
   "error": "Bad Request",
-  "message": "El campo 'email' es obligatorio.",
-  "path": "/basic-data/1"
+  "message": "Descripción del error",
+  "path": "/ruta/que/causo/el/error",
+  "validationErrors": [
+    {
+      "field": "nombreDelCampo",
+      "message": "Mensaje de validación"
+    }
+  ]
 }
 ```
 
@@ -287,3 +301,70 @@ curl -X GET "http://localhost:8080/v1/ms-resume/basic-data/1" -H 'Accept: applic
 curl -X POST "http://localhost:8080/v1/ms-resume/label" \
      -H 'Content-Type: application/json' \
      -d '{"name":"Java"}'
+
+# Obtener habilidades
+curl -X GET "http://localhost:8080/v1/ms-resume/skill" -H 'Accept: application/json'
+
+# Obtener proyectos destacados
+curl -X GET "http://localhost:8080/v1/ms-resume/featured-project" -H 'Accept: application/json'
+
+# Obtener experiencia
+curl -X GET "http://localhost:8080/v1/ms-resume/experience" -H 'Accept: application/json'
+```
+
+## Estructura del Proyecto
+
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── com/cristiansrc/resume/msresume/
+│   │       ├── application/                    # Capa de aplicación
+│   │       │   ├── exception/                  # Excepciones personalizadas
+│   │       │   │   ├── BusinessException.java
+│   │       │   │   └── TechnicalException.java
+│   │       │   └── port/                       # Puertos (interfaces) para la arquitectura hexagonal
+│   │       │       ├── input/                  # Puertos de entrada (casos de uso)
+│   │       │       └── output/                 # Puertos de salida (repositorios)
+│   │       ├── domain/                         # Capa de dominio
+│   │       │   ├── entity/                     # Entidades de dominio
+│   │       │   ├── repository/                 # Interfaces de repositorio
+│   │       │   ├── service/                    # Servicios de dominio
+│   │       │   └── valueobject/                # Objetos de valor
+│   │       └── infrastructure/                 # Capa de infraestructura
+│   │           ├── adapter/                    # Adaptadores para la arquitectura hexagonal
+│   │           │   ├── input/                  # Adaptadores de entrada (controllers)
+│   │           │   └── output/                 # Adaptadores de salida (implementación repos)
+│   │           ├── config/                     # Configuraciones de Spring
+│   │           ├── mapper/                     # Mappers para convertir entre DTOs y entidades
+│   │           ├── persistence/                # Entidades JPA y repositorios Spring Data
+│   │           └── util/                       # Clases utilitarias
+│   └── resources/
+│       ├── db/migration/                       # Scripts de migración Flyway
+│       ├── application.properties              # Configuración principal
+│       ├── application-local.properties        # Configuración para desarrollo local
+│       ├── application-test.properties         # Configuración para pruebas
+│       └── messages.properties                 # Mensajes i18n
+└── test/                                       # Pruebas unitarias y de integración
+```
+
+### Descripción de los Paquetes Principales
+
+#### Application
+- **exception**: Manejo centralizado de excepciones del negocio y técnicas
+- **port/input**: Interfaces que definen los casos de uso de la aplicación
+- **port/output**: Interfaces que definen las operaciones necesarias para persistencia
+
+#### Domain
+- **entity**: Clases que representan las entidades principales del negocio
+- **repository**: Interfaces que definen los contratos para acceso a datos
+- **service**: Implementación de la lógica de negocio
+- **valueobject**: Objetos inmutables que no tienen identidad pero describen características
+
+#### Infrastructure
+- **adapter/input**: Implementación de controladores REST
+- **adapter/output**: Implementación de repositorios y servicios externos
+- **config**: Configuraciones de Spring Boot, seguridad, etc
+- **mapper**: Conversión entre objetos DTO y entidades de dominio
+- **persistence**: Entidades JPA y repositorios Spring Data JPA
+- **util**: Clases utilitarias como resolución de mensajes, validaciones, etc
