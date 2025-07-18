@@ -71,7 +71,7 @@ GET http://localhost:8080/v1/ms-resume/basic-data/{id}
 ---
 
 ## Generar controladores y modelos
-Este proyecto incluye el plugin OpenAPI Generator configurado en el `pom.xml`. Cada vez que compiles el proyecto con Maven, los controladores y modelos se generan automáticamente a partir de `src/main/resources/openapi.yml`:
+Este proyecto incluye el plugin OpenAPI Generator configurado en él `pom.xml`. Cada vez que compiles el proyecto con Maven, los controladores y modelos se generan automáticamente a partir de `src/main/resources/openapi.yml`:
 
 ```sh
 mvn clean compile
@@ -384,3 +384,157 @@ src/
 - **mapper**: Conversión entre objetos DTO y entidades de dominio
 - **persistence**: Entidades JPA y repositorios Spring Data JPA
 - **util**: Clases utilitarias como resolución de mensajes, validaciones, etc
+
+---
+
+## Diagramas
+
+### Arquitectura Hexagonal
+```mermaid
+graph TD
+    A[API Controllers] --> B[Puertos de Entrada]
+    B --> C[Servicios de Aplicación]
+    C --> D[Puertos de Salida]
+    D --> E[Adaptadores de Persistencia]
+    E --> F[Base de Datos]
+```
+
+### Diagrama de Relaciones (ER)
+```mermaid
+erDiagram
+    BASIC_DATA ||--o{ IMAGE_URL : contains
+    BLOG ||--o{ LABEL : tagged
+    EXPERIENCE ||--o{ SKILL : has
+    SKILL }o--|| SKILL_TYPE : belongs
+    SKILL ||--o{ SKILL_SON : contains
+    HOME ||--o{ LABEL : tagged
+```
+
+---
+
+## Seguridad
+
+### Headers Recomendados
+```properties
+# Security Headers
+security.headers.content-security-policy=default-src 'self'
+security.headers.x-frame-options=DENY
+security.headers.x-content-type-options=nosniff
+security.headers.referrer-policy=strict-origin-when-cross-origin
+```
+
+### CORS
+El servicio está configurado para aceptar peticiones de dominios específicos:
+```java
+@Configuration
+public class CorsConfig {
+    @Bean
+    public CorsFilter corsFilter() {
+        // ...existing code...
+    }
+}
+```
+
+### Rate Limiting
+Se implementa rate limiting por IP usando bucket4j:
+- 100 peticiones/minuto para endpoints públicos
+- 300 peticiones/minuto para endpoints autenticados
+
+---
+
+## Monitoreo y Observabilidad
+
+### Endpoints de Actuator
+Disponibles en `/actuator`:
+- `/health` - Estado del servicio
+- `/metrics` - Métricas JVM y personalizadas
+- `/prometheus` - Endpoint para Prometheus
+
+### Métricas Disponibles
+- Tiempos de respuesta por endpoint
+- Tasa de errores
+- Uso de memoria/CPU
+- Conexiones de base de datos
+
+### Logging
+- Logging estructurado en JSON
+- Correlación de trazas con `trace-id`
+- Integración con ELK Stack
+
+---
+
+## Performance
+
+### Configuraciones Recomendadas
+```properties
+# Connection Pool
+spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle=5
+
+# JPA/Hibernate
+spring.jpa.properties.hibernate.jdbc.batch_size=30
+spring.jpa.properties.hibernate.order_inserts=true
+
+# Tomcat
+server.tomcat.threads.max=200
+server.tomcat.accept-count=100
+```
+
+### Estrategias de Caché
+- Caché de segundo nivel con Hibernate
+- Caché distribuido con Redis para entornos multi-instancia
+- Caché de respuestas HTTP con ETags
+
+---
+
+## Troubleshooting
+
+### Problemas Comunes
+
+1. **Error de Conexión a BD**
+   ```
+   Caused by: org.postgresql.util.PSQLException: Connection refused
+   ```
+   **Solución**: Verificar credenciales y conectividad a PostgreSQL
+
+2. **OutOfMemoryError**
+   ```
+   java.lang.OutOfMemoryError: Java heap space
+   ```
+   **Solución**: Ajustar -Xmx y monitorear uso de memoria
+
+3. **Error en Migraciones Flyway**
+   ```
+   FlywayException: Migration checksum mismatch
+   ```
+   **Solución**: Limpiar historial de migraciones o reparar checksums
+
+### Debugging
+
+1. Habilitar logs de debug:
+   ```properties
+   logging.level.com.cristiansrc=DEBUG
+   logging.level.org.hibernate.SQL=DEBUG
+   ```
+
+2. Remote Debugging:
+   ```bash
+   java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+   ```
+
+### FAQs
+
+1. **¿Cómo actualizar la documentación OpenAPI?**
+   - Modificar `openapi.yml` y recompilar
+
+2. **¿Cómo agregar un nuevo endpoint?**
+   - Definir en OpenAPI
+   - Crear DTOs
+   - Implementar controlador
+   - Agregar pruebas
+
+3. **¿Cómo implementar una nueva migración?**
+   - Crear script SQL en `db/migration`
+   - Seguir convención de nombrado Vn__descripcion.sql
+
+---
