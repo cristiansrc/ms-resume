@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -17,11 +18,11 @@ public class ExperienceEntity extends AuditBasicEntity {
 
     @Column(name = "year_start", nullable = false)
     @NotNull
-    private String yearStart;
+    private LocalDate yearStart;
 
     @Column(name = "year_end", nullable = false)
     @NotNull
-    private String yearEnd;
+    private LocalDate yearEnd;
 
     @Column(nullable = false)
     @NotNull
@@ -30,4 +31,12 @@ public class ExperienceEntity extends AuditBasicEntity {
     @Column(nullable = false)
     @NotNull
     private String description;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name="experience_skill",
+            joinColumns=@JoinColumn(name="experience_id"),
+            inverseJoinColumns=@JoinColumn(name="skill_son_id")
+    )
+    private List<SkillSonEntity> skillSons;
 }
