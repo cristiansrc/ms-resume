@@ -4,8 +4,8 @@ CREATE TABLE experience
     created     TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     updated     TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     deleted     BOOLEAN                                 NOT NULL,
-    year_start  VARCHAR(255)                            NOT NULL,
-    year_end    VARCHAR(255)                            NOT NULL,
+    year_start  date                                    NOT NULL,
+    year_end    date                                    NOT NULL,
     company     VARCHAR(255)                            NOT NULL,
     description VARCHAR(255)                            NOT NULL,
     CONSTRAINT pk_experience PRIMARY KEY (id)

@@ -1,18 +1,19 @@
 package com.cristiansrc.resume.msresume.infrastructure.mapper;
 
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BasicDataRequest;
+import com.cristiansrc.resume.msresume.infrastructure.controller.model.BasicDataResponse;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.BasicDataEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface IBasicDataRequestMapper {
+public interface IBasicDataMapper {
 
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "othersName", source = "othersName")
-    @Mapping(target = "firstSurname", source = "firstSurname")
-    @Mapping(target = "othersSurname", source = "othersSurname")
+    @Mapping(target = "firstSurName", source = "firstSurName")
+    @Mapping(target = "othersSurName", source = "othersSurName")
     @Mapping(target = "dateBirth", source = "dateBirth")
     @Mapping(target = "located", source = "located")
     @Mapping(target = "startWorkingDate", source = "startWorkingDate")
@@ -25,4 +26,7 @@ public interface IBasicDataRequestMapper {
     @Mapping(target = "description", source = "description")
     void updateBasicDataEntityFromBasicDataRequest(
             BasicDataRequest basicDataRequest, @MappingTarget BasicDataEntity basicDataEntity);
+
+    @Mapping(target = "id", source = "id")
+    BasicDataResponse toBasicDataResponse(BasicDataEntity basicDataEntity);
 }

@@ -20,6 +20,9 @@ La arquitectura y el diseño siguen las mejores prácticas REST, OpenAPI 3.1.0 y
 - Manejo robusto de errores y validaciones
 - Relacionamiento anidado en entidades clave
 - Endpoints para imágenes, videos, etiquetas, habilidades, proyectos y blog con paginación
+- Internacionalización de mensajes (i18n)
+- Validaciones automáticas desde OpenAPI
+- Arquitectura Hexagonal (Ports & Adapters)
 - Preparado para despliegue en Docker, Heroku, AWS u otros proveedores
 
 ---
@@ -35,11 +38,24 @@ src/
           resume/
             msresume/
               MsResumeApplication.java
+              application/
+                exception/
+                port/
+                  interactor/
+                  output/
+                    repository/
               infrastructure/
-                repository/
                 controller/
-                service/
-                model/
+                mapper/
+                repository/
+                  jpa/
+                    entity/
+              config/
+    resources/
+      db/
+        migration/      # Scripts Flyway para migración de BD
+      messages.properties   # Mensajes internacionalizados
+      application.properties
   // ...otros paquetes que se agreguen en el futuro según avance el desarrollo...
 ```
 
