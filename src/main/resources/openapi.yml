@@ -1277,10 +1277,10 @@ components:
           description: Mensaje de bienvenida
           minLength: 1
           maxLength: 200
-        imageUrl:
-          type: string
-          description: URL de la imagen principal
-          maxLength: 500
+        imageUrlid:
+          type: integer
+          format: int64
+          description: Identificador de la imagen (para actualizaciones)
         buttonWorkLabel:
           type: string
           description: Texto del botón de trabajo
@@ -1558,8 +1558,7 @@ components:
           type: string
           description: Mensaje de bienvenida
         imageUrl:
-          type: string
-          description: URL de la imagen principal
+          $ref: '#/components/schemas/ImageUrlResponse'
         buttonWorkLabel:
           type: string
           description: Texto del botón de trabajo
@@ -1747,16 +1746,14 @@ components:
         name:
           type: string
           description: Nombre del proyecto
-        experienceId:
-          type: integer
-          format: int64
-          description: ID de la experiencia laboral asociada
         descriptionShort:
           type: string
           description: Descripción breve del proyecto
         description:
           type: string
           description: Descripción detallada del proyecto
+        experience:
+          $ref: '#/components/schemas/ExperienceResponse'
         imageListUrl:
           $ref: '#/components/schemas/ImageUrlResponse'
         imageUrl:

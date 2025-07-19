@@ -32,29 +32,29 @@ public class ExperienceService implements IExperienceService {
 
     @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<List<ExperienceResponse>> experienceGet() {
+    public List<ExperienceResponse> experienceGet() {
         log.debug("Fetching all experiences");
         var experienceEntities = experienceRepository.findAllByDeletedFalse();
 
         // allow returning empty list instead of 404
         var experienceResponses = experienceMapper.toExperienceResponseList(experienceEntities);
         log.debug("Fetched {} experiences", experienceResponses.size());
-        return ResponseEntity.ok(experienceResponses);
+        return experienceResponses;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<ExperienceResponse> experienceIdGet(Long id) {
+    public ExperienceResponse experienceIdGet(Long id) {
         log.debug("Fetching experience with id: {}", id);
         var experienceEntity = getEntityById(id);
         var experienceResponse = experienceMapper.toExperienceResponse(experienceEntity);
         log.debug("Fetched experience with id: {}", id);
-        return ResponseEntity.ok(experienceResponse);
+        return experienceResponse;
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Void> experienceIdPut(Long id, ExperienceRequest experienceRequest) {
+    public void experienceIdPut(Long id, ExperienceRequest experienceRequest) {
         log.info("Updating experience with id: {}", id);
         var experienceEntity = getEntityById(id);
         experienceMapper.updateExperienceEntityFromRequest(experienceRequest, experienceEntity);
@@ -63,12 +63,11 @@ public class ExperienceService implements IExperienceService {
         experienceEntity.getSkillSons().addAll(newSkillSonEntities);
         experienceRepository.save(experienceEntity);
         log.info("Updated experience with id: {}", id);
-        return ResponseEntity.noContent().build();
     }
 
     @Transactional
     @Override
-    public ResponseEntity<ImageUrlPost201Response> experiencePost(ExperienceRequest experienceRequest) {
+    public ImageUrlPost201Response experiencePost(ExperienceRequest experienceRequest) {
         log.info("Creating new experience");
         var experienceEntity = experienceMapper.toExperienceEntity(experienceRequest);
         var newSkillSonEntities = getSkillSons(experienceRequest.getSkillSonIds());
@@ -77,18 +76,17 @@ public class ExperienceService implements IExperienceService {
         var imageUrlResponse = new ImageUrlPost201Response();
         imageUrlResponse.setId(savedEntity.getId());
         log.info("Created new experience with id: {}", savedEntity.getId());
-        return ResponseEntity.ok(imageUrlResponse);
+        return imageUrlResponse;
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Void> experienceIdDelete(Long id) {
+    public void experienceIdDelete(Long id) {
         log.info("Deleting experience with id: {}", id);
         var experienceEntity = getEntityById(id);
         experienceEntity.setDeleted(true);
         experienceRepository.save(experienceEntity);
         log.info("Deleted experience with id: {}", id);
-        return ResponseEntity.noContent().build();
     }
 
     private List<SkillSonEntity> getSkillSons(List<Long> skillSonIds) {

@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +29,7 @@ public class BlogService implements IBlogService {
 
     @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<BlogPageResponse> blogGet(Integer page, Integer size, String sortDirection){
+    public BlogPageResponse blogGet(Integer page, Integer size, String sortDirection){
         log.debug("Fetching blog posts with page: {}, size: {}, sort: {}", page, size, sortDirection);
         sortDirection = sortDirection == null ? "DESC" : sortDirection.toUpperCase();
         size = size == null ? 10 : size;
@@ -39,51 +38,49 @@ public class BlogService implements IBlogService {
         var entityPage = blogRepository.findByTitleContainingIgnoreCaseAndSort(null, pageable);
         var models = blogResponseMapper.toPageResponse(entityPage);
         log.debug("Fetched {} blog posts", models.getContent().size());
-        return ResponseEntity.ok(models);
+        return models;
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Void> blogIdDelete(Long id) {
+    public void blogIdDelete(Long id) {
         log.info("Deleting blog post with id: {}", id);
         var entity = getEntityById(id);
         entity.setDeleted(true);
         blogRepository.save(entity);
         log.info("Blog post with id: {} deleted successfully", id);
-        return ResponseEntity.noContent().build();
     }
 
     @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<BlogResponse> blogIdGet(Long id) {
+    public BlogResponse blogIdGet(Long id) {
         log.debug("Fetching blog post with id: {}", id);
         var entity = getEntityById(id);
         var response = blogResponseMapper.toResponse(entity);
         log.debug("Fetched blog post with id: {}", id);
-        return ResponseEntity.ok(response);
+        return response;
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Void> blogIdPut(Long id, BlogRequest blogRequest) {
+    public void blogIdPut(Long id, BlogRequest blogRequest) {
         log.info("Updating blog post with id: {}", id);
         var entity = getEntityById(id);
         blogRequestMapper.updateEntityFromBlogRequest(blogRequest, entity);
         blogRepository.save(entity);
         log.info("Blog post with id: {} updated successfully", id);
-        return ResponseEntity.noContent().build();
     }
 
     @Transactional
     @Override
-    public ResponseEntity<ImageUrlPost201Response> blogPost(BlogRequest blogRequest) {
+    public ImageUrlPost201Response blogPost(BlogRequest blogRequest) {
         log.info("Creating new blog post");
         var entity = blogRequestMapper.toEntity(blogRequest);
         var savedEntity = blogRepository.save(entity);
         var response = new ImageUrlPost201Response();
         response.setId(savedEntity.getId());
         log.info("Blog post created with id: {}", savedEntity.getId());
-        return ResponseEntity.status(201).body(response);
+        return response;
     }
 
     private BlogEntity getEntityById(Long id) {

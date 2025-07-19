@@ -8,9 +8,9 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface IExperienceService {
-    ResponseEntity<List<ExperienceResponse>> experienceGet();
-    ResponseEntity<ExperienceResponse> experienceIdGet(Long id);
-    ResponseEntity<Void> experienceIdPut(Long id, ExperienceRequest experienceRequest);
-    ResponseEntity<ImageUrlPost201Response> experiencePost(ExperienceRequest experienceRequest);
-    ResponseEntity<Void> experienceIdDelete(Long id);
+    List<ExperienceResponse> experienceGet();
+    ExperienceResponse experienceIdGet(Long id);
+    void experienceIdPut(Long id, ExperienceRequest experienceRequest);
+    ImageUrlPost201Response experiencePost(ExperienceRequest experienceRequest);
+    void experienceIdDelete(Long id);
 }

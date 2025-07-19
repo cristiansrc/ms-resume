@@ -16,11 +16,13 @@ public class BasicDataController implements BasicDataApi {
 
     @Override
     public ResponseEntity<BasicDataResponse> basicDataIdGet(Long id) {
-        return basicDataService.basicDataIdGet(id);
+        var response = basicDataService.basicDataIdGet(id);
+        return ResponseEntity.ok().body(response);
     }
 
     @Override
     public ResponseEntity<Void> basicDataIdPut(Long id, BasicDataRequest basicDataRequest) {
-        return basicDataService.basicDataIdPut(id, basicDataRequest);
+        basicDataService.basicDataIdPut(id, basicDataRequest);
+        return ResponseEntity.noContent().build();
     }
 }

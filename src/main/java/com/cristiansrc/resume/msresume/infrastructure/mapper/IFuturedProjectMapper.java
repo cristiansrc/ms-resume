@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface IFuturedProject {
+public interface IFuturedProjectMapper {
 
     @Mapping(target = "name", source = "name")
     @Mapping(target = "descriptionShort", source = "descriptionShort")

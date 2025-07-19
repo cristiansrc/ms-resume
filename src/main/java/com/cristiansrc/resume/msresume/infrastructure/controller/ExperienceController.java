@@ -5,6 +5,7 @@ import com.cristiansrc.resume.msresume.application.port.interactor.IExperienceSe
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ExperienceRequest;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ExperienceResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
+import com.cristiansrc.resume.msresume.infrastructure.util.UrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,26 +20,32 @@ public class ExperienceController implements ExperienceApi {
 
     @Override
     public ResponseEntity<List<ExperienceResponse>> experienceGet() {
-        return experienceService.experienceGet();
+        var response = experienceService.experienceGet();
+        return ResponseEntity.ok().body(response);
     }
 
     @Override
     public ResponseEntity<ExperienceResponse> experienceIdGet(Long id) {
-        return experienceService.experienceIdGet(id);
+        var response = experienceService.experienceIdGet(id);
+        return ResponseEntity.ok().body(response);
     }
 
     @Override
     public ResponseEntity<Void> experienceIdPut(Long id, ExperienceRequest experienceRequest) {
-        return experienceService.experienceIdPut(id, experienceRequest);
+        experienceService.experienceIdPut(id, experienceRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<ImageUrlPost201Response> experiencePost(ExperienceRequest experienceRequest) {
-        return experienceService.experiencePost(experienceRequest);
+        var response = experienceService.experiencePost(experienceRequest);
+        var uri = UrlUtils.getCreatedResourceUri(response.getId());
+        return ResponseEntity.created(uri).body(response);
     }
 
     @Override
     public ResponseEntity<Void> experienceIdDelete(Long id) {
-        return experienceService.experienceIdDelete(id);
+        experienceService.experienceIdDelete(id);
+        return ResponseEntity.noContent().build();
     }
 }

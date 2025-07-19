@@ -5,6 +5,6 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.BasicData
 import org.springframework.http.ResponseEntity;
 
 public interface IBasicDataService {
-    ResponseEntity<BasicDataResponse> basicDataIdGet(Long id);
-    ResponseEntity<Void> basicDataIdPut(Long id, BasicDataRequest basicDataRequest);
+    BasicDataResponse basicDataIdGet(Long id);
+    void basicDataIdPut(Long id, BasicDataRequest basicDataRequest);
 }

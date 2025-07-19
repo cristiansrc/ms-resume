@@ -19,10 +19,6 @@ public class HomeEntity extends AuditBasicEntity {
     @NotNull
     private String greeting;
 
-    @Column(name = "image_url", nullable = false)
-    @NotNull
-    private String imageUrl;
-
     @Column(name = "button_work_label", nullable = false)
     @NotNull
     private String buttonWorkLabel;
@@ -30,6 +26,10 @@ public class HomeEntity extends AuditBasicEntity {
     @Column(name = "button_contact_label", nullable = false)
     @NotNull
     private String buttonContactLabel;
+
+    @ManyToOne
+    @JoinColumn(name = "image_id", nullable = false)
+    private ImageUrlEntity imageUrl;
 
     @ManyToMany
     @JoinTable(

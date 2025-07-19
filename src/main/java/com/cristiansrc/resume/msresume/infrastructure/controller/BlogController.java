@@ -6,6 +6,7 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogPageR
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogRequest;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
+import com.cristiansrc.resume.msresume.infrastructure.util.UrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,26 +19,32 @@ public class BlogController implements BlogApi {
 
     @Override
     public ResponseEntity<BlogPageResponse> blogGet(Integer page, Integer size, String sort) {
-        return blogService.blogGet(page, size, sort);
+        var response = blogService.blogGet(page, size, sort);
+        return ResponseEntity.ok().body(response);
     }
 
     @Override
     public ResponseEntity<Void> blogIdDelete(Long id) {
-        return blogService.blogIdDelete(id);
+        blogService.blogIdDelete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<BlogResponse> blogIdGet(Long id) {
-        return blogService.blogIdGet(id);
+        var response = blogService.blogIdGet(id);
+        return ResponseEntity.ok().body(response);
     }
 
     @Override
     public ResponseEntity<Void> blogIdPut(Long id, BlogRequest blogRequest) {
-        return blogService.blogIdPut(id, blogRequest);
+        blogService.blogIdPut(id, blogRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<ImageUrlPost201Response> blogPost(BlogRequest blogRequest) {
-        return blogService.blogPost(blogRequest);
+        var response = blogService.blogPost(blogRequest);
+        var uri = UrlUtils.getCreatedResourceUri(response.getId());
+        return ResponseEntity.created(uri).body(response);
     }
 }

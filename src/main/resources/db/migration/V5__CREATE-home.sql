@@ -5,8 +5,11 @@ CREATE TABLE home
     updated              TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     deleted              BOOLEAN                                 NOT NULL,
     greeting             VARCHAR(255)                            NOT NULL,
-    image_url            VARCHAR(255)                            NOT NULL,
+    image_id             BIGINT                                  NOT NULL,
     button_work_label    VARCHAR(255)                            NOT NULL,
     button_contact_label VARCHAR(255)                            NOT NULL,
     CONSTRAINT pk_home PRIMARY KEY (id)
 );
+
+ALTER TABLE home
+    ADD CONSTRAINT FK_HOME_ON_IMAGE FOREIGN KEY (image_id) REFERENCES image_url (id);

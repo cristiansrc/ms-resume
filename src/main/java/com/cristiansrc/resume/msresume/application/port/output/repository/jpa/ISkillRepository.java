@@ -1,0 +1,17 @@
+package com.cristiansrc.resume.msresume.application.port.output.repository.jpa;
+
+import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.SkillEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface ISkillRepository extends JpaRepository<SkillEntity, Long> {
+    @Query("SELECT s FROM SkillEntity s WHERE s.id = :id AND s.deleted = false")
+    Optional<SkillEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+
+    @Query("SELECT s FROM SkillEntity s WHERE s.deleted = false")
+    List<SkillEntity> findAllByDeletedFalse();
+}
