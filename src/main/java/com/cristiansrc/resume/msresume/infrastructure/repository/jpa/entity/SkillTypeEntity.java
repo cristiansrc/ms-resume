@@ -19,7 +19,7 @@ public class SkillTypeEntity extends AuditBasicEntity {
     @NotNull
     private String name;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name="skill_type_relational",
             joinColumns=@JoinColumn(name="skill_type_id"),

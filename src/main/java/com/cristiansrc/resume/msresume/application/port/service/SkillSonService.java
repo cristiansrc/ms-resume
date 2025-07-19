@@ -11,6 +11,7 @@ import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class SkillSonService implements ISkillSonService {
     private final ISkillSonMapper skillSonMapper;
     private final MessageResolver messageResolver;
 
+    @Transactional(readOnly = true)
     @Override
     public List<SkillSonResponse> skillSonGet() {
         log.info("Fetching all skill sons");
@@ -32,6 +34,7 @@ public class SkillSonService implements ISkillSonService {
         return models;
     }
 
+    @Transactional
     @Override
     public void skillSonIdDelete(Long id) {
         log.info("Deleting skill son with id: {}", id);
@@ -41,6 +44,7 @@ public class SkillSonService implements ISkillSonService {
         log.info("Skill son with id: {} deleted successfully", id);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public SkillSonResponse skillSonIdGet(Long id) {
         log.info("Fetching skill son with id: {}", id);
@@ -50,6 +54,7 @@ public class SkillSonService implements ISkillSonService {
         return model;
     }
 
+    @Transactional
     @Override
     public void skillSonIdPut(Long id, SkillSonRequest skillSonRequest) {
         log.info("Updating skill son with id: {}", id);
@@ -59,6 +64,7 @@ public class SkillSonService implements ISkillSonService {
         log.info("Skill son with id: {} updated successfully", id);
     }
 
+    @Transactional
     @Override
     public ImageUrlPost201Response skillSonPost(SkillSonRequest skillSonRequest) {
         log.info("Creating new skill son");

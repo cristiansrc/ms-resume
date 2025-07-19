@@ -1,6 +1,5 @@
 package com.cristiansrc.resume.msresume.infrastructure.mapper;
 
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.SkillRequest;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.SkillSonRequest;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.SkillSonResponse;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.SkillSonEntity;

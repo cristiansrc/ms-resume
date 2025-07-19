@@ -31,7 +31,7 @@ public class HomeEntity extends AuditBasicEntity {
     @JoinColumn(name = "image_id", nullable = false)
     private ImageUrlEntity imageUrl;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name="home_label_relational",
             joinColumns=@JoinColumn(name="home_id"),
