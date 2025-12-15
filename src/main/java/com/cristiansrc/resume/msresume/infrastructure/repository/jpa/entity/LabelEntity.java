@@ -16,4 +16,8 @@ public class LabelEntity extends AuditBasicEntity {
     @Column(nullable = false)
     @NotNull
     private String name;
+
+    @Column(nullable = false)
+    @NotNull
+    private String nameEng;
 }

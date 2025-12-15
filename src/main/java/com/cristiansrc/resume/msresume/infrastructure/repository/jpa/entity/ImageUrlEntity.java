@@ -19,6 +19,10 @@ public class ImageUrlEntity extends AuditBasicEntity {
     @NotNull
     private String name;
 
+    @Column(nullable = false)
+    @NotNull
+    private String nameEng;
+
     @Column(name = "name_file_aws", nullable = false)
     @NotNull
     private String nameFileAws;

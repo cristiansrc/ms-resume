@@ -32,6 +32,10 @@ public class ExperienceEntity extends AuditBasicEntity {
     @NotNull
     private String description;
 
+    @Column(nullable = false)
+    @NotNull
+    private String descriptionEng;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name="experience_skill",

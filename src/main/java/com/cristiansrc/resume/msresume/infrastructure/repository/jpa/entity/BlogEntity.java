@@ -30,4 +30,12 @@ public class BlogEntity extends AuditBasicEntity {
     @Column(nullable = false)
     @NotNull
     private String description;
+
+    @Column(nullable = false)
+    @NotNull
+    private String descriptionShortEng;
+
+    @Column(nullable = false)
+    @NotNull
+    private String descriptionEng;
 }

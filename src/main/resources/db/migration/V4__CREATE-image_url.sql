@@ -5,6 +5,7 @@ CREATE TABLE image_url
     updated             TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     deleted             BOOLEAN                                 NOT NULL,
     name                VARCHAR(255)                            NOT NULL,
+    name_eng            VARCHAR(255)                            NOT NULL,
     name_file_aws       VARCHAR(255)                            NOT NULL,
     CONSTRAINT pk_image_url PRIMARY KEY (id)
 );
