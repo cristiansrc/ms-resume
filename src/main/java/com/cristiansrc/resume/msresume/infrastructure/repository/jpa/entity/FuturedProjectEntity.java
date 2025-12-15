@@ -19,7 +19,7 @@ public class FuturedProjectEntity extends AuditBasicEntity {
     @NotNull
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "name_eng", nullable = false)
     @NotNull
     private String nameEng;
 
@@ -31,11 +31,11 @@ public class FuturedProjectEntity extends AuditBasicEntity {
     @NotNull
     private String description;
 
-    @Column(name = "description_short", nullable = false)
+    @Column(name = "description_short_eng", nullable = false)
     @NotNull
     private String descriptionShortEng;
 
-    @Column(nullable = false)
+    @Column(name = "description_eng", nullable = false)
     @NotNull
     private String descriptionEng;
 

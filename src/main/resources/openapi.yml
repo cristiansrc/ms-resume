@@ -18,6 +18,46 @@ servers:
 
 
 paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Autenticar usuario y obtener token JWT
+      description: Genera un token JWT para el usuario si las credenciales son correctas.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+                - password
+              properties:
+                user:
+                  type: string
+                  description: Nombre de usuario
+                password:
+                  type: string
+                  description: Contraseña del usuario
+      responses:
+        '200':
+          description: Autenticación exitosa, token JWT generado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Token JWT con una validez de 24 horas
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   # Basic Data Endpoints
   /public/basic-data/{id}:
     get:
@@ -25,6 +65,7 @@ paths:
         - Basic Data Public
       summary: Obtener datos básicos por ID
       description: Recupera la información básica del perfil profesional
+      security: []
       parameters:
         - name: id
           in: path
@@ -49,6 +90,7 @@ paths:
         - Label Public
       summary: Obtener todas las etiquetas
       description: Recupera la lista completa de etiquetas que se visualizan en el home
+      security: []
       responses:
         '200':
           description: Lista de etiquetas obtenida exitosamente
@@ -66,6 +108,7 @@ paths:
         - Label Public
       summary: Obtener etiqueta por ID
       description: Recupera una etiqueta específica por su identificador
+      security: []
       parameters:
         - name: id
           in: path
@@ -90,6 +133,7 @@ paths:
         - Home Public
       summary: Obtener información del home
       description: Recupera la información configurada para la página de inicio
+      security: []
       parameters:
         - name: id
           in: path
@@ -114,6 +158,7 @@ paths:
         - Blog Public
       summary: Obtener artículos del blog con paginación
       description: Recupera la lista paginada de artículos del blog tecnológico
+      security: []
       parameters:
         - name: page
           in: query
@@ -156,6 +201,7 @@ paths:
         - Blog Public
       summary: Obtener artículo del blog por ID
       description: Recupera un artículo específico del blog por su identificador
+      security: []
       parameters:
         - name: id
           in: path
@@ -180,6 +226,7 @@ paths:
         - Skill Type Public
       summary: Obtener todos los tipos de habilidades
       description: Recupera la lista completa de categorías de habilidades técnicas
+      security: []
       responses:
         '200':
           description: Lista de tipos de habilidades obtenida exitosamente
@@ -197,6 +244,7 @@ paths:
         - Skill Type Public
       summary: Obtener tipo de habilidad por ID
       description: Recupera un tipo de habilidad específico por su identificador
+      security: []
       parameters:
         - name: id
           in: path
@@ -221,6 +269,7 @@ paths:
         - Skill Public
       summary: Obtener todas las habilidades
       description: Recupera la lista completa de habilidades técnicas registradas
+      security: []
       responses:
         '200':
           description: Lista de habilidades obtenida exitosamente
@@ -238,6 +287,7 @@ paths:
         - Skill Public
       summary: Obtener habilidad por ID
       description: Recupera una habilidad específica por su identificador
+      security: []
       parameters:
         - name: id
           in: path
@@ -262,6 +312,7 @@ paths:
         - Skill Son Public
       summary: Obtener todas las especializaciones de habilidades
       description: Recupera la lista completa de especializaciones y tecnologías específicas
+      security: []
       responses:
         '200':
           description: Lista de especializaciones obtenida exitosamente
@@ -279,6 +330,7 @@ paths:
         - Skill Son Public
       summary: Obtener especialización por ID
       description: Recupera una especialización específica por su identificador
+      security: []
       parameters:
         - name: id
           in: path
@@ -303,6 +355,7 @@ paths:
         - Experience Public
       summary: Obtener todas las experiencias laborales
       description: Recupera la lista completa de experiencias laborales registradas
+      security: []
       responses:
         '200':
           description: Lista de experiencias laborales obtenida exitosamente
@@ -320,6 +373,7 @@ paths:
         - Experience Public
       summary: Obtener experiencia laboral por ID
       description: Recupera una experiencia laboral específica por su identificador
+      security: []
       parameters:
         - name: id
           in: path
@@ -344,6 +398,7 @@ paths:
         - Futured Project Public
       summary: Obtener todos los proyectos destacados
       description: Recupera la lista completa de proyectos destacados del portfolio
+      security: []
       responses:
         '200':
           description: Lista de proyectos destacados obtenida exitosamente
@@ -361,6 +416,7 @@ paths:
         - Futured Project Public
       summary: Obtener proyecto destacado por ID
       description: Recupera un proyecto destacado específico por su identificador
+      security: []
       parameters:
         - name: id
           in: path
@@ -385,6 +441,7 @@ paths:
         - Curriculum Public
       summary: Descargar curriculum en PDF
       description: Genera y descarga el curriculum vitae en formato PDF basado en la información almacenada en la base de datos
+      security: []
       responses:
         '200':
           description: Curriculum PDF generado y descargado exitosamente

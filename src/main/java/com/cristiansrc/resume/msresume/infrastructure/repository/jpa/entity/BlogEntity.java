@@ -19,11 +19,11 @@ public class BlogEntity extends AuditBasicEntity {
     @NotNull
     private String title;
 
-    @Column(nullable = false)
+    @Column(name = "clean_url_title", nullable = false)
     @NotNull
     private String cleanUrlTitle;
 
-    @Column(nullable = false)
+    @Column(name = "description_short", nullable = false)
     @NotNull
     private String descriptionShort;
 
@@ -31,11 +31,11 @@ public class BlogEntity extends AuditBasicEntity {
     @NotNull
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "description_short_eng", nullable = false)
     @NotNull
     private String descriptionShortEng;
 
-    @Column(nullable = false)
+    @Column(name = "description_eng", nullable = false)
     @NotNull
     private String descriptionEng;
 }

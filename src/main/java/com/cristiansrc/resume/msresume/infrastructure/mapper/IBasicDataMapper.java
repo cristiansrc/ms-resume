@@ -12,8 +12,8 @@ public interface IBasicDataMapper {
 
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "othersName", source = "othersName")
-    @Mapping(target = "firstSurName", source = "firstSurName")
-    @Mapping(target = "othersSurName", source = "othersSurName")
+    @Mapping(target = "firstSurname", source = "firstSurName")
+    @Mapping(target = "othersSurname", source = "othersSurName")
     @Mapping(target = "dateBirth", source = "dateBirth")
     @Mapping(target = "located", source = "located")
     @Mapping(target = "startWorkingDate", source = "startWorkingDate")

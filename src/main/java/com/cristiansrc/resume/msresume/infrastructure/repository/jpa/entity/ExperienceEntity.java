@@ -32,7 +32,7 @@ public class ExperienceEntity extends AuditBasicEntity {
     @NotNull
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "description_eng", nullable = false)
     @NotNull
     private String descriptionEng;
 

@@ -19,7 +19,7 @@ public class VideoUrlEntity extends AuditBasicEntity {
     @NotNull
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "name_eng", nullable = false)
     @NotNull
     private String nameEng;
 

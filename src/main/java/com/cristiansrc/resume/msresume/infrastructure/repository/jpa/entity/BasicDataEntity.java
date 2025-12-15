@@ -27,11 +27,11 @@ public class BasicDataEntity extends AuditBasicEntity {
 
     @Column(name = "first_surname", nullable = false)
     @NotNull
-    private String firstSurName;
+    private String firstSurname;
 
     @Column(name = "others_sur_name", nullable = false)
     @NotNull
-    private String othersSurName;
+    private String othersSurname;
 
     @Column(name = "date_birth", nullable = false)
     @NotNull
