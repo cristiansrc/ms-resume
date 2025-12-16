@@ -1,18 +1,6 @@
 package com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
+// No tests needed for this entity as it only contains Lombok-generated code.
+// The lombok.config file is configured to exclude Lombok-generated code from JaCoCo coverage reports.
 class SkillEntityTest {
-
-    @Test
-    void testEntity() {
-        SkillEntity entity = new SkillEntity();
-        entity.setId(1L);
-        entity.setName("Skill");
-
-        assertEquals(1L, entity.getId());
-        assertEquals("Skill", entity.getName());
-        assertNotNull(entity.toString());
-    }
 }

@@ -10,6 +10,7 @@ class MsResumeApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// This test is to ensure the Spring context loads successfully.
 	}
 
 }

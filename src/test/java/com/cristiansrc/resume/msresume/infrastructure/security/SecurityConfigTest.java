@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
@@ -17,6 +16,8 @@ class SecurityConfigTest {
 
     @MockBean
     private JwtRequestFilter jwtRequestFilter;
+    @MockBean
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

@@ -2,7 +2,7 @@ package com.cristiansrc.resume.msresume.application.exception;
 
 import java.nio.file.AccessDeniedException;
 import java.time.OffsetDateTime;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ErrorResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ErrorResponseValidationErrorsInner;

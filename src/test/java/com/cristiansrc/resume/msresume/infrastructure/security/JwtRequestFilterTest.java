@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -100,5 +102,23 @@ class JwtRequestFilterTest {
         jwtRequestFilter.doFilterInternal(request, response, filterChain);
 
         verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    void shouldNotFilterPublicEndpoints() throws ServletException {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/v1/ms-resume/public/label/1");
+        when(request.getContextPath()).thenReturn("/v1/ms-resume");
+
+        assertTrue(jwtRequestFilter.shouldNotFilter(request));
+    }
+
+    @Test
+    void shouldFilterNonPublicEndpoints() throws ServletException {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/v1/ms-resume/secure/label");
+        when(request.getContextPath()).thenReturn("/v1/ms-resume");
+
+        assertFalse(jwtRequestFilter.shouldNotFilter(request));
     }
 }

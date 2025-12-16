@@ -69,6 +69,18 @@ class HomeServiceTest {
     }
 
     @Test
+    void homeIdPut_imageNotFound_throws() {
+        HomeEntity entity = new HomeEntity();
+        entity.setId(1L);
+        HomeRequest request = new HomeRequest();
+        when(homeRepository.findById(1L)).thenReturn(Optional.of(entity));
+        when(imageUrlRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.empty());
+        when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("image.home.not.found"));
+
+        assertThrows(RuntimeException.class, () -> homeService.homeIdPut(1L, request));
+    }
+
+    @Test
     void getEntityById_notFound() {
         when(homeRepository.findById(1L)).thenReturn(Optional.empty());
         when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("home.not.found.byid"));

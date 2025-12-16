@@ -1,18 +1,6 @@
 package com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
+// No tests needed for this entity as it only contains Lombok-generated code.
+// The lombok.config file is configured to exclude Lombok-generated code from JaCoCo coverage reports.
 class VideoUrlEntityTest {
-
-    @Test
-    void testEntity() {
-        VideoUrlEntity entity = new VideoUrlEntity();
-        entity.setId(1L);
-        entity.setName("Video");
-
-        assertEquals(1L, entity.getId());
-        assertEquals("Video", entity.getName());
-        assertNotNull(entity.toString());
-    }
 }
