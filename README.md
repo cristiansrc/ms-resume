@@ -29,35 +29,48 @@ La arquitectura y el diseño siguen las mejores prácticas REST, OpenAPI 3.1.0 y
 
 ## Estructura de carpetas
 
-```plaintext
-src/
-  main/
-    java/
-      com/
-        cristiansrc/
-          resume/
-            msresume/
-              MsResumeApplication.java
-              application/
-                exception/
-                port/
-                  interactor/
-                  output/
-                    repository/
-              infrastructure/
-                controller/
-                mapper/
-                repository/
-                  jpa/
-                    entity/
-              config/
-    resources/
-      db/
-        migration/      # Scripts Flyway para migración de BD
-      messages.properties   # Mensajes internacionalizados
-      application.properties
-  // ...otros paquetes que se agreguen en el futuro según avance el desarrollo...
+> **Nota:** El proyecto está en proceso de migración hacia una Arquitectura Hexagonal. La estructura actual refleja una organización por capas tradicional de Spring Boot, que evolucionará para separar completamente el dominio de la infraestructura.
+
 ```
+src/
+├── main/
+│   ├── java/
+│   │   └── com/cristiansrc/resume/msresume/
+│   │       ├── MsResumeApplication.java        # Clase principal de la aplicación
+│   │       ├── application/                    # Lógica de negocio y casos de uso
+│   │       │   └── usecase/
+│   │       ├── config/                         # Configuración de Spring (Beans, Seguridad)
+│   │       └── infrastructure/                 # Interacción con tecnologías externas
+│   │           ├── controller/                 # Controladores REST
+│   │           ├── mapper/                     # Mappers entre DTOs y Entidades
+│   │           ├── repository/                 # Repositorios (implementación de persistencia)
+│   │           │   └── jpa/
+│   │           │       ├── entity/             # Entidades JPA
+│   │           │       └── repository/         # Interfaces de Spring Data JPA
+│   │           ├── security/                   # Configuración de seguridad y JWT
+│   │           └── util/                       # Clases de utilidad
+│   └── resources/
+│       ├── db/migration/                       # Scripts de migración de la base de datos (Flyway)
+│       ├── application.properties              # Configuración principal
+│       ├── application-local.properties        # Perfil para desarrollo local
+│       └── openapi.yml                         # Especificación OpenAPI
+└── test/
+    └── java/
+        └── com/cristiansrc/resume/msresume/    # Pruebas unitarias y de integración
+```
+
+### Descripción de los Paquetes
+
+-   **MsResumeApplication**: Punto de entrada de la aplicación Spring Boot.
+-   **application**: Contiene la lógica de negocio principal y los casos de uso.
+-   **config**: Clases de configuración de Spring, como la configuración de beans y seguridad.
+-   **infrastructure**: Contiene las implementaciones de los componentes que interactúan con sistemas externos.
+    -   **controller**: Controladores de la API REST.
+    -   **mapper**: Mapeadores de objetos entre las capas de la aplicación (por ejemplo, DTO a entidad).
+    -   **repository**: Implementaciones de los repositorios para el acceso a datos, utilizando JPA.
+    -   **security**: Clases relacionadas con la seguridad, como la configuración de JWT.
+    -   **util**: Clases de utilidad.
+-   **resources**: Contiene los recursos de la aplicación, como los scripts de migración de la base de datos y los archivos de configuración.
 
 ---
 
@@ -82,19 +95,27 @@ mvn openapi-generator:generate
 ---
 
 ## Tabla de Endpoints principales
+
+### Endpoints Públicos (no requieren autenticación)
 | Entidad          | Métodos         | Endpoint                                  | Descripción                                   |
 |------------------|-----------------|-------------------------------------------|-----------------------------------------------|
-| Basic Data       | GET, PUT        | `/v1/ms-resume/basic-data/{id}`           | Consultar o actualizar datos personales       |
-| ImageUrl         | GET, POST, GET(id), DELETE | `/v1/ms-resume/image-url`, `/v1/ms-resume/image-url/{id}` | Gestión de URLs de imágenes                    |
-| VideoUrl         | GET, POST, GET(id), DELETE | `/v1/ms-resume/video-url`, `/v1/ms-resume/video-url/{id}` | Gestión de URLs de videos                      |
-| Label            | GET, POST, GET(id), DELETE | `/v1/ms-resume/label`, `/v1/ms-resume/label/{id}`           | Gestión de etiquetas                          |
-| Home             | GET, PUT        | `/v1/ms-resume/home/{id}`                  | Gestión de la información del home            |
-| Blog             | GET(pag), POST, GET(id), PUT, DELETE | `/v1/ms-resume/blog`, `/v1/ms-resume/blog/{id}` | Artículos de blog con paginación              |
-| SkillType        | GET, POST, GET(id), PUT, DELETE | `/v1/ms-resume/skill-type`, `/v1/ms-resume/skill-type/{id}` | Tipos de habilidad                             |
-| Skill            | GET, POST, GET(id), PUT, DELETE | `/v1/ms-resume/skill`, `/v1/ms-resume/skill/{id}` | Habilidades y especializaciones               |
-| SkillSon         | GET, POST, GET(id), PUT, DELETE | `/v1/ms-resume/skill-son`, `/v1/ms-resume/skill-son/{id}` | Especializaciones de habilidades              |
-| FuturedProject   | GET, POST, GET(id), PUT, DELETE | `/v1/ms-resume/futured-project`, `/v1/ms-resume/futured-project/{id}` | Proyectos destacados                          |
-| Curriculum (PDF) | GET             | `/v1/ms-resume/curriculum`                | Descargar CV en formato PDF                   |
+| Authentication   | POST            | `/login`                                  | Autenticar usuario y obtener token JWT        |
+| Public           | GET             | `/public/**`                              | Endpoints públicos para consulta de datos     |
+| Curriculum (PDF) | GET             | `/public/curriculum`                      | Descargar CV en formato PDF                   |
+
+### Endpoints Privados (requieren autenticación)
+| Entidad          | Métodos         | Endpoint                                  | Descripción                                   |
+|------------------|-----------------|-------------------------------------------|-----------------------------------------------|
+| Basic Data       | GET, PUT        | `/basic-data/{id}`                        | Consultar o actualizar datos personales       |
+| ImageUrl         | GET, POST, GET(id), DELETE | `/image-url`, `/image-url/{id}`       | Gestión de URLs de imágenes                    |
+| VideoUrl         | GET, POST, GET(id), DELETE | `/video-url`, `/video-url/{id}`       | Gestión de URLs de videos                      |
+| Label            | GET, POST, GET(id), DELETE | `/label`, `/label/{id}`               | Gestión de etiquetas                          |
+| Home             | GET, PUT        | `/home/{id}`                              | Gestión de la información del home            |
+| Blog             | GET(pag), POST, GET(id), PUT, DELETE | `/blog`, `/blog/{id}`                 | Artículos de blog con paginación              |
+| SkillType        | GET, POST, GET(id), PUT, DELETE | `/skill-type`, `/skill-type/{id}`     | Tipos de habilidad                             |
+| Skill            | GET, POST, GET(id), PUT, DELETE | `/skill`, `/skill/{id}`               | Habilidades y especializaciones               |
+| SkillSon         | GET, POST, GET(id), PUT, DELETE | `/skill-son`, `/skill-son/{id}`       | Especializaciones de habilidades              |
+| FuturedProject   | GET, POST, GET(id), PUT, DELETE | `/futured-project`, `/futured-project/{id}` | Proyectos destacados                          |
 
 ---
 
@@ -327,63 +348,6 @@ curl -X GET "http://localhost:8080/v1/ms-resume/featured-project" -H 'Accept: ap
 # Obtener experiencia
 curl -X GET "http://localhost:8080/v1/ms-resume/experience" -H 'Accept: application/json'
 ```
-
-## Estructura del Proyecto
-
-```
-src/
-├── main/
-│   ├── java/
-│   │   └── com/cristiansrc/resume/msresume/
-│   │       ├── application/                    # Capa de aplicación
-│   │       │   ├── exception/                  # Excepciones personalizadas
-│   │       │   │   ├── BusinessException.java
-│   │       │   │   └── TechnicalException.java
-│   │       │   └── port/                       # Puertos (interfaces) para la arquitectura hexagonal
-│   │       │       ├── input/                  # Puertos de entrada (casos de uso)
-│   │       │       └── output/                 # Puertos de salida (repositorios)
-│   │       ├── domain/                         # Capa de dominio
-│   │       │   ├── entity/                     # Entidades de dominio
-│   │       │   ├── repository/                 # Interfaces de repositorio
-│   │       │   ├── service/                    # Servicios de dominio
-│   │       │   └── valueobject/                # Objetos de valor
-│   │       └── infrastructure/                 # Capa de infraestructura
-│   │           ├── adapter/                    # Adaptadores para la arquitectura hexagonal
-│   │           │   ├── input/                  # Adaptadores de entrada (controllers)
-│   │           │   └── output/                 # Adaptadores de salida (implementación repos)
-│   │           ├── config/                     # Configuraciones de Spring
-│   │           ├── mapper/                     # Mappers para convertir entre DTOs y entidades
-│   │           ├── persistence/                # Entidades JPA y repositorios Spring Data
-│   │           └── util/                       # Clases utilitarias
-│   └── resources/
-│       ├── db/migration/                       # Scripts de migración Flyway
-│       ├── application.properties              # Configuración principal
-│       ├── application-local.properties        # Configuración para desarrollo local
-│       ├── application-test.properties         # Configuración para pruebas
-│       └── messages.properties                 # Mensajes i18n
-└── test/                                       # Pruebas unitarias y de integración
-```
-
-### Descripción de los Paquetes Principales
-
-#### Application
-- **exception**: Manejo centralizado de excepciones del negocio y técnicas
-- **port/input**: Interfaces que definen los casos de uso de la aplicación
-- **port/output**: Interfaces que definen las operaciones necesarias para persistencia
-
-#### Domain
-- **entity**: Clases que representan las entidades principales del negocio
-- **repository**: Interfaces que definen los contratos para acceso a datos
-- **service**: Implementación de la lógica de negocio
-- **valueobject**: Objetos inmutables que no tienen identidad pero describen características
-
-#### Infrastructure
-- **adapter/input**: Implementación de controladores REST
-- **adapter/output**: Implementación de repositorios y servicios externos
-- **config**: Configuraciones de Spring Boot, seguridad, etc
-- **mapper**: Conversión entre objetos DTO y entidades de dominio
-- **persistence**: Entidades JPA y repositorios Spring Data JPA
-- **util**: Clases utilitarias como resolución de mensajes, validaciones, etc
 
 ---
 
