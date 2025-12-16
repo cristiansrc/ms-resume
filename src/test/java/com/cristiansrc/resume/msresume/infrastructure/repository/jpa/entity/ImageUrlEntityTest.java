@@ -8,10 +8,8 @@ class ImageUrlEntityTest {
     @Test
     void testEntity() {
         ImageUrlEntity entity = new ImageUrlEntity();
-        entity.setId(1L);
         entity.setName("Image");
 
-        assertEquals(1L, entity.getId());
         assertEquals("Image", entity.getName());
         assertNotNull(entity.toString());
     }

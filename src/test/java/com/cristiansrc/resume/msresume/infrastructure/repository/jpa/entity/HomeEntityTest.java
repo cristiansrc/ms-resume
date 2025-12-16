@@ -8,10 +8,8 @@ class HomeEntityTest {
     @Test
     void testEntity() {
         HomeEntity entity = new HomeEntity();
-        entity.setId(1L);
         entity.setGreeting("Hello");
 
-        assertEquals(1L, entity.getId());
         assertEquals("Hello", entity.getGreeting());
         assertNotNull(entity.toString());
     }

@@ -7,7 +7,6 @@ import lombok.Setter;
 import java.sql.Timestamp;
 
 @Getter
-@Setter
 @MappedSuperclass
 public abstract class AuditBasicEntity {
 
@@ -22,6 +21,7 @@ public abstract class AuditBasicEntity {
     private Timestamp updated;
 
     @Column(nullable = false)
+    @Setter
     private Boolean deleted;
 
     @PrePersist

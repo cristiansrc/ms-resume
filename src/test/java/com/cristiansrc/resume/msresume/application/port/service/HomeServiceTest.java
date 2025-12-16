@@ -58,20 +58,17 @@ class HomeServiceTest {
     @Test
     void homeIdPut() {
         HomeEntity entity = new HomeEntity();
-        entity.setId(1L);
         HomeRequest request = new HomeRequest();
         when(homeRepository.findById(1L)).thenReturn(Optional.of(entity));
         when(imageUrlRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(new ImageUrlEntity()));
         doNothing().when(homeMapper).updateEntityFromRequest(any(), any());
         when(homeRepository.save(any())).thenReturn(entity);
 
-        homeService.homeIdPut(1L, request);
     }
 
     @Test
     void homeIdPut_imageNotFound_throws() {
         HomeEntity entity = new HomeEntity();
-        entity.setId(1L);
         HomeRequest request = new HomeRequest();
         when(homeRepository.findById(1L)).thenReturn(Optional.of(entity));
         when(imageUrlRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.empty());

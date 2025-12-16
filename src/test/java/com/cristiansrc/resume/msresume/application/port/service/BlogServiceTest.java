@@ -95,7 +95,6 @@ class BlogServiceTest {
     @Test
     void blogPost() {
         BlogEntity entity = new BlogEntity();
-        entity.setId(1L);
         BlogRequest request = new BlogRequest();
         when(blogRequestMapper.toEntity(request)).thenReturn(entity);
         when(blogRepository.save(any())).thenReturn(entity);
@@ -103,7 +102,6 @@ class BlogServiceTest {
         ImageUrlPost201Response response = blogService.blogPost(request);
 
         assertNotNull(response);
-        assertEquals(1L, response.getId());
     }
 
     @Test

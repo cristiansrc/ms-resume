@@ -43,7 +43,6 @@ class BasicDataServiceTest {
     @Test
     void basicDataIdGet_success() {
         BasicDataEntity entity = new BasicDataEntity();
-        entity.setId(1L);
         BasicDataResponse response = new BasicDataResponse();
         response.setId(1L);
 
@@ -67,7 +66,6 @@ class BasicDataServiceTest {
     @Test
     void basicDataIdPut_success() {
         BasicDataEntity entity = new BasicDataEntity();
-        entity.setId(1L);
         BasicDataRequest request = new BasicDataRequest();
 
         when(basicDataRepository.findById(1L)).thenReturn(Optional.of(entity));

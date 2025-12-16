@@ -51,6 +51,8 @@ class FuturedProjectServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        // Common mock for the mapper to avoid NPE
+        when(futuredProjectMapper.toFuturedProjectEntity(any(FuturedProjectRequest.class))).thenReturn(new FuturedProjectEntity());
     }
 
     @Test
@@ -102,12 +104,10 @@ class FuturedProjectServiceTest {
     @Test
     void futuredProjectPost() {
         FuturedProjectEntity entity = new FuturedProjectEntity();
-        entity.setId(1L);
         FuturedProjectRequest request = new FuturedProjectRequest();
         request.setExperienceId(1L);
         request.setImageUrlId(1L);
         request.setImageListUrlId(1L);
-        when(futuredProjectMapper.toFuturedProjectEntity(request)).thenReturn(entity);
         when(experienceRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(new ExperienceEntity()));
         when(imageUrlRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(new ImageUrlEntity()));
         when(futuredProjectRepository.save(any())).thenReturn(entity);
@@ -115,7 +115,6 @@ class FuturedProjectServiceTest {
         ImageUrlPost201Response response = futuredProjectService.futuredProjectPost(request);
 
         assertNotNull(response);
-        assertEquals(1L, response.getId());
     }
 
     @Test
@@ -124,5 +123,44 @@ class FuturedProjectServiceTest {
         when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("futured.project.not.found"));
 
         assertThrows(RuntimeException.class, () -> futuredProjectService.futuredProjectIdGet(1L));
+    }
+
+    @Test
+    void save_experienceNotFound() {
+        FuturedProjectRequest request = new FuturedProjectRequest();
+        request.setExperienceId(1L);
+        when(experienceRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.empty());
+        when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("experience.not.found"));
+
+        assertThrows(RuntimeException.class, () -> futuredProjectService.futuredProjectPost(request));
+    }
+
+    @Test
+    void save_imageListUrlNotFound() {
+        FuturedProjectRequest request = new FuturedProjectRequest();
+        request.setExperienceId(1L);
+        request.setImageListUrlId(2L); // Use a different ID to avoid mock conflicts
+        request.setImageUrlId(1L);
+
+        when(experienceRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(new ExperienceEntity()));
+        when(imageUrlRepository.findByIdAndDeletedFalse(2L)).thenReturn(Optional.empty());
+        when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("image.list.url.not.found"));
+
+        assertThrows(RuntimeException.class, () -> futuredProjectService.futuredProjectPost(request));
+    }
+
+    @Test
+    void save_imageUrlNotFound() {
+        FuturedProjectRequest request = new FuturedProjectRequest();
+        request.setExperienceId(1L);
+        request.setImageListUrlId(2L);
+        request.setImageUrlId(1L);
+
+        when(experienceRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(new ExperienceEntity()));
+        when(imageUrlRepository.findByIdAndDeletedFalse(2L)).thenReturn(Optional.of(new ImageUrlEntity()));
+        when(imageUrlRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.empty());
+        when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("image.url.not.found"));
+
+        assertThrows(RuntimeException.class, () -> futuredProjectService.futuredProjectPost(request));
     }
 }

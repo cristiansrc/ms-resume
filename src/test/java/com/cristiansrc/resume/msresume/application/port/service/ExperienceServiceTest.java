@@ -87,7 +87,6 @@ class ExperienceServiceTest {
     @Test
     void experiencePost() {
         ExperienceEntity entity = new ExperienceEntity();
-        entity.setId(1L);
         entity.setSkillSons(new ArrayList<>());
         ExperienceRequest request = new ExperienceRequest();
         request.setSkillSonIds(Collections.singletonList(1L));
@@ -98,7 +97,6 @@ class ExperienceServiceTest {
         ImageUrlPost201Response response = experienceService.experiencePost(request);
 
         assertNotNull(response);
-        assertEquals(1L, response.getId());
     }
 
     @Test
@@ -116,5 +114,15 @@ class ExperienceServiceTest {
         when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("experience.not.found.byid"));
 
         assertThrows(RuntimeException.class, () -> experienceService.experienceIdGet(1L));
+    }
+
+    @Test
+    void getSkillSons_notFound() {
+        ExperienceRequest request = new ExperienceRequest();
+        request.setSkillSonIds(Collections.singletonList(1L));
+        when(skillSonRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.empty());
+        when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("skill.not.found"));
+
+        assertThrows(RuntimeException.class, () -> experienceService.experiencePost(request));
     }
 }

@@ -87,7 +87,6 @@ class SkillSonServiceTest {
     @Test
     void skillSonPost() {
         SkillSonEntity entity = new SkillSonEntity();
-        entity.setId(1L);
         SkillSonRequest request = new SkillSonRequest();
         when(skillSonMapper.toEntity(request)).thenReturn(entity);
         when(skillSonRepository.save(any())).thenReturn(entity);
@@ -95,7 +94,6 @@ class SkillSonServiceTest {
         ImageUrlPost201Response response = skillSonService.skillSonPost(request);
 
         assertNotNull(response);
-        assertEquals(1L, response.getId());
     }
 
     @Test

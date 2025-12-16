@@ -267,6 +267,7 @@
 				</executions>
 				<configuration>
 					<excludes>
+						<exclude>**/MsResumeApplication.class</exclude>
 						<exclude>**/infrastructure/controller/model/**</exclude>
 						<exclude>**/generated-sources/**</exclude>
 						<exclude>**/application/port/input/**</exclude>

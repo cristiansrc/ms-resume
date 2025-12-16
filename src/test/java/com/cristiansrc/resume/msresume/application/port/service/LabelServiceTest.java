@@ -76,7 +76,6 @@ class LabelServiceTest {
     @Test
     void labelPost() {
         LabelEntity entity = new LabelEntity();
-        entity.setId(1L);
         LabelRequest request = new LabelRequest();
         when(labelMapper.labelToLabelEntity(request)).thenReturn(entity);
         when(labelRepository.save(any())).thenReturn(entity);
@@ -84,7 +83,6 @@ class LabelServiceTest {
         ImageUrlPost201Response response = labelService.labelPost(request);
 
         assertNotNull(response);
-        assertEquals(1L, response.getId());
     }
 
     @Test

@@ -84,7 +84,6 @@ class ImageUrlServiceTest {
     @Test
     void imageUrlPost() {
         ImageUrlEntity entity = new ImageUrlEntity();
-        entity.setId(1L);
         ImageUrlRequest request = new ImageUrlRequest();
         request.setName("test");
         request.setFile("dGVzdA==");
@@ -94,7 +93,6 @@ class ImageUrlServiceTest {
         ImageUrlPost201Response response = imageUrlService.imageUrlPost(request);
 
         assertNotNull(response);
-        assertEquals(1L, response.getId());
     }
 
     @Test

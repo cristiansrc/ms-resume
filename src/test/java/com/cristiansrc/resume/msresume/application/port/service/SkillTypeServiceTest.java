@@ -96,7 +96,6 @@ class SkillTypeServiceTest {
     @Test
     void skillTypePost() {
         SkillTypeEntity entity = new SkillTypeEntity();
-        entity.setId(1L);
         entity.setSkills(new ArrayList<>());
         SkillTypeRequest request = new SkillTypeRequest();
         request.setSkillIds(Collections.singletonList(1L));
@@ -107,7 +106,6 @@ class SkillTypeServiceTest {
         ImageUrlPost201Response response = skillTypeService.skillTypePost(request);
 
         assertNotNull(response);
-        assertEquals(1L, response.getId());
     }
 
     @Test
@@ -116,5 +114,15 @@ class SkillTypeServiceTest {
         when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("skill.type.not.found"));
 
         assertThrows(RuntimeException.class, () -> skillTypeService.skillTypeIdGet(1L));
+    }
+
+    @Test
+    void saveEntity_skillNotFound() {
+        SkillTypeRequest request = new SkillTypeRequest();
+        request.setSkillIds(Collections.singletonList(1L));
+        when(skillRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.empty());
+        when(messageResolver.notFound(any(), any())).thenThrow(new RuntimeException("skill.not.found"));
+
+        assertThrows(RuntimeException.class, () -> skillTypeService.skillTypePost(request));
     }
 }
