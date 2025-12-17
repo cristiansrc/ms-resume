@@ -27,11 +27,11 @@ public class BasicDataEntity extends AuditBasicEntity {
 
     @Column(name = "first_surname", nullable = false)
     @NotNull
-    private String firstSurname;
+    private String firstSurName;
 
     @Column(name = "others_sur_name", nullable = false)
     @NotNull
-    private String othersSurname;
+    private String othersSurName;
 
     @Column(name = "date_birth", nullable = false)
     @NotNull
@@ -41,6 +41,10 @@ public class BasicDataEntity extends AuditBasicEntity {
     @NotNull
     private String located;
 
+    @Column(name = "located_eng", nullable = false)
+    @NotNull
+    private String locatedEng;
+
     @Column(name = "start_working_date", nullable = false)
     @NotNull
     private LocalDateTime startWorkingDate;
@@ -48,6 +52,10 @@ public class BasicDataEntity extends AuditBasicEntity {
     @Column(nullable = false)
     @NotNull
     private String greeting;
+
+    @Column(name = "greeting_eng", nullable = false)
+    @NotNull
+    private String greetingEng;
 
     @Column(nullable = false)
     @NotNull
@@ -72,5 +80,9 @@ public class BasicDataEntity extends AuditBasicEntity {
     @Column(nullable = false)
     @NotNull
     private String description;
+
+    @Column(name = "description_eng", nullable = false)
+    @NotNull
+    private String descriptionEng;
 
 }
