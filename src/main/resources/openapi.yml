@@ -1888,7 +1888,7 @@ components:
           description: Mensaje de bienvenida
           minLength: 1
           maxLength: 200
-        imageUrlid:
+        imageUrlId:
           type: integer
           format: int64
           description: Identificador de la imagen (para actualizaciones)

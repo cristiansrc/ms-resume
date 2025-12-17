@@ -6,7 +6,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Setter
@@ -35,7 +35,7 @@ public class BasicDataEntity extends AuditBasicEntity {
 
     @Column(name = "date_birth", nullable = false)
     @NotNull
-    private LocalDateTime dateBirth;
+    private LocalDate dateBirth;
 
     @Column(nullable = false)
     @NotNull
@@ -47,7 +47,7 @@ public class BasicDataEntity extends AuditBasicEntity {
 
     @Column(name = "start_working_date", nullable = false)
     @NotNull
-    private LocalDateTime startWorkingDate;
+    private LocalDate startWorkingDate;
 
     @Column(nullable = false)
     @NotNull
