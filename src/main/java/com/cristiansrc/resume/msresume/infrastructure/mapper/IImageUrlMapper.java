@@ -5,10 +5,15 @@ import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.Imag
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface IImageUrlMapper {
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "name", source = "name")
     ImageUrlResponse imageUrlToImageUrlResponse(ImageUrlEntity imageUrlEntity);
+    List<ImageUrlResponse> toImageUrlResponseList(List<ImageUrlEntity> imageUrlEntities);
+
+
 }

@@ -17,9 +17,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 class VideoUrlControllerTest {
@@ -45,6 +48,14 @@ class VideoUrlControllerTest {
     }
 
     @Test
+    void videoUrlGet_empty() {
+        when(videoUrlService.videoUrlGet()).thenReturn(Collections.emptyList());
+        ResponseEntity<List<VideoUrlResponse>> response = videoUrlController.videoUrlGet();
+        assertNotNull(response);
+        assertEquals(0, response.getBody().size());
+    }
+
+    @Test
     void videoUrlIdDelete() {
         doNothing().when(videoUrlService).videoUrlIdDelete(any());
         ResponseEntity<Void> response = videoUrlController.videoUrlIdDelete(1L);
@@ -52,10 +63,22 @@ class VideoUrlControllerTest {
     }
 
     @Test
+    void videoUrlIdDelete_notFound() {
+        doThrow(new RuntimeException("not found")).when(videoUrlService).videoUrlIdDelete(1L);
+        assertThrows(RuntimeException.class, () -> videoUrlController.videoUrlIdDelete(1L));
+    }
+
+    @Test
     void videoUrlIdGet() {
         when(videoUrlService.videoUrlIdGet(1L)).thenReturn(new VideoUrlResponse());
         ResponseEntity<VideoUrlResponse> response = videoUrlController.videoUrlIdGet(1L);
         assertNotNull(response);
+    }
+
+    @Test
+    void videoUrlIdGet_notFound() {
+        when(videoUrlService.videoUrlIdGet(1L)).thenThrow(new RuntimeException("not found"));
+        assertThrows(RuntimeException.class, () -> videoUrlController.videoUrlIdGet(1L));
     }
 
     @Test

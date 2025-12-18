@@ -1,5 +1,6 @@
 package com.cristiansrc.resume.msresume.infrastructure.util;
 
+import com.cristiansrc.resume.msresume.application.exception.InvalidCredentialsException;
 import com.cristiansrc.resume.msresume.application.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -18,5 +19,10 @@ public class MessageResolver {
     public ResourceNotFoundException notFound(String key, Object... args) {
         String msg = getMessage(key, args);
         return new ResourceNotFoundException(msg);
+    }
+
+    public InvalidCredentialsException invalidCredentials(String key, Object... args) {
+        String msg = getMessage(key, args);
+        return new InvalidCredentialsException(msg);
     }
 }

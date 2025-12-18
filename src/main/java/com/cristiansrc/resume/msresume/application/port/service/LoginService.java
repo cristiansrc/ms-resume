@@ -1,5 +1,6 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
+import com.cristiansrc.resume.msresume.application.exception.InvalidCredentialsException;
 import com.cristiansrc.resume.msresume.application.port.interactor.ILoginService;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LoginPost200Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LoginPostRequest;
@@ -36,6 +37,6 @@ public class LoginService implements ILoginService {
             return response;
         }
 
-        throw messageResolver.notFound("login.user.pass.not.found");
+        throw new InvalidCredentialsException(messageResolver.getMessage("login.user.pass.not.found"));
     }
 }

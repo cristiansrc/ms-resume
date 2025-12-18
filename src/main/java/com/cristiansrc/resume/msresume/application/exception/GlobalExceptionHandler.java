@@ -59,6 +59,12 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(HttpStatus.NOT_FOUND, msg, request);
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentialsExceptions(InvalidCredentialsException ex, HttpServletRequest request) {
+        logger.warn("Invalid credentials: {}", ex.getMessage());
+        return buildResponseEntity(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, HttpServletRequest request) {
         logger.error("Unhandled exception: ", ex);

@@ -1844,15 +1844,15 @@ components:
           type: string
           description: Nombre identificador del video
           minLength: 1
-          maxLength: 100
+          maxLength: 255
         nameEng:
           type: string
           description: Nombre identificador del video
           minLength: 1
-          maxLength: 100
+          maxLength: 255
         url:
           type: string
-          format: uri
+          format: string
           description: URL del video en YouTube
           minLength: 1
           maxLength: 500
@@ -2217,7 +2217,7 @@ components:
           description: Nombre identificador del video en ingles
         url:
           type: string
-          format: uri
+          format: string
           description: URL del video en YouTube
 
     LabelResponse:

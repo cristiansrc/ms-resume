@@ -27,7 +27,7 @@ public class LabelController implements LabelApi {
     @Override
     public ResponseEntity<Void> labelIdDelete(Long id) {
         labelService.labelIdDelete(id);
-        return LabelApi.super.labelIdDelete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override

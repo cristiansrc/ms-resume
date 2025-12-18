@@ -32,11 +32,7 @@ public class ImageUrlService implements IImageUrlService {
     public List<ImageUrlResponse> imageUrlGet() {
         log.info("Fetching all image URLs");
         var listEntities = imageUrlRepository.findAllByDeletedFalse();
-
-        var listResponse = listEntities.stream()
-                .map(this::imageUrlToImageUrlResponse)
-                .toList();
-
+        var listResponse = imageUrlMapper.toImageUrlResponseList(listEntities);
         log.info("Fetched {} image URLs", listResponse.size());
         return listResponse;
     }

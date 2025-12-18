@@ -1,5 +1,6 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
+import com.cristiansrc.resume.msresume.application.exception.InvalidCredentialsException;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LoginPost200Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LoginPostRequest;
 import com.cristiansrc.resume.msresume.infrastructure.security.JwtUtil;
@@ -60,8 +61,8 @@ class LoginServiceTest {
         request.setPassword("wrong-password");
 
         when(passwordEncoder.matches(any(), any())).thenReturn(false);
-        when(messageResolver.notFound(any())).thenThrow(new RuntimeException("login.user.pass.not.found"));
+        when(messageResolver.invalidCredentials("login.user.pass.not.found")).thenThrow(new InvalidCredentialsException("login.user.pass.not.found"));
 
-        assertThrows(RuntimeException.class, () -> loginService.loginPost(request));
+        assertThrows(InvalidCredentialsException.class, () -> loginService.loginPost(request));
     }
 }
