@@ -1830,7 +1830,6 @@ components:
           type: string
           description: Ruta o identificador del archivo de imagen
           minLength: 1
-          maxLength: 500
 
     VideoUrlRequest:
       type: object

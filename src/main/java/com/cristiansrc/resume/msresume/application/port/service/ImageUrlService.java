@@ -32,7 +32,7 @@ public class ImageUrlService implements IImageUrlService {
     public List<ImageUrlResponse> imageUrlGet() {
         log.info("Fetching all image URLs");
         var listEntities = imageUrlRepository.findAllByDeletedFalse();
-        var listResponse = imageUrlMapper.toImageUrlResponseList(listEntities);
+        var listResponse = imageUrlMapper.toImageUrlResponseList(listEntities, s3Service);
         log.info("Fetched {} image URLs", listResponse.size());
         return listResponse;
     }
@@ -52,7 +52,7 @@ public class ImageUrlService implements IImageUrlService {
     public ImageUrlResponse imageUrlIdGet(Long id) {
         log.info("Fetching image URL with id: {}", id);
         var entity = entityById(id);
-        var response = imageUrlToImageUrlResponse(entity);
+        var response = imageUrlMapper.imageUrlToImageUrlResponse(entity, s3Service);
         log.info("Fetched image URL with id: {}", id);
         return response;
     }
@@ -65,6 +65,7 @@ public class ImageUrlService implements IImageUrlService {
         var nameFileAws = s3Service.uploadFile(file);
         var entity = new ImageUrlEntity();
         entity.setName(imageUrlRequest.getName());
+        entity.setNameEng(imageUrlRequest.getNameEng());
         entity.setNameFileAws(nameFileAws);
         var savedEntity = imageUrlRepository.save(entity);
         log.info("Created new image URL with id: {}", savedEntity.getId());
@@ -73,16 +74,14 @@ public class ImageUrlService implements IImageUrlService {
         return responde;
     }
 
+
     private ImageUrlEntity entityById(Long id) {
         return imageUrlRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> messageResolver.notFound("image.home.not.found", id));
     }
 
     private ImageUrlResponse imageUrlToImageUrlResponse(ImageUrlEntity entity) {
-        var response = imageUrlMapper.imageUrlToImageUrlResponse(entity);
-        var nameFileAws = entity.getNameFileAws();
-        var urlFileAws = s3Service.getAwsUrlFile(nameFileAws);
-        response.setUrl(urlFileAws);
-        return response;
+        // Mantengo este helper en caso de uso interno; delega al mapper con contexto
+        return imageUrlMapper.imageUrlToImageUrlResponse(entity, s3Service);
     }
 }

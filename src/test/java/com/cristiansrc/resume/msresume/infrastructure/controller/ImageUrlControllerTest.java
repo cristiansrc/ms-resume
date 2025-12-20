@@ -17,6 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -39,9 +40,12 @@ class ImageUrlControllerTest {
 
     @Test
     void imageUrlGet() {
-        when(imageUrlService.imageUrlGet()).thenReturn(Collections.singletonList(new ImageUrlResponse()));
+        ImageUrlResponse resp = new ImageUrlResponse();
+        resp.setUrl("http://test.com/test.txt");
+        when(imageUrlService.imageUrlGet()).thenReturn(Collections.singletonList(resp));
         ResponseEntity<List<ImageUrlResponse>> response = imageUrlController.imageUrlGet();
         assertNotNull(response);
+        assertEquals("http://test.com/test.txt", response.getBody().get(0).getUrl());
     }
 
     @Test
@@ -53,9 +57,12 @@ class ImageUrlControllerTest {
 
     @Test
     void imageUrlIdGet() {
-        when(imageUrlService.imageUrlIdGet(1L)).thenReturn(new ImageUrlResponse());
+        ImageUrlResponse resp = new ImageUrlResponse();
+        resp.setUrl("http://test.com/test.txt");
+        when(imageUrlService.imageUrlIdGet(1L)).thenReturn(resp);
         ResponseEntity<ImageUrlResponse> response = imageUrlController.imageUrlIdGet(1L);
         assertNotNull(response);
+        assertEquals("http://test.com/test.txt", response.getBody().getUrl());
     }
 
     @Test

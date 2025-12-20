@@ -51,12 +51,18 @@ class ImageUrlServiceTest {
         ImageUrlEntity entity = new ImageUrlEntity();
         entity.setNameFileAws("test.txt");
         when(imageUrlRepository.findAllByDeletedFalse()).thenReturn(Collections.singletonList(entity));
-        when(imageUrlMapper.imageUrlToImageUrlResponse(any())).thenReturn(new ImageUrlResponse());
+        // Mockear primero S3
         when(s3Service.getAwsUrlFile(any())).thenReturn("http://test.com/test.txt");
+        // El mapper ahora convierte listas y recibe IS3Service como contexto; devolverá response con URL ya seteada (simular afterMapping)
+        ImageUrlResponse resp = new ImageUrlResponse();
+        resp.setUrl("http://test.com/test.txt");
+        when(imageUrlMapper.toImageUrlResponseList(any(), any())).thenReturn(Collections.singletonList(resp));
 
         List<ImageUrlResponse> response = imageUrlService.imageUrlGet();
 
         assertNotNull(response);
+        assertEquals(1, response.size());
+        assertEquals("http://test.com/test.txt", response.get(0).getUrl());
     }
 
     @Test
@@ -73,12 +79,15 @@ class ImageUrlServiceTest {
         ImageUrlEntity entity = new ImageUrlEntity();
         entity.setNameFileAws("test.txt");
         when(imageUrlRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(entity));
-        when(imageUrlMapper.imageUrlToImageUrlResponse(any())).thenReturn(new ImageUrlResponse());
         when(s3Service.getAwsUrlFile(any())).thenReturn("http://test.com/test.txt");
+        ImageUrlResponse resp = new ImageUrlResponse();
+        resp.setUrl("http://test.com/test.txt");
+        when(imageUrlMapper.imageUrlToImageUrlResponse(any(), any())).thenReturn(resp);
 
         ImageUrlResponse response = imageUrlService.imageUrlIdGet(1L);
 
         assertNotNull(response);
+        assertEquals("http://test.com/test.txt", response.getUrl());
     }
 
     @Test

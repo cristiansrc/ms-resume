@@ -39,7 +39,7 @@ class S3ServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         ReflectionTestUtils.setField(s3Service, "bucketName", "test-bucket");
-        ReflectionTestUtils.setField(s3Service, "awsUrlFormat", "https://%s.s3.amazonaws.com/%s");
+        ReflectionTestUtils.setField(s3Service, "awsUrlFormat", "https://s3.amazonaws.com/%s/%s");
     }
 
     @Test
@@ -123,7 +123,7 @@ class S3ServiceTest {
     void getFileUrl() throws Exception {
         S3Utilities s3Utilities = mock(S3Utilities.class);
         when(s3Client.utilities()).thenReturn(s3Utilities);
-        when(s3Utilities.getUrl(any(GetUrlRequest.class))).thenReturn(new URL("http://test.com"));
+        when(s3Utilities.getUrl(any(GetUrlRequest.class))).thenReturn(new URL("https://signed.example.com/test.txt"));
         assertDoesNotThrow(() -> s3Service.getFileUrl("test.txt"));
     }
 
@@ -136,8 +136,20 @@ class S3ServiceTest {
     }
 
     @Test
-    void getAwsUrlFile_returnsFormattedUrl() {
+    void getAwsUrlFile_returnsUtilitiesUrlWhenAvailable() throws Exception {
+        S3Utilities s3Utilities = mock(S3Utilities.class);
+        when(s3Client.utilities()).thenReturn(s3Utilities);
+        when(s3Utilities.getUrl(any(GetUrlRequest.class))).thenReturn(new URL("https://signed.example.com/test-bucket/path/to/file.txt"));
         String url = s3Service.getAwsUrlFile("path/to/file.txt");
-        assertEquals("https://test-bucket.s3.amazonaws.com/path/to/file.txt", url);
+        assertEquals("https://signed.example.com/test-bucket/path/to/file.txt", url);
+    }
+
+    @Test
+    void getAwsUrlFile_fallbackToConfiguredFormatOnError() throws Exception {
+        S3Utilities s3Utilities = mock(S3Utilities.class);
+        when(s3Client.utilities()).thenReturn(s3Utilities);
+        when(s3Utilities.getUrl(any(GetUrlRequest.class))).thenThrow(S3Exception.builder().message("err").build());
+        String url = s3Service.getAwsUrlFile("path/to/file.txt");
+        assertEquals("https://s3.amazonaws.com/test-bucket/path/to/file.txt", url);
     }
 }

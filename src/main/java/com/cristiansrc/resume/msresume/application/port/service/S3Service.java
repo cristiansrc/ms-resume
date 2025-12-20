@@ -29,7 +29,19 @@ public class S3Service implements IS3Service {
     private String awsUrlFormat;
 
     public String getAwsUrlFile(String key) {
-        return String.format(awsUrlFormat, bucketName, key);
+        try {
+            // Intentar obtener la URL desde S3Utilities (región/endpoint correcto, certificado válido)
+            GetUrlRequest request = GetUrlRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+            URL url = s3Client.utilities().getUrl(request);
+            return url.toString();
+        } catch (Exception e) {
+            // Fallback a la plantilla configurable (path-style o virtual-hosted según config)
+            log.warn("Could not get S3 utilities URL, falling back to configured format: {}", e.getMessage());
+            return String.format(awsUrlFormat, bucketName, key);
+        }
     }
 
     public String uploadFile(MultipartFile file) {
