@@ -19,16 +19,28 @@ public class HomeEntity extends AuditBasicEntity {
     @NotNull
     private String greeting;
 
+    @Column(name = "greeting_eng", nullable = false)
+    @NotNull
+    private String greetingEng;
+
     @Column(name = "button_work_label", nullable = false)
     @NotNull
     private String buttonWorkLabel;
+
+    @Column(name = "button_work_label_eng", nullable = false)
+    @NotNull
+    private String buttonWorkLabelEng;
 
     @Column(name = "button_contact_label", nullable = false)
     @NotNull
     private String buttonContactLabel;
 
+    @Column(name = "button_contact_label_eng", nullable = false)
+    @NotNull
+    private String buttonContactLabelEng;
+
     @ManyToOne
-    @JoinColumn(name = "image_id", nullable = false)
+    @JoinColumn(name = "image_id", nullable = true)
     private ImageUrlEntity imageUrl;
 
     @ManyToMany(cascade = CascadeType.ALL)

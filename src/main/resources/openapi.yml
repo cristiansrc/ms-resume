@@ -1879,12 +1879,20 @@ components:
       description: Estructura de configuración para la página de inicio
       required:
         - greeting
+        - greetingEng
         - buttonWorkLabel
+        - buttonWorkLabelEng
         - buttonContactLabel
+        - buttonContactLabelEng
       properties:
         greeting:
           type: string
           description: Mensaje de bienvenida
+          minLength: 1
+          maxLength: 200
+        greetingEng:
+          type: string
+          description: Mensaje de bienvenida en ingles
           minLength: 1
           maxLength: 200
         imageUrlId:
@@ -1896,7 +1904,17 @@ components:
           description: Texto del botón de trabajo
           minLength: 1
           maxLength: 50
+        buttonWorkLabelEng:
+          type: string
+          description: Texto del botón de trabajo
+          minLength: 1
+          maxLength: 50
         buttonContactLabel:
+          type: string
+          description: Texto del botón de contacto
+          minLength: 1
+          maxLength: 50
+        buttonContactLabelEng:
           type: string
           description: Texto del botón de contacto
           minLength: 1
@@ -2245,14 +2263,23 @@ components:
         greeting:
           type: string
           description: Mensaje de bienvenida
+        greetingEng:
+          type: string
+          description: Mensaje de bienvenida en ingles
         imageUrl:
           $ref: '#/components/schemas/ImageUrlResponse'
         buttonWorkLabel:
           type: string
           description: Texto del botón de trabajo
+        buttonWorkLabelEng:
+          type: string
+          description: Texto del botón de trabajo en ingles
         buttonContactLabel:
           type: string
           description: Texto del botón de contacto
+        buttonContactLabelEng:
+          type: string
+          description: Texto del botón de contacto en ingles
         labels:
           type: array
           description: Etiquetas asociadas
