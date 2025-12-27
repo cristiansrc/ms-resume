@@ -11,9 +11,13 @@ import java.util.Optional;
 
 public interface IBlogRepository extends JpaRepository<BlogEntity, Long> {
 
-    @Query("SELECT b FROM BlogEntity b WHERE (:title IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND b.deleted = false")
-    Page<BlogEntity> findByTitleContainingIgnoreCaseAndSort(String title, Pageable pageable);
+    @Query("SELECT b FROM BlogEntity b WHERE (:title IS NULL OR LOWER(CAST(b.title AS string)) LIKE LOWER(CONCAT('%', CAST(:title AS string), '%'))) AND b.deleted = false")
+    Page<BlogEntity> findByTitleContainingIgnoreCaseAndSort(@Param("title") String title, Pageable pageable);
 
     @Query("SELECT b FROM BlogEntity b WHERE b.id = :id AND b.deleted = false")
     Optional<BlogEntity> findByIdAndNotDeleted(@Param("id") Long id);
+
+    boolean existsByVideoUrlIdAndDeletedFalse(Long videoUrlId);
+
+    boolean existsByCleanUrlTitleAndDeletedFalse(String cleanUrlTitle);
 }

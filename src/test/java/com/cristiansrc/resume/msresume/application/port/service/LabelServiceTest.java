@@ -1,5 +1,7 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
+import com.cristiansrc.resume.msresume.application.exception.PreconditionFailedException;
+import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IHomeRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.ILabelRepository;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LabelRequest;
@@ -17,11 +19,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class LabelServiceTest {
@@ -34,6 +36,9 @@ class LabelServiceTest {
 
     @Mock
     private MessageResolver messageResolver;
+
+    @Mock
+    private IHomeRepository homeRepository;
 
     @InjectMocks
     private LabelService labelService;
@@ -57,9 +62,22 @@ class LabelServiceTest {
     void labelIdDelete() {
         LabelEntity entity = new LabelEntity();
         when(labelRepository.findById(1L)).thenReturn(Optional.of(entity));
+        when(homeRepository.existsByLabelIdAndDeletedFalse(1L)).thenReturn(false);
         doNothing().when(labelRepository).delete(any());
 
         labelService.labelIdDelete(1L);
+        
+        verify(labelRepository).delete(entity);
+    }
+
+    @Test
+    void labelIdDelete_PreconditionFailed() {
+        LabelEntity entity = new LabelEntity();
+        when(labelRepository.findById(1L)).thenReturn(Optional.of(entity));
+        when(homeRepository.existsByLabelIdAndDeletedFalse(1L)).thenReturn(true);
+        when(messageResolver.preconditionFailed(any(), any())).thenReturn(new PreconditionFailedException("Precondition failed"));
+
+        assertThrows(PreconditionFailedException.class, () -> labelService.labelIdDelete(1L));
     }
 
     @Test

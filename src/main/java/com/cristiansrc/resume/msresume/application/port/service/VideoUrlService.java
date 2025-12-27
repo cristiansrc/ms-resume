@@ -1,6 +1,7 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
 import com.cristiansrc.resume.msresume.application.port.interactor.IVideoUrlService;
+import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IBlogRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IVideoUrlRepository;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.VideoUrlRequest;
@@ -23,6 +24,7 @@ public class VideoUrlService implements IVideoUrlService {
     private final IVideoUrlRepository videoUrlRepository;
     private final IVideoUrlMapper videoUrlMapper;
     private final MessageResolver messageResolver;
+    private final IBlogRepository blogRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -39,6 +41,11 @@ public class VideoUrlService implements IVideoUrlService {
     public void videoUrlIdDelete(Long id) {
         log.info("Deleting video with id: {}", id);
         var videoUrlEntity = getEntityById(id);
+        
+        if (blogRepository.existsByVideoUrlIdAndDeletedFalse(id)) {
+            throw messageResolver.preconditionFailed("video.url.delete.precondition.failed", id);
+        }
+
         videoUrlEntity.setDeleted(true);
         videoUrlRepository.save(videoUrlEntity);
         log.info("Deleted video url with id: {}", id);

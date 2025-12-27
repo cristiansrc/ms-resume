@@ -2,6 +2,8 @@ package com.cristiansrc.resume.msresume.application.port.service;
 
 import com.cristiansrc.resume.msresume.application.port.interactor.IImageUrlService;
 import com.cristiansrc.resume.msresume.application.port.interactor.IS3Service;
+import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IFuturedProjectRepository;
+import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IHomeRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IImageUrlRepository;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlRequest;
@@ -26,6 +28,8 @@ public class ImageUrlService implements IImageUrlService {
     private final IImageUrlMapper imageUrlMapper;
     private final MessageResolver messageResolver;
     private final IS3Service s3Service;
+    private final IFuturedProjectRepository futuredProjectRepository;
+    private final IHomeRepository homeRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -42,6 +46,13 @@ public class ImageUrlService implements IImageUrlService {
     public void imageUrlIdDelete(Long id) {
         log.info("Deleting image URL with id: {}", id);
         var entity = entityById(id);
+
+        if (futuredProjectRepository.existsByImageUrlIdAndDeletedFalse(id) ||
+                futuredProjectRepository.existsByImageListUrlIdAndDeletedFalse(id) ||
+                homeRepository.existsByImageUrlIdAndDeletedFalse(id)) {
+            throw messageResolver.preconditionFailed("image.url.delete.precondition.failed", id);
+        }
+
         entity.setDeleted(true);
         imageUrlRepository.save(entity);
         log.info("Image URL with id: {} deleted successfully", id);

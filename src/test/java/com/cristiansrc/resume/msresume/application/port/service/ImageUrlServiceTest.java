@@ -1,6 +1,9 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
+import com.cristiansrc.resume.msresume.application.exception.PreconditionFailedException;
 import com.cristiansrc.resume.msresume.application.port.interactor.IS3Service;
+import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IFuturedProjectRepository;
+import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IHomeRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IImageUrlRepository;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlRequest;
@@ -22,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ImageUrlServiceTest {
@@ -37,6 +42,12 @@ class ImageUrlServiceTest {
 
     @Mock
     private IS3Service s3Service;
+
+    @Mock
+    private IFuturedProjectRepository futuredProjectRepository;
+
+    @Mock
+    private IHomeRepository homeRepository;
 
     @InjectMocks
     private ImageUrlService imageUrlService;
@@ -69,9 +80,24 @@ class ImageUrlServiceTest {
     void imageUrlIdDelete() {
         ImageUrlEntity entity = new ImageUrlEntity();
         when(imageUrlRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(entity));
+        when(futuredProjectRepository.existsByImageUrlIdAndDeletedFalse(1L)).thenReturn(false);
+        when(futuredProjectRepository.existsByImageListUrlIdAndDeletedFalse(1L)).thenReturn(false);
+        when(homeRepository.existsByImageUrlIdAndDeletedFalse(1L)).thenReturn(false);
         when(imageUrlRepository.save(any())).thenReturn(entity);
 
         imageUrlService.imageUrlIdDelete(1L);
+        
+        verify(imageUrlRepository).save(entity);
+    }
+
+    @Test
+    void imageUrlIdDelete_PreconditionFailed() {
+        ImageUrlEntity entity = new ImageUrlEntity();
+        when(imageUrlRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(entity));
+        when(futuredProjectRepository.existsByImageUrlIdAndDeletedFalse(1L)).thenReturn(true);
+        when(messageResolver.preconditionFailed(any(), any())).thenReturn(new PreconditionFailedException("Precondition failed"));
+
+        assertThrows(PreconditionFailedException.class, () -> imageUrlService.imageUrlIdDelete(1L));
     }
 
     @Test

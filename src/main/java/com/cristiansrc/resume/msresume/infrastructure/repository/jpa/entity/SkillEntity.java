@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,11 +24,7 @@ public class SkillEntity extends AuditBasicEntity {
     @NotNull
     private String nameEng;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name="skill_son_relational",
-            joinColumns=@JoinColumn(name="skill_id"),
-            inverseJoinColumns=@JoinColumn(name="skill_son_id")
-    )
-    private List<SkillSonEntity> skillSons;
+    @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SkillSonRelationalEntity> skillSons = new ArrayList<>();
 }

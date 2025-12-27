@@ -153,6 +153,15 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, msg, request);
     }
 
+    @ExceptionHandler(PreconditionFailedException.class)
+    public ResponseEntity<ErrorResponse> handlePreconditionFailedException(
+            PreconditionFailedException ex, HttpServletRequest request) {
+        logger.error("Precondition failed: ", ex);
+        String msg = messageSource.getMessage(
+                "error.precondition.failed", null, LocaleContextHolder.getLocale());
+        return buildResponseEntity(HttpStatus.PRECONDITION_FAILED, msg, request);
+    }
+
     private ResponseEntity<ErrorResponse> buildResponseEntity(HttpStatus status, String message, HttpServletRequest request) {
         return ResponseEntity.status(status).body(createErrorResponse(status, message, request));
     }

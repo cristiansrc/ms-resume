@@ -9,9 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(
-        name = "home_label_relational",
-        uniqueConstraints = { @UniqueConstraint(columnNames = {"home_id", "label_id"})})
+@Table(name = "home_label_relational")
 public class HomeLabelRelationalEntity extends AuditBasicEntity {
 
     @ManyToOne

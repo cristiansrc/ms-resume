@@ -1,5 +1,6 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
+import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IBlogRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IVideoUrlRepository;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.VideoUrlRequest;
@@ -36,6 +37,9 @@ class VideoUrlServiceTest {
 
     @Mock
     private MessageResolver messageResolver;
+
+    @Mock
+    private IBlogRepository blogRepository;
 
     @InjectMocks
     private VideoUrlService videoUrlService;
@@ -79,12 +83,26 @@ class VideoUrlServiceTest {
         VideoUrlEntity entity = new VideoUrlEntity();
         entity.setDeleted(false);
         when(videoUrlRepository.findByIdAndNotDeleted(id)).thenReturn(Optional.of(entity));
+        when(blogRepository.existsByVideoUrlIdAndDeletedFalse(id)).thenReturn(false);
 
         videoUrlService.videoUrlIdDelete(id);
 
         assertTrue(entity.getDeleted());
         verify(videoUrlRepository).findByIdAndNotDeleted(id);
         verify(videoUrlRepository).save(entity);
+    }
+
+    @Test
+    void videoUrlIdDelete_shouldThrowPreconditionFailed() {
+        Long id = 1L;
+        VideoUrlEntity entity = new VideoUrlEntity();
+        entity.setDeleted(false);
+        when(videoUrlRepository.findByIdAndNotDeleted(id)).thenReturn(Optional.of(entity));
+        when(blogRepository.existsByVideoUrlIdAndDeletedFalse(id)).thenReturn(true);
+        when(messageResolver.preconditionFailed(any(), any())).thenThrow(new RuntimeException("Precondition Failed"));
+
+        assertThrows(RuntimeException.class, () -> videoUrlService.videoUrlIdDelete(id));
+        verify(videoUrlRepository).findByIdAndNotDeleted(id);
     }
 
     @Test

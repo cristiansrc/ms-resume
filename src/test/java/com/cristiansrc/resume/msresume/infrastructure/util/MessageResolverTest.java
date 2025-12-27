@@ -1,6 +1,7 @@
 package com.cristiansrc.resume.msresume.infrastructure.util;
 
 import com.cristiansrc.resume.msresume.application.exception.InvalidCredentialsException;
+import com.cristiansrc.resume.msresume.application.exception.PreconditionFailedException;
 import com.cristiansrc.resume.msresume.application.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,18 @@ class MessageResolverTest {
 
         InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> {
             throw messageResolver.invalidCredentials("key");
+        });
+
+        assertEquals(errorMessage, exception.getMessage());
+    }
+
+    @Test
+    void preconditionFailed() {
+        String errorMessage = "Precondition failed";
+        when(messageSource.getMessage(eq("key"), any(), any(Locale.class))).thenReturn(errorMessage);
+
+        PreconditionFailedException exception = assertThrows(PreconditionFailedException.class, () -> {
+            throw messageResolver.preconditionFailed("key");
         });
 
         assertEquals(errorMessage, exception.getMessage());

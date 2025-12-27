@@ -13,6 +13,11 @@ public interface IBlogRequestMapper {
     @Mapping(target = "cleanUrlTitle", source = "cleanUrlTitle")
     @Mapping(target = "descriptionShort", source = "descriptionShort")
     @Mapping(target = "description", source = "description")
+    @Mapping(target = "imageUrl", ignore = true)
+    @Mapping(target = "videoUrl", ignore = true)
     void updateEntityFromBlogRequest(BlogRequest blogRequest, @MappingTarget BlogEntity blogEntity);
+
+    @Mapping(target = "imageUrl", ignore = true)
+    @Mapping(target = "videoUrl", ignore = true)
     BlogEntity toEntity(BlogRequest blogRequest);
 }

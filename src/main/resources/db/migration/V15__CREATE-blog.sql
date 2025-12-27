@@ -5,10 +5,15 @@ CREATE TABLE blog
     updated                 TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     deleted                 BOOLEAN                                 NOT NULL,
     title                   VARCHAR(255)                            NOT NULL,
+    title_eng               VARCHAR(255)                            NOT NULL,
     clean_url_title         VARCHAR(255)                            NOT NULL,
     description_short       VARCHAR(255)                            NOT NULL,
     description             VARCHAR(255)                            NOT NULL,
     description_short_eng   VARCHAR(255)                            NOT NULL,
     description_eng         VARCHAR(255)                            NOT NULL,
-    CONSTRAINT pk_blog      PRIMARY KEY (id)
+    image_url_id            BIGINT,
+    video_url_id            BIGINT,
+    CONSTRAINT pk_blog      PRIMARY KEY (id),
+    CONSTRAINT fk_blog_on_image_url FOREIGN KEY (image_url_id) REFERENCES image_url (id),
+    CONSTRAINT fk_blog_on_video_url FOREIGN KEY (video_url_id) REFERENCES video_url (id)
 );

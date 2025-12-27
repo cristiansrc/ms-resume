@@ -4,19 +4,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Table(
-    name = "skill_son_relational",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"skill_id", "skill_son_id"})
-)
+@Table(name = "skill_son_relational")
 public class SkillSonRelationalEntity extends AuditBasicEntity {
 
     @ManyToOne

@@ -49,4 +49,22 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.UNAUTHORIZED.getReasonPhrase(), errorResponse.getError());
         assertEquals(errorMessage, errorResponse.getMessage());
     }
+
+    @Test
+    void handlePreconditionFailedException() {
+        String errorMessage = "Precondition failed";
+        when(messageSource.getMessage(eq("error.precondition.failed"), any(), any(Locale.class))).thenReturn(errorMessage);
+        PreconditionFailedException ex = new PreconditionFailedException("Some detail");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        ResponseEntity<ErrorResponse> responseEntity = globalExceptionHandler.handlePreconditionFailedException(ex, request);
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.PRECONDITION_FAILED, responseEntity.getStatusCode());
+        ErrorResponse errorResponse = responseEntity.getBody();
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.PRECONDITION_FAILED.value(), errorResponse.getStatus());
+        assertEquals(HttpStatus.PRECONDITION_FAILED.getReasonPhrase(), errorResponse.getError());
+        assertEquals(errorMessage, errorResponse.getMessage());
+    }
 }

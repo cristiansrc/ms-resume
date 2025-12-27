@@ -7,15 +7,17 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlP
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.SkillRequest;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.SkillResponse;
 import com.cristiansrc.resume.msresume.infrastructure.mapper.ISkillMapper;
-import com.cristiansrc.resume.msresume.infrastructure.mapper.ISkillSonMapper;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.SkillEntity;
+import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.SkillSonRelationalEntity;
 import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,7 +27,6 @@ public class SkillService implements ISkillService {
     private final ISkillRepository skillRepository;
     private final ISkillSonRepository skillSonRepository;
     private final ISkillMapper skillMapper;
-    private final ISkillSonMapper skillSonMapper;
     private final MessageResolver messageResolver;
 
     @Transactional(readOnly = true)
@@ -83,19 +84,26 @@ public class SkillService implements ISkillService {
     private SkillEntity entityById(Long id) {
         return skillRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> messageResolver.notFound("skill.not.found", id));
-
-
     }
 
     private Long saveEntity(SkillEntity skillEntity, List<Long> skillSonIds) {
-        var SkillSonEntities = skillSonIds.stream()
-                .map( skillSinId -> skillSonRepository.findByIdAndDeletedFalse(skillSinId)
-                        .orElseThrow(() -> messageResolver.notFound("skill.son.not.found", skillSinId)))
+        List<Long> ids = skillSonIds != null ? skillSonIds : Collections.emptyList();
+        skillEntity.getSkillSons().clear();
+        skillRepository.saveAndFlush(skillEntity);
+        var newSkillSonRelations = ids.stream()
+                .map(skillSonId -> {
+                    var skillSonEntity = skillSonRepository.findByIdAndDeletedFalse(skillSonId)
+                            .orElseThrow(() -> messageResolver.notFound("skill.son.not.found", skillSonId));
+                    var relationalEntity = new SkillSonRelationalEntity();
+                    relationalEntity.setSkill(skillEntity);
+                    relationalEntity.setSkillSon(skillSonEntity);
+                    return relationalEntity;
+                })
                 .toList();
 
-        skillEntity.getSkillSons().clear();
-        skillEntity.getSkillSons().addAll(SkillSonEntities);
-        var saveEntity = skillRepository.save(skillEntity);
-        return saveEntity.getId();
+        // 4. Agregar las nuevas relaciones y guardar nuevamente
+        skillEntity.getSkillSons().addAll(newSkillSonRelations);
+        var savedEntity = skillRepository.save(skillEntity);
+        return savedEntity.getId();
     }
 }

@@ -43,12 +43,6 @@ public class HomeEntity extends AuditBasicEntity {
     @JoinColumn(name = "image_id", nullable = true)
     private ImageUrlEntity imageUrl;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name="home_label_relational",
-            joinColumns=@JoinColumn(name="home_id"),
-            inverseJoinColumns=@JoinColumn(name="label_id")
-    )
-    private List<LabelEntity> labels;
-
+    @OneToMany(mappedBy = "home", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HomeLabelRelationalEntity> homeLabelRelations;
 }

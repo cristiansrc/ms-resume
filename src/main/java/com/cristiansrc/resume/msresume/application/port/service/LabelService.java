@@ -1,6 +1,7 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
 import com.cristiansrc.resume.msresume.application.port.interactor.ILabelService;
+import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IHomeRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.ILabelRepository;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LabelRequest;
@@ -23,6 +24,7 @@ public class LabelService implements ILabelService {
     private final ILabelRepository labelRepository;
     private final ILabelMapper labelMapper;
     private final MessageResolver messageResolver;
+    private final IHomeRepository homeRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -39,6 +41,11 @@ public class LabelService implements ILabelService {
     public void labelIdDelete(Long id) {
         log.info("Deleting label with id: {}", id);
         var entity = entityById(id);
+
+        if (homeRepository.existsByLabelIdAndDeletedFalse(id)) {
+            throw messageResolver.preconditionFailed("label.delete.precondition.failed", id);
+        }
+
         labelRepository.delete(entity);
         log.info("Label with id: {} deleted successfully", id);
     }

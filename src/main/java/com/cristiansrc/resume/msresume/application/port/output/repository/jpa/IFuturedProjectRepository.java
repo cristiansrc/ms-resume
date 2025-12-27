@@ -14,4 +14,8 @@ public interface IFuturedProjectRepository extends JpaRepository<FuturedProjectE
 
     @Query("SELECT f FROM FuturedProjectEntity f WHERE f.deleted = false")
     List<FuturedProjectEntity> findAllByDeletedFalse();
+
+    boolean existsByImageUrlIdAndDeletedFalse(Long imageUrlId);
+
+    boolean existsByImageListUrlIdAndDeletedFalse(Long imageListUrlId);
 }

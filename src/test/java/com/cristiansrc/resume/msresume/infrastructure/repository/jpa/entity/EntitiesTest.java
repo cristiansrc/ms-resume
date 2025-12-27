@@ -3,13 +3,16 @@ package com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EntitiesTest {
 
     @Test
-    void auditBasicEntity_onCreate_and_onUpdate() throws InterruptedException {
+    void auditBasicEntity_onCreate_and_onUpdate() {
         AuditBasicEntity entity = new AuditBasicEntity() {};
         // aseguramos valores nulos antes de persist
         assertNull(entity.getCreated());
@@ -22,9 +25,13 @@ class EntitiesTest {
         assertFalse(entity.getDeleted());
 
         Timestamp before = entity.getUpdated();
-        Thread.sleep(10);
-        entity.onUpdate();
-        assertTrue(entity.getUpdated().after(before));
+        
+        // Usamos Awaitility para esperar a que el tiempo avance lo suficiente
+        // para que el timestamp cambie, evitando Thread.sleep
+        await().atLeast(10, TimeUnit.MILLISECONDS).until(() -> {
+            entity.onUpdate();
+            return entity.getUpdated().after(before);
+        });
     }
 
     @Test
@@ -47,9 +54,15 @@ class EntitiesTest {
         home.setGreeting("g2");
         assertEquals("g2", home.getGreeting());
 
-        home.setLabels(java.util.List.of(label));
-        assertNotNull(home.getLabels());
-        assertEquals(1, home.getLabels().size());
+        HomeLabelRelationalEntity relation = new HomeLabelRelationalEntity();
+        relation.setHome(home);
+        relation.setLabel(label);
+        home.setHomeLabelRelations(new ArrayList<>());
+        home.getHomeLabelRelations().add(relation);
+        
+        assertNotNull(home.getHomeLabelRelations());
+        assertEquals(1, home.getHomeLabelRelations().size());
+        assertEquals(label, home.getHomeLabelRelations().getFirst().getLabel());
     }
 
     @Test
@@ -61,4 +74,3 @@ class EntitiesTest {
         assertEquals("ln", l.getName());
     }
 }
-

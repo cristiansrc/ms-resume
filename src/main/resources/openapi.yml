@@ -1932,7 +1932,6 @@ components:
       required:
         - title
         - titleEng
-        - cleanUrlTitle
         - descriptionShort
         - description
         - descriptionShortEng
@@ -1955,7 +1954,7 @@ components:
         cleanUrlTitle:
           type: string
           description: Título limpio para URL amigable
-          minLength: 1
+          minLength: 0
           maxLength: 200
         descriptionShort:
           type: string
@@ -1975,6 +1974,14 @@ components:
           type: string
           description: Contenido completo del artículo
           minLength: 1
+        imageUrlId:
+          type: integer
+          format: int64
+          description: ID de la imagen asociada
+        videoUrlId:
+          type: integer
+          format: int64
+          description: ID del video asociado
 
     SkillTypeRequest:
       type: object
@@ -2315,6 +2322,10 @@ components:
         descriptionEng:
           type: string
           description: Contenido completo del artículo
+        imageUrl:
+          $ref: '#/components/schemas/ImageUrlResponse'
+        videoUrl:
+          $ref: '#/components/schemas/VideoUrlResponse'
 
     BlogPageResponse:
       type: object
