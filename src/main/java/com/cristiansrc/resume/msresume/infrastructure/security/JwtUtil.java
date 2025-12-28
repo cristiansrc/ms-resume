@@ -70,10 +70,6 @@ public class JwtUtil {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
-    private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
     private Key getSigningKey() {
         // secret is expected to be a Base64-encoded key
         byte[] keyBytes = Base64.getDecoder().decode(secret);

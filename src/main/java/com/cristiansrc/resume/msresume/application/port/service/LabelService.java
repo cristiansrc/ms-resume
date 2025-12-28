@@ -10,70 +10,87 @@ import com.cristiansrc.resume.msresume.infrastructure.mapper.ILabelMapper;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.LabelEntity;
 import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class LabelService implements ILabelService {
 
-    private final ILabelRepository labelRepository;
-    private final ILabelMapper labelMapper;
+    private static final Logger LOGGER = LoggerFactory.getLogger(LabelService.class);
+    private final ILabelRepository repository;
+    private final ILabelMapper mapper;
     private final MessageResolver messageResolver;
-    private final IHomeRepository homeRepository;
+    private final IHomeRepository homeRepo;
 
     @Transactional(readOnly = true)
     @Override
     public List<LabelResponse> labelGet() {
-        log.info("Fetching all labels");
-        var listEntities = labelRepository.findAll();
-        var listResponse = labelMapper.labelToLabelResponse(listEntities);
-        log.info("Fetched {} labels", listResponse.size());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetching all labels");
+        }
+        final List<LabelEntity> listEntities = repository.findAll();
+        final List<LabelResponse> listResponse = mapper.labelToLabelResponse(listEntities);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} labels", listResponse.size());
+        }
         return listResponse;
     }
 
     @Transactional
     @Override
-    public void labelIdDelete(Long id) {
-        log.info("Deleting label with id: {}", id);
-        var entity = entityById(id);
+    public void labelIdDelete(final Long identifier) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Deleting label with id: {}", identifier);
+        }
+        final LabelEntity entity = entityById(identifier);
 
-        if (homeRepository.existsByLabelIdAndDeletedFalse(id)) {
-            throw messageResolver.preconditionFailed("label.delete.precondition.failed", id);
+        if (homeRepo.existsByLabelIdAndDeletedFalse(identifier)) {
+            throw messageResolver.preconditionFailed("label.delete.precondition.failed", identifier);
         }
 
-        labelRepository.delete(entity);
-        log.info("Label with id: {} deleted successfully", id);
+        repository.delete(entity);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Label with id: {} deleted successfully", identifier);
+        }
     }
 
     @Transactional(readOnly = true)
     @Override
-    public LabelResponse labelIdGet(Long id) {
-        log.info("Fetching label with id: {}", id);
-        var entity = entityById(id);
-        var response = labelMapper.labelToLabelResponse(entity);
-        log.info("Fetched label with id: {}", id);
+    public LabelResponse labelIdGet(final Long identifier) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetching label with id: {}", identifier);
+        }
+        final LabelEntity entity = entityById(identifier);
+        final LabelResponse response = mapper.labelToLabelResponse(entity);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched label with id: {}", identifier);
+        }
         return response;
     }
 
     @Transactional
     @Override
-    public ImageUrlPost201Response labelPost(LabelRequest labelRequest) {
-        log.info("Creating new label with name: {}", labelRequest.getName());
-        var labelEntity = labelMapper.labelToLabelEntity(labelRequest);
-        labelEntity = labelRepository.save(labelEntity);
-        var response = new ImageUrlPost201Response();
+    public ImageUrlPost201Response labelPost(final LabelRequest labelRequest) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Creating new label with name: {}", labelRequest.getName());
+        }
+        LabelEntity labelEntity = mapper.labelToLabelEntity(labelRequest);
+        labelEntity = repository.save(labelEntity);
+        final ImageUrlPost201Response response = new ImageUrlPost201Response();
         response.setId(labelEntity.getId());
-        log.info("Created label with id: {}", labelEntity.getId());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Created label with id: {}", labelEntity.getId());
+        }
         return response;
     }
 
-    private LabelEntity entityById(Long id) {
-        return labelRepository.findById(id)
-                .orElseThrow(() -> messageResolver.notFound("label.not.found", id));
+    private LabelEntity entityById(final Long identifier) {
+        return repository.findById(identifier)
+                .orElseThrow(() -> messageResolver.notFound("label.not.found", identifier));
     }
 }

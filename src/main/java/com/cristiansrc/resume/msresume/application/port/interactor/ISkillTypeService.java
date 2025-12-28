@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface ISkillTypeService {
     List<SkillTypeResponse> skillTypeGet();
-    void skillTypeIdDelete(Long id);
-    SkillTypeResponse skillTypeIdGet(Long id);
-    void skillTypeIdPut(Long id, SkillTypeRequest skillTypeRequest);
+    void skillTypeIdDelete(Long identifier);
+    SkillTypeResponse skillTypeIdGet(Long identifier);
+    void skillTypeIdPut(Long identifier, SkillTypeRequest skillTypeRequest);
     ImageUrlPost201Response skillTypePost(SkillTypeRequest skillTypeRequest);
 }

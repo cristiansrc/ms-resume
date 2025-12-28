@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface ISkillSonService {
     List<SkillSonResponse> skillSonGet();
-    void skillSonIdDelete(Long id);
-    SkillSonResponse skillSonIdGet(Long id);
-    void skillSonIdPut(Long id, SkillSonRequest skillSonRequest);
+    void skillSonIdDelete(Long identifier);
+    SkillSonResponse skillSonIdGet(Long identifier);
+    void skillSonIdPut(Long identifier, SkillSonRequest skillSonRequest);
     ImageUrlPost201Response skillSonPost(SkillSonRequest skillSonRequest);
 }

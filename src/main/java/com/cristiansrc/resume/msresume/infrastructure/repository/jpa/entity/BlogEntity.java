@@ -46,10 +46,14 @@ public class BlogEntity extends AuditBasicEntity {
     private String descriptionEng;
 
     @ManyToOne
+    @JoinColumn(name = "blog_type_id")
+    private BlogTypeEntity blogType;
+
+    @ManyToOne
     @JoinColumn(name = "image_url_id")
     private ImageUrlEntity imageUrl;
 
     @ManyToOne
-    @JoinColumn(name = "video_url_id")
+    @JoinColumn(name = "video_url_id", nullable = true)
     private VideoUrlEntity videoUrl;
 }

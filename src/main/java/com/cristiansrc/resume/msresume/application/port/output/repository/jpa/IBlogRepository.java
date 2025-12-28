@@ -15,7 +15,7 @@ public interface IBlogRepository extends JpaRepository<BlogEntity, Long> {
     Page<BlogEntity> findByTitleContainingIgnoreCaseAndSort(@Param("title") String title, Pageable pageable);
 
     @Query("SELECT b FROM BlogEntity b WHERE b.id = :id AND b.deleted = false")
-    Optional<BlogEntity> findByIdAndNotDeleted(@Param("id") Long id);
+    Optional<BlogEntity> findByIdAndNotDeleted(@Param("id") Long identifier);
 
     boolean existsByVideoUrlIdAndDeletedFalse(Long videoUrlId);
 

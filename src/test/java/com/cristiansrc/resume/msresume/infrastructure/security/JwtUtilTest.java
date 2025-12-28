@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class JwtUtilTest {
 
     private JwtUtil jwtUtil;
-    private final String USERNAME = "testUser";
+    private final String user = "testUser";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -32,38 +32,38 @@ class JwtUtilTest {
 
     @Test
     void generateToken_createsValidToken() {
-        String token = jwtUtil.generateToken(USERNAME);
+        String token = jwtUtil.generateToken(user);
         assertNotNull(token);
-        assertEquals(USERNAME, jwtUtil.extractUsername(token));
+        assertEquals(user, jwtUtil.extractUsername(token));
     }
 
     @Test
     void validateToken_withValidTokenAndCorrectUser_returnsTrue() {
-        String token = jwtUtil.generateToken(USERNAME);
-        assertTrue(jwtUtil.validateToken(token, USERNAME));
+        String token = jwtUtil.generateToken(user);
+        assertTrue(jwtUtil.validateToken(token, user));
     }
 
     @Test
     void validateToken_withValidTokenAndIncorrectUser_returnsFalse() {
-        String token = jwtUtil.generateToken(USERNAME);
+        String token = jwtUtil.generateToken(user);
         assertFalse(jwtUtil.validateToken(token, "wrongUser"));
     }
 
     @Test
     void validateToken_withExpiredToken_returnsFalse() throws Exception {
         setField(jwtUtil, "expiration", -1000L); // Expired
-        String token = jwtUtil.generateToken(USERNAME);
-        assertFalse(jwtUtil.validateToken(token, USERNAME));
+        String token = jwtUtil.generateToken(user);
+        assertFalse(jwtUtil.validateToken(token, user));
     }
 
     @Test
     void validateToken_withMalformedToken_returnsFalse() {
-        assertFalse(jwtUtil.validateToken("a-malformed-token", USERNAME));
+        assertFalse(jwtUtil.validateToken("a-malformed-token", user));
     }
 
     @Test
     void extractExpiration_fromValidToken_returnsFutureDate() {
-        String token = jwtUtil.generateToken(USERNAME);
+        String token = jwtUtil.generateToken(user);
         Date expiration = jwtUtil.extractExpiration(token);
         assertNotNull(expiration);
         assertTrue(expiration.after(new Date()));
@@ -72,13 +72,13 @@ class JwtUtilTest {
     @Test
     void extractExpiration_fromExpiredToken_throwsExpiredJwtException() throws Exception {
         setField(jwtUtil, "expiration", -1000L); // Expired
-        String token = jwtUtil.generateToken(USERNAME);
+        String token = jwtUtil.generateToken(user);
         assertThrows(ExpiredJwtException.class, () -> jwtUtil.extractExpiration(token));
     }
 
     @Test
     void isTokenExpired_withValidToken_returnsFalse() throws Exception {
-        String token = jwtUtil.generateToken(USERNAME);
+        String token = jwtUtil.generateToken(user);
         
         Method method = JwtUtil.class.getDeclaredMethod("isTokenExpired", String.class);
         method.setAccessible(true);
@@ -90,7 +90,7 @@ class JwtUtilTest {
     @Test
     void isTokenExpired_withExpiredToken_throwsExpiredJwtException() throws Exception {
         setField(jwtUtil, "expiration", -1000L); // Expired
-        String token = jwtUtil.generateToken(USERNAME);
+        String token = jwtUtil.generateToken(user);
         
         Method method = JwtUtil.class.getDeclaredMethod("isTokenExpired", String.class);
         method.setAccessible(true);

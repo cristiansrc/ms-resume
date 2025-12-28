@@ -36,11 +36,6 @@ public class ExperienceEntity extends AuditBasicEntity {
     @NotNull
     private String descriptionEng;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name="experience_skill",
-            joinColumns=@JoinColumn(name="experience_id"),
-            inverseJoinColumns=@JoinColumn(name="skill_son_id")
-    )
-    private List<SkillSonEntity> skillSons;
+    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExperienceSkillEntity> experienceSkills;
 }

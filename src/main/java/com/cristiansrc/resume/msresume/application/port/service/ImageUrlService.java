@@ -13,86 +13,99 @@ import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.Imag
 import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
 import com.cristiansrc.resume.msresume.infrastructure.util.MultipartUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ImageUrlService implements IImageUrlService {
 
-    private final IImageUrlRepository imageUrlRepository;
-    private final IImageUrlMapper imageUrlMapper;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImageUrlService.class);
+    private final IImageUrlRepository repository;
+    private final IImageUrlMapper mapper;
     private final MessageResolver messageResolver;
     private final IS3Service s3Service;
-    private final IFuturedProjectRepository futuredProjectRepository;
-    private final IHomeRepository homeRepository;
+    private final IFuturedProjectRepository futuredProjectRepo;
+    private final IHomeRepository homeRepo;
 
     @Transactional(readOnly = true)
     @Override
     public List<ImageUrlResponse> imageUrlGet() {
-        log.info("Fetching all image URLs");
-        var listEntities = imageUrlRepository.findAllByDeletedFalse();
-        var listResponse = imageUrlMapper.toImageUrlResponseList(listEntities, s3Service);
-        log.info("Fetched {} image URLs", listResponse.size());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetching all image URLs");
+        }
+        final List<ImageUrlEntity> listEntities = repository.findAllByDeletedFalse();
+        final List<ImageUrlResponse> listResponse = mapper.toImageUrlResponseList(listEntities, s3Service);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} image URLs", listResponse.size());
+        }
         return listResponse;
     }
 
     @Transactional
     @Override
-    public void imageUrlIdDelete(Long id) {
-        log.info("Deleting image URL with id: {}", id);
-        var entity = entityById(id);
+    public void imageUrlIdDelete(final Long identifier) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Deleting image URL with id: {}", identifier);
+        }
+        final ImageUrlEntity entity = entityById(identifier);
 
-        if (futuredProjectRepository.existsByImageUrlIdAndDeletedFalse(id) ||
-                futuredProjectRepository.existsByImageListUrlIdAndDeletedFalse(id) ||
-                homeRepository.existsByImageUrlIdAndDeletedFalse(id)) {
-            throw messageResolver.preconditionFailed("image.url.delete.precondition.failed", id);
+        if (futuredProjectRepo.existsByImageUrlIdAndDeletedFalse(identifier) ||
+                futuredProjectRepo.existsByImageListUrlIdAndDeletedFalse(identifier) ||
+                homeRepo.existsByImageUrlIdAndDeletedFalse(identifier)) {
+            throw messageResolver.preconditionFailed("image.url.delete.precondition.failed", identifier);
         }
 
         entity.setDeleted(true);
-        imageUrlRepository.save(entity);
-        log.info("Image URL with id: {} deleted successfully", id);
+        repository.save(entity);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Image URL with id: {} deleted successfully", identifier);
+        }
     }
 
     @Transactional(readOnly = true)
     @Override
-    public ImageUrlResponse imageUrlIdGet(Long id) {
-        log.info("Fetching image URL with id: {}", id);
-        var entity = entityById(id);
-        var response = imageUrlMapper.imageUrlToImageUrlResponse(entity, s3Service);
-        log.info("Fetched image URL with id: {}", id);
+    public ImageUrlResponse imageUrlIdGet(final Long identifier) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetching image URL with id: {}", identifier);
+        }
+        final ImageUrlEntity entity = entityById(identifier);
+        final ImageUrlResponse response = mapper.imageUrlToImageUrlResponse(entity, s3Service);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched image URL with id: {}", identifier);
+        }
         return response;
     }
 
     @Transactional
     @Override
-    public ImageUrlPost201Response imageUrlPost(ImageUrlRequest imageUrlRequest) {
-        log.info("Creating new image URL with name: {}", imageUrlRequest.getName());
-        var file = MultipartUtils.base64ToMultipart(imageUrlRequest.getFile(), imageUrlRequest.getName());
-        var nameFileAws = s3Service.uploadFile(file);
-        var entity = new ImageUrlEntity();
+    public ImageUrlPost201Response imageUrlPost(final ImageUrlRequest imageUrlRequest) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Creating new image URL with name: {}", imageUrlRequest.getName());
+        }
+        final MultipartFile file = MultipartUtils.base64ToMultipart(imageUrlRequest.getFile(), imageUrlRequest.getName());
+        final String nameFileAws = s3Service.uploadFile(file);
+        final ImageUrlEntity entity = new ImageUrlEntity();
         entity.setName(imageUrlRequest.getName());
         entity.setNameEng(imageUrlRequest.getNameEng());
         entity.setNameFileAws(nameFileAws);
-        var savedEntity = imageUrlRepository.save(entity);
-        log.info("Created new image URL with id: {}", savedEntity.getId());
-        var responde = new ImageUrlPost201Response();
-        responde.setId(savedEntity.getId());
-        return responde;
+        final ImageUrlEntity savedEntity = repository.save(entity);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Created new image URL with id: {}", savedEntity.getId());
+        }
+        final ImageUrlPost201Response response = new ImageUrlPost201Response();
+        response.setId(savedEntity.getId());
+        return response;
     }
 
 
-    private ImageUrlEntity entityById(Long id) {
-        return imageUrlRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> messageResolver.notFound("image.home.not.found", id));
-    }
-
-    private ImageUrlResponse imageUrlToImageUrlResponse(ImageUrlEntity entity) {
-        // Mantengo este helper en caso de uso interno; delega al mapper con contexto
-        return imageUrlMapper.imageUrlToImageUrlResponse(entity, s3Service);
+    private ImageUrlEntity entityById(final Long identifier) {
+        return repository.findByIdAndDeletedFalse(identifier)
+                .orElseThrow(() -> messageResolver.notFound("image.home.not.found", identifier));
     }
 }

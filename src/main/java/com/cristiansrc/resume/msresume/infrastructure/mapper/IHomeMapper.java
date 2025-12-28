@@ -5,7 +5,6 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.HomeReque
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.HomeResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LabelResponse;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.HomeEntity;
-import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.HomeLabelRelationalEntity;
 import com.cristiansrc.resume.msresume.infrastructure.util.S3UrlUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
@@ -14,7 +13,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface IHomeMapper {

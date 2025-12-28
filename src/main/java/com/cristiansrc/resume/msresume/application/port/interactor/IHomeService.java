@@ -4,6 +4,6 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.HomeReque
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.HomeResponse;
 
 public interface IHomeService {
-    HomeResponse homeIdGet(Long id);
-    void homeIdPut(Long id, HomeRequest homeRequest);
+    HomeResponse homeIdGet(Long identifier);
+    void homeIdPut(Long identifier, HomeRequest homeRequest);
 }

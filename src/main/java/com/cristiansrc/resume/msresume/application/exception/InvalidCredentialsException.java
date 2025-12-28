@@ -2,7 +2,9 @@ package com.cristiansrc.resume.msresume.application.exception;
 
 public class InvalidCredentialsException extends RuntimeException {
 
-    public InvalidCredentialsException(String message) {
+    private static final long serialVersionUID = 1L;
+
+    public InvalidCredentialsException(final String message) {
         super(message);
     }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ILabelService {
     List<LabelResponse> labelGet();
-    void labelIdDelete(Long id);
-    LabelResponse labelIdGet(Long id);
+    void labelIdDelete(Long identifier);
+    LabelResponse labelIdGet(Long identifier);
     ImageUrlPost201Response labelPost(LabelRequest labelRequest);
 }

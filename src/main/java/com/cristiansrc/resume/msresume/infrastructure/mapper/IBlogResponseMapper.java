@@ -9,7 +9,7 @@ import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.Blog
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogPageResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogResponse;
 
-@Mapper(componentModel = "spring", uses = {IImageUrlMapper.class, IVideoUrlMapper.class})
+@Mapper(componentModel = "spring", uses = {IImageUrlMapper.class, IVideoUrlMapper.class, IBlogTypeMapper.class})
 public interface IBlogResponseMapper {
 
     @Mapping(target = "content", source = "content")
@@ -26,5 +26,6 @@ public interface IBlogResponseMapper {
 
     @Mapping(target = "imageUrl", source = "imageUrl")
     @Mapping(target = "videoUrl", source = "videoUrl")
+    @Mapping(target = "blogType", source = "blogType")
     BlogResponse toResponse(BlogEntity entity, @Context IS3Service s3Service);
 }

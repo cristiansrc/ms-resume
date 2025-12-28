@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface IFuturedProjectService {
     List<FuturedProjectResponse> futuredProjectGet();
-    void futuredProjectIdDelete(Long id);
-    FuturedProjectResponse futuredProjectIdGet(Long id);
-    void futuredProjectIdPut(Long id, FuturedProjectRequest futuredProjectRequest);
-    ImageUrlPost201Response futuredProjectPost(FuturedProjectRequest futuredProjectRequest);
+    void futuredProjectIdDelete(Long identifier);
+    FuturedProjectResponse futuredProjectIdGet(Long identifier);
+    void futuredProjectIdPut(Long identifier, FuturedProjectRequest request);
+    ImageUrlPost201Response futuredProjectPost(FuturedProjectRequest request);
 }

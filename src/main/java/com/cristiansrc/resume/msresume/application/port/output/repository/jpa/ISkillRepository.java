@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ISkillRepository extends JpaRepository<SkillEntity, Long> {
     @Query("SELECT s FROM SkillEntity s WHERE s.id = :id AND s.deleted = false")
-    Optional<SkillEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+    Optional<SkillEntity> findByIdAndDeletedFalse(@Param("id") Long identifier);
 
     @Query("SELECT s FROM SkillEntity s WHERE s.deleted = false")
     List<SkillEntity> findAllByDeletedFalse();

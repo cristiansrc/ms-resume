@@ -22,6 +22,7 @@ public class PublicController implements PublicApi {
     private final ISkillService skillService;
     private final ISkillSonService skillSonService;
     private final ISkillTypeService skillTypeService;
+    private final IBlogTypeService blogTypeService;
 
     @Override
     public ResponseEntity<BasicDataResponse> publicBasicDataIdGet(Long id) {
@@ -39,6 +40,18 @@ public class PublicController implements PublicApi {
     public ResponseEntity<BlogResponse> publicBlogIdGet(Long id) {
         var response = blogService.blogIdGet(id);
         return ResponseEntity.ok().body(response);
+    }
+
+    @Override
+    public ResponseEntity<List<BlogTypeResponse>> publicBlogTypeGet() {
+        var response = blogTypeService.blogTypeGet();
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<BlogTypeResponse> publicBlogTypeIdGet(Long id) {
+        var response = blogTypeService.blogTypeIdGet(id);
+        return ResponseEntity.ok(response);
     }
 
     @Override

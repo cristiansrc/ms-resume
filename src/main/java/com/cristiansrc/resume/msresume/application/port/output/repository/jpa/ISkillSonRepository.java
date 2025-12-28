@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ISkillSonRepository extends JpaRepository<SkillSonEntity, Long> {
 
     @Query("SELECT s FROM SkillSonEntity s WHERE s.id = :id AND s.deleted = false")
-    Optional<SkillSonEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+    Optional<SkillSonEntity> findByIdAndDeletedFalse(@Param("id") Long identifier);
 
     @Query("SELECT s FROM SkillSonEntity s WHERE s.deleted = false")
     List<SkillSonEntity> findAllByDeletedFalse();

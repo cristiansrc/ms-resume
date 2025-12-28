@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface IImageUrlRepository extends JpaRepository<ImageUrlEntity, Long> {
 
     @Query("SELECT i FROM ImageUrlEntity i WHERE i.id = :id AND i.deleted = false")
-    Optional<ImageUrlEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+    Optional<ImageUrlEntity> findByIdAndDeletedFalse(@Param("id") Long identifier);
 
     @Query("SELECT i FROM ImageUrlEntity i WHERE i.deleted = false")
     List<ImageUrlEntity> findAllByDeletedFalse();

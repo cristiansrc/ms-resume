@@ -7,15 +7,17 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.LoginPost
 import com.cristiansrc.resume.msresume.infrastructure.security.JwtUtil;
 import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class LoginService implements ILoginService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginService.class);
 
     @Value("${auth.user}")
     private String user;
@@ -28,15 +30,22 @@ public class LoginService implements ILoginService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public LoginPost200Response loginPost(LoginPostRequest loginPostRequest) {
-
+    public LoginPost200Response loginPost(final LoginPostRequest loginPostRequest) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Login attempt for user: {}", loginPostRequest.getUser());
+        }
         if (loginPostRequest.getUser().equals(user) && passwordEncoder.matches(loginPostRequest.getPassword(), pass)) {
-            String token = jwtUtil.generateToken(loginPostRequest.getUser());
-            LoginPost200Response response = new LoginPost200Response();
+            final String token = jwtUtil.generateToken(loginPostRequest.getUser());
+            final LoginPost200Response response = new LoginPost200Response();
             response.setToken(token);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Login successful for user: {}", loginPostRequest.getUser());
+            }
             return response;
         }
-
+        if (LOGGER.isWarnEnabled()) {
+            LOGGER.warn("Invalid login attempt for user: {}", loginPostRequest.getUser());
+        }
         throw new InvalidCredentialsException(messageResolver.getMessage("login.user.pass.not.found"));
     }
 }

@@ -2,24 +2,30 @@ package com.cristiansrc.resume.msresume.application.port.service;
 
 import com.cristiansrc.resume.msresume.application.port.interactor.IS3Service;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service implements IS3Service {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(S3Service.class);
     private final S3Client s3Client;
 
     @Value("${aws.s3.bucket}")
@@ -28,26 +34,28 @@ public class S3Service implements IS3Service {
     @Value("${config.aws.url}")
     private String awsUrlFormat;
 
-    public String getAwsUrlFile(String key) {
+    public String getAwsUrlFile(final String key) {
         try {
             // Intentar obtener la URL desde S3Utilities (región/endpoint correcto, certificado válido)
-            GetUrlRequest request = GetUrlRequest.builder()
+            final GetUrlRequest request = GetUrlRequest.builder()
                     .bucket(bucketName)
                     .key(key)
                     .build();
-            URL url = s3Client.utilities().getUrl(request);
+            final URL url = s3Client.utilities().getUrl(request);
             return url.toString();
-        } catch (Exception e) {
+        } catch (final S3Exception e) {
             // Fallback a la plantilla configurable (path-style o virtual-hosted según config)
-            log.warn("Could not get S3 utilities URL, falling back to configured format: {}", e.getMessage());
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Could not get S3 utilities URL, falling back to configured format: {}", e.getMessage());
+            }
             return String.format(awsUrlFormat, bucketName, key);
         }
     }
 
-    public String uploadFile(MultipartFile file) {
+    public String uploadFile(final MultipartFile file) {
         try {
-            String key = generateUniqueFileName(file.getOriginalFilename());
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+            final String key = generateUniqueFileName(file.getOriginalFilename());
+            final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(key)
                     .contentType(file.getContentType())
@@ -55,56 +63,56 @@ public class S3Service implements IS3Service {
 
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
             return key;
-        } catch (IOException e) {
-            log.error("Error uploading file to S3", e);
+        } catch (final IOException e) {
+            LOGGER.error("Error uploading file to S3", e);
             throw new RuntimeException("Error uploading file", e);
         }
     }
 
-    public byte[] downloadFile(String key) {
+    public byte[] downloadFile(final String key) {
         try {
-            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
                     .key(key)
                     .build();
 
-            ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
+            final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
             return response.readAllBytes();
-        } catch (IOException | S3Exception e) {
-            log.error("Error downloading file from S3", e);
+        } catch (final IOException | S3Exception e) {
+            LOGGER.error("Error downloading file from S3", e);
             throw new RuntimeException("Error downloading file", e);
         }
     }
 
-    public void deleteFile(String key) {
+    public void deleteFile(final String key) {
         try {
-            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+            final DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket(bucketName)
                     .key(key)
                     .build();
 
             s3Client.deleteObject(deleteObjectRequest);
-        } catch (S3Exception e) {
-            log.error("Error deleting file from S3", e);
+        } catch (final S3Exception e) {
+            LOGGER.error("Error deleting file from S3", e);
             throw new RuntimeException("Error deleting file", e);
         }
     }
 
-    public URL getFileUrl(String key) {
+    public URL getFileUrl(final String key) {
         try {
-            GetUrlRequest request = GetUrlRequest.builder()
+            final GetUrlRequest request = GetUrlRequest.builder()
                     .bucket(bucketName)
                     .key(key)
                     .build();
 
             return s3Client.utilities().getUrl(request);
-        } catch (S3Exception e) {
-            log.error("Error getting file URL from S3", e);
+        } catch (final S3Exception e) {
+            LOGGER.error("Error getting file URL from S3", e);
             throw new RuntimeException("Error getting file URL", e);
         }
     }
 
-    private String generateUniqueFileName(String originalFilename) {
+    private String generateUniqueFileName(final String originalFilename) {
         return UUID.randomUUID() + "-" + originalFilename;
     }
 }

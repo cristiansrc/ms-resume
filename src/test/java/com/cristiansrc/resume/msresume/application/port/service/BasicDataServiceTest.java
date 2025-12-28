@@ -6,6 +6,7 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.BasicData
 import com.cristiansrc.resume.msresume.infrastructure.mapper.IBasicDataMapper;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.BasicDataEntity;
 import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class BasicDataServiceTest {
@@ -35,9 +37,16 @@ class BasicDataServiceTest {
     @InjectMocks
     private BasicDataService basicDataService;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close();
     }
 
     @Test
@@ -73,6 +82,8 @@ class BasicDataServiceTest {
         when(basicDataRepository.save(any())).thenReturn(entity);
 
         basicDataService.basicDataIdPut(1L, request);
+
+        verify(basicDataRepository).save(entity);
     }
 
     @Test

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface IFuturedProjectRepository extends JpaRepository<FuturedProjectEntity, Long> {
     @Query("SELECT f FROM FuturedProjectEntity f WHERE f.id = :id AND f.deleted = false")
-    Optional<FuturedProjectEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+    Optional<FuturedProjectEntity> findByIdAndDeletedFalse(@Param("id") Long identifier);
 
     @Query("SELECT f FROM FuturedProjectEntity f WHERE f.deleted = false")
     List<FuturedProjectEntity> findAllByDeletedFalse();

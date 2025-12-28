@@ -10,10 +10,12 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.HomeRespo
 import com.cristiansrc.resume.msresume.infrastructure.mapper.IHomeMapper;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.HomeEntity;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.HomeLabelRelationalEntity;
+import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.ImageUrlEntity;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.LabelEntity;
 import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,81 +24,90 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class HomeService implements IHomeService {
-    private final IHomeRepository homeRepository;
-    private final IHomeMapper homeMapper;
-    private final IImageUrlRepository imageUrlRepository;
-    private final ILabelRepository labelRepository;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomeService.class);
+    private final IHomeRepository repository;
+    private final IHomeMapper mapper;
+    private final IImageUrlRepository imageUrlRepo;
+    private final ILabelRepository labelRepo;
     private final MessageResolver messageResolver;
     private final IS3Service s3Service;
 
     @Transactional(readOnly = true)
     @Override
-    public HomeResponse homeIdGet(Long id) {
-        log.info("Fetching home with id: {}", id);
-        var homeEntity = getEntityById(id);
-        var homeResponse = homeMapper.toResponse(homeEntity, s3Service);
-        log.info("Fetched home with id: {}", id);
+    public HomeResponse homeIdGet(final Long identifier) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetching home with id: {}", identifier);
+        }
+        final HomeEntity homeEntity = getEntityById(identifier);
+        final HomeResponse homeResponse = mapper.toResponse(homeEntity, s3Service);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched home with id: {}", identifier);
+        }
         return homeResponse;
     }
 
     @Transactional
     @Override
-    public void homeIdPut(Long id, HomeRequest homeRequest) {
-        log.info("Updating home with id: {}", id);
-        var homeEntity = getEntityById(id);
-        
-        homeMapper.updateEntityFromRequest(homeRequest, homeEntity);
+    public void homeIdPut(final Long identifier, final HomeRequest homeRequest) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Updating home with id: {}", identifier);
+        }
+        final HomeEntity homeEntity = getEntityById(identifier);
+
+        mapper.updateEntityFromRequest(homeRequest, homeEntity);
 
         updateImage(homeRequest.getImageUrlId(), homeEntity);
         updateLabels(homeRequest.getLabelIds(), homeEntity);
 
-        homeRepository.save(homeEntity);
-        log.info("Updated home with id: {}", id);
+        repository.save(homeEntity);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Updated home with id: {}", identifier);
+        }
     }
 
-    private void updateImage(Long imageId, HomeEntity homeEntity) {
+    private void updateImage(final Long imageId, final HomeEntity homeEntity) {
         if (imageId != null) {
-            var imagen = imageUrlRepository.findByIdAndDeletedFalse(imageId)
+            final ImageUrlEntity imagen = imageUrlRepo.findByIdAndDeletedFalse(imageId)
                     .orElseThrow(() -> messageResolver.notFound("image.home.not.found", imageId));
             homeEntity.setImageUrl(imagen);
         }
     }
 
-    private void updateLabels(List<Long> labelIds, HomeEntity homeEntity) {
+    private void updateLabels(final List<Long> labelIds, final HomeEntity homeEntity) {
         if (labelIds == null) {
             return;
         }
 
         homeEntity.getHomeLabelRelations().clear();
-        homeRepository.flush();
+        repository.flush();
 
-        Set<Long> uniqueLabelIds = new HashSet<>(labelIds);
+        final Set<Long> uniqueLabelIds = new HashSet<>(labelIds);
 
-        var labels = labelRepository.findAllById(uniqueLabelIds);
-        
+        final List<LabelEntity> labels = labelRepo.findAllById(uniqueLabelIds);
+
         if (labels.size() != uniqueLabelIds.size()) {
-            var foundIds = labels.stream().map(LabelEntity::getId).collect(Collectors.toSet());
-            var missingId = uniqueLabelIds.stream()
+            final Set<Long> foundIds = labels.stream().map(LabelEntity::getId).collect(Collectors.toSet());
+            final Long missingId = uniqueLabelIds.stream()
                     .filter(id -> !foundIds.contains(id))
                     .findFirst()
                     .orElse(null);
             throw messageResolver.notFound("label.not.found", missingId);
         }
-        
-        for (LabelEntity label : labels) {
-            var relation = new HomeLabelRelationalEntity();
+
+        for (final LabelEntity label : labels) {
+            final HomeLabelRelationalEntity relation = new HomeLabelRelationalEntity();
             relation.setHome(homeEntity);
             relation.setLabel(label);
             homeEntity.getHomeLabelRelations().add(relation);
         }
     }
 
-    private HomeEntity getEntityById(Long id) {
-        return homeRepository.findById(id)
-                .orElseThrow(() -> messageResolver.notFound("home.not.found.byid", id));
+    private HomeEntity getEntityById(final Long identifier) {
+        return repository.findById(identifier)
+                .orElseThrow(() -> messageResolver.notFound("home.not.found.byid", identifier));
     }
 }

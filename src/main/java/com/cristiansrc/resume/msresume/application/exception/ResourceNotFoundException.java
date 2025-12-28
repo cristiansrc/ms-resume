@@ -2,7 +2,9 @@ package com.cristiansrc.resume.msresume.application.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 
-    public ResourceNotFoundException(String message) {
+    private static final long serialVersionUID = 1L;
+
+    public ResourceNotFoundException(final String message) {
         super(message);
     }
 }

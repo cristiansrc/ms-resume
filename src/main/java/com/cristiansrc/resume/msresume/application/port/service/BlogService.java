@@ -3,6 +3,7 @@ package com.cristiansrc.resume.msresume.application.port.service;
 import com.cristiansrc.resume.msresume.application.port.interactor.IBlogService;
 import com.cristiansrc.resume.msresume.application.port.interactor.IS3Service;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IBlogRepository;
+import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IBlogTypeRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IImageUrlRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IVideoUrlRepository;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogPageResponse;
@@ -14,169 +15,203 @@ import com.cristiansrc.resume.msresume.infrastructure.mapper.IBlogResponseMapper
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.BlogEntity;
 import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BlogService implements IBlogService {
 
-    private final IBlogRepository blogRepository;
-    private final IBlogResponseMapper blogResponseMapper;
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlogService.class);
+    private static final String BLOG_CLEAN_URL_TITLE_EXISTS = "blog.clean.url.title.exists";
+    private static final String IMAGE_URL_NOT_FOUND = "image.url.not.found";
+    private static final String VIDEO_URL_NOT_FOUND = "video.url.not.found";
+    private static final String BLOG_TYPE_NOT_FOUND = "blog.type.not.found";
+    private static final Pattern DIACRITICAL_MARKS = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+    private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-zA-Z0-9\\s-]");
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
+    private final IBlogRepository blogRepo;
+    private final IBlogResponseMapper responseMapper;
     private final MessageResolver messageResolver;
-    private final IBlogRequestMapper blogRequestMapper;
-    private final IImageUrlRepository imageUrlRepository;
-    private final IVideoUrlRepository videoUrlRepository;
+    private final IBlogRequestMapper requestMapper;
+    private final IImageUrlRepository imageUrlRepo;
+    private final IVideoUrlRepository videoUrlRepo;
+    private final IBlogTypeRepository blogTypeRepo;
     private final IS3Service s3Service;
 
     @Transactional(readOnly = true)
     @Override
-    public BlogPageResponse blogGet(Integer page, Integer size, String sortParam) {
-        log.debug("Fetching blog posts with page: {}, size: {}, sort: {}", page, size, sortParam);
+    public BlogPageResponse blogGet(final Integer page, final Integer size, final String sortParam) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Fetching blog posts with page: {}, size: {}, sort: {}", page, size, sortParam);
+        }
 
-        page = (page == null || page < 0) ? 0 : page;
-        size = (size == null || size < 1) ? 10 : size;
-        sortParam = (sortParam == null || sortParam.isBlank()) ? "id,desc" : sortParam;
+        final int pageNumber = Optional.ofNullable(page).filter(p -> p >= 0).orElse(0);
+        final int pageSize = Optional.ofNullable(size).filter(s -> s >= 1).orElse(10);
+        final String sortString = Optional.ofNullable(sortParam).filter(s -> !s.isBlank()).orElse("id,desc");
 
-        String[] sortParts = sortParam.split(",");
-        String property = sortParts[0];
-        Sort.Direction direction = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.DESC;
+        final String[] sortParts = sortString.split(",");
+        final String property = sortParts[0];
+        final Sort.Direction direction = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.DESC;
 
-        var sort = Sort.by(direction, property);
-        var pageable = PageRequest.of(page, size, sort);
+        final Sort sort = Sort.by(direction, property);
+        final Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
-        var entityPage = blogRepository.findByTitleContainingIgnoreCaseAndSort(null, pageable);
-        var models = blogResponseMapper.toPageResponse(entityPage, s3Service);
-        log.debug("Fetched {} blog posts", models.getContent().size());
+        final Page<BlogEntity> entityPage = blogRepo.findByTitleContainingIgnoreCaseAndSort(null, pageable);
+        final BlogPageResponse models = responseMapper.toPageResponse(entityPage, s3Service);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Fetched {} blog posts", models.getContent().size());
+        }
         return models;
     }
 
     @Transactional
     @Override
-    public void blogIdDelete(Long id) {
-        log.info("Deleting blog post with id: {}", id);
-        var entity = getEntityById(id);
+    public void blogIdDelete(final Long identifier) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Deleting blog post with id: {}", identifier);
+        }
+        final BlogEntity entity = getEntityById(identifier);
         entity.setDeleted(true);
-        blogRepository.save(entity);
-        log.info("Blog post with id: {} deleted successfully", id);
+        blogRepo.save(entity);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Blog post with id: {} deleted successfully", identifier);
+        }
     }
 
     @Transactional(readOnly = true)
     @Override
-    public BlogResponse blogIdGet(Long id) {
-        log.debug("Fetching blog post with id: {}", id);
-        var entity = getEntityById(id);
-        var response = blogResponseMapper.toResponse(entity, s3Service);
-        log.debug("Fetched blog post with id: {}", id);
+    public BlogResponse blogIdGet(final Long identifier) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Fetching blog post with id: {}", identifier);
+        }
+        final BlogEntity entity = getEntityById(identifier);
+        final BlogResponse response = responseMapper.toResponse(entity, s3Service);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Fetched blog post with id: {}", identifier);
+        }
         return response;
     }
 
     @Transactional
     @Override
-    public void blogIdPut(Long id, BlogRequest blogRequest) {
-        log.info("Updating blog post with id: {}", id);
-        var entity = getEntityById(id);
+    public void blogIdPut(final Long identifier, final BlogRequest blogRequest) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Updating blog post with id: {}", identifier);
+        }
+        final BlogEntity entity = getEntityById(identifier);
 
-        String cleanUrlTitle = processCleanUrlTitle(blogRequest);
+        final String cleanUrlTitle = processCleanUrlTitle(blogRequest);
         
-        if (!entity.getCleanUrlTitle().equals(cleanUrlTitle) && blogRepository.existsByCleanUrlTitleAndDeletedFalse(cleanUrlTitle)) {
-            throw messageResolver.preconditionFailed("blog.clean.url.title.exists", cleanUrlTitle);
+        if (!entity.getCleanUrlTitle().equals(cleanUrlTitle) && blogRepo.existsByCleanUrlTitleAndDeletedFalse(cleanUrlTitle)) {
+            throw messageResolver.preconditionFailed(BLOG_CLEAN_URL_TITLE_EXISTS, cleanUrlTitle);
         }
         
         blogRequest.setCleanUrlTitle(cleanUrlTitle);
-        blogRequestMapper.updateEntityFromBlogRequest(blogRequest, entity);
+        requestMapper.updateEntityFromBlogRequest(blogRequest, entity);
         
-        if (blogRequest.getImageUrlId() != null) {
-            var image = imageUrlRepository.findByIdAndDeletedFalse(blogRequest.getImageUrlId())
-                    .orElseThrow(() -> messageResolver.notFound("image.url.not.found", blogRequest.getImageUrlId()));
-            entity.setImageUrl(image);
-        } else {
-            entity.setImageUrl(null);
-        }
+        updateRelations(entity, blogRequest);
 
-        if (blogRequest.getVideoUrlId() != null) {
-            var video = videoUrlRepository.findByIdAndNotDeleted(blogRequest.getVideoUrlId())
-                    .orElseThrow(() -> messageResolver.notFound("video.url.not.found", blogRequest.getVideoUrlId()));
-            entity.setVideoUrl(video);
-        } else {
-            entity.setVideoUrl(null);
+        blogRepo.save(entity);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Blog post with id: {} updated successfully", identifier);
         }
-
-        blogRepository.save(entity);
-        log.info("Blog post with id: {} updated successfully", id);
     }
 
     @Transactional
     @Override
-    public ImageUrlPost201Response blogPost(BlogRequest blogRequest) {
-        log.info("Creating new blog post");
+    public ImageUrlPost201Response blogPost(final BlogRequest blogRequest) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Creating new blog post");
+        }
 
-        String cleanUrlTitle = processCleanUrlTitle(blogRequest);
+        final String cleanUrlTitle = processCleanUrlTitle(blogRequest);
         blogRequest.setCleanUrlTitle(cleanUrlTitle);
 
-        if (blogRepository.existsByCleanUrlTitleAndDeletedFalse(cleanUrlTitle)) {
-            throw messageResolver.preconditionFailed("blog.clean.url.title.exists", cleanUrlTitle);
+        if (blogRepo.existsByCleanUrlTitleAndDeletedFalse(cleanUrlTitle)) {
+            throw messageResolver.preconditionFailed(BLOG_CLEAN_URL_TITLE_EXISTS, cleanUrlTitle);
         }
 
-        var entity = blogRequestMapper.toEntity(blogRequest);
+        final BlogEntity entity = requestMapper.toEntity(blogRequest);
         
-        if (blogRequest.getImageUrlId() != null) {
-            var image = imageUrlRepository.findByIdAndDeletedFalse(blogRequest.getImageUrlId())
-                    .orElseThrow(() -> messageResolver.notFound("image.url.not.found", blogRequest.getImageUrlId()));
-            entity.setImageUrl(image);
-        }
+        updateRelations(entity, blogRequest);
 
-        if (blogRequest.getVideoUrlId() != null) {
-            var video = videoUrlRepository.findByIdAndNotDeleted(blogRequest.getVideoUrlId())
-                    .orElseThrow(() -> messageResolver.notFound("video.url.not.found", blogRequest.getVideoUrlId()));
-            entity.setVideoUrl(video);
-        }
-
-        var savedEntity = blogRepository.save(entity);
-        var response = new ImageUrlPost201Response();
+        final BlogEntity savedEntity = blogRepo.save(entity);
+        final ImageUrlPost201Response response = new ImageUrlPost201Response();
         response.setId(savedEntity.getId());
-        log.info("Blog post created with id: {}", savedEntity.getId());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Blog post created with id: {}", savedEntity.getId());
+        }
         return response;
     }
 
-    private BlogEntity getEntityById(Long id) {
-        return blogRepository.findByIdAndNotDeleted(id)
-            .orElseThrow(() -> messageResolver.notFound("blog.post.not.found", id));
+    private void updateRelations(final BlogEntity entity, final BlogRequest blogRequest) {
+        Optional.ofNullable(blogRequest.getImageUrlId())
+                .ifPresentOrElse(
+                        imgId -> entity.setImageUrl(imageUrlRepo.findByIdAndDeletedFalse(imgId)
+                                .orElseThrow(() -> messageResolver.notFound(IMAGE_URL_NOT_FOUND, imgId))),
+                        () -> {
+                            if (entity.getId() != null) entity.setImageUrl(null);
+                        }
+                );
+
+        Optional.ofNullable(blogRequest.getVideoUrlId())
+                .ifPresentOrElse(
+                        vidId -> entity.setVideoUrl(videoUrlRepo.findByIdAndNotDeleted(vidId)
+                                .orElseThrow(() -> messageResolver.notFound(VIDEO_URL_NOT_FOUND, vidId))),
+                        () -> {
+                            if (entity.getId() != null) entity.setVideoUrl(null);
+                        }
+                );
+
+        Optional.ofNullable(blogRequest.getBlogTypeId())
+                .ifPresentOrElse(
+                        typeId -> entity.setBlogType(blogTypeRepo.findByIdAndDeletedFalse(typeId)
+                                .orElseThrow(() -> messageResolver.notFound(BLOG_TYPE_NOT_FOUND, typeId))),
+                        () -> {
+                            if (entity.getId() != null) entity.setBlogType(null);
+                        }
+                );
     }
 
-    private String processCleanUrlTitle(BlogRequest blogRequest) {
-        String titleToProcess = blogRequest.getCleanUrlTitle();
-        if (titleToProcess == null || titleToProcess.isBlank()) {
-            titleToProcess = blogRequest.getTitleEng();
-        }
+    private BlogEntity getEntityById(final Long identifier) {
+        return blogRepo.findByIdAndNotDeleted(identifier)
+            .orElseThrow(() -> messageResolver.notFound("blog.post.not.found", identifier));
+    }
 
-        if (titleToProcess == null) {
+    private String processCleanUrlTitle(final BlogRequest blogRequest) {
+        final String titleToProcess = Optional.ofNullable(blogRequest.getCleanUrlTitle())
+                .filter(t -> !t.isBlank())
+                .or(() -> Optional.ofNullable(blogRequest.getTitleEng()))
+                .orElse("");
+
+        if (titleToProcess.isBlank()) {
              return "";
         }
 
-        String normalized = Normalizer.normalize(titleToProcess, Normalizer.Form.NFD);
-        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        String noAccents = pattern.matcher(normalized).replaceAll("");
+        final String normalized = Normalizer.normalize(titleToProcess, Normalizer.Form.NFD);
+        final String noAccents = DIACRITICAL_MARKS.matcher(normalized).replaceAll("");
 
-        String noSpecialChars = noAccents.replaceAll("[^a-zA-Z0-9\\s-]", "");
-        String withHyphens = noSpecialChars.trim().replaceAll("\\s+", "-");
+        final String noSpecialChars = NON_ALPHANUMERIC.matcher(noAccents).replaceAll("");
+        final String withHyphens = WHITESPACE.matcher(noSpecialChars.trim()).replaceAll("-");
         String lowerCase = withHyphens.toLowerCase();
 
         if (lowerCase.length() > 30) {
             lowerCase = lowerCase.substring(0, 30);
-             if (lowerCase.endsWith("-")) {
-                lowerCase = lowerCase.substring(0, lowerCase.length() - 1);
-            }
         }
 
-        return lowerCase;
+        return lowerCase.endsWith("-") ? lowerCase.substring(0, lowerCase.length() - 1) : lowerCase;
     }
 
 }

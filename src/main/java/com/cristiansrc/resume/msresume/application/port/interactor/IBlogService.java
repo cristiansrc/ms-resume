@@ -7,8 +7,8 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlP
 
 public interface IBlogService {
     BlogPageResponse blogGet(Integer page, Integer size, String sort);
-    void blogIdDelete(Long id);
-    BlogResponse blogIdGet(Long id);
-    void blogIdPut(Long id, BlogRequest blogRequest);
+    void blogIdDelete(Long identifier);
+    BlogResponse blogIdGet(Long identifier);
+    void blogIdPut(Long identifier, BlogRequest blogRequest);
     ImageUrlPost201Response blogPost(BlogRequest blogRequest);
 }

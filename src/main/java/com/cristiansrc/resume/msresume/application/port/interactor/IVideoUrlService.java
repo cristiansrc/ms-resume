@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IVideoUrlService {
     List<VideoUrlResponse> videoUrlGet();
-    void videoUrlIdDelete(Long id);
-    VideoUrlResponse videoUrlIdGet(Long id);
+    void videoUrlIdDelete(Long identifier);
+    VideoUrlResponse videoUrlIdGet(Long identifier);
     ImageUrlPost201Response videoUrlPost(VideoUrlRequest videoUrlRequest);
 }

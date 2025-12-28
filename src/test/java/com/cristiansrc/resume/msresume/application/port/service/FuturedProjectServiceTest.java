@@ -11,6 +11,7 @@ import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.Expe
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.FuturedProjectEntity;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.ImageUrlEntity;
 import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,11 +22,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class FuturedProjectServiceTest {
@@ -48,11 +49,18 @@ class FuturedProjectServiceTest {
     @InjectMocks
     private FuturedProjectService futuredProjectService;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
         // Common mock for the mapper to avoid NPE
         when(futuredProjectMapper.toFuturedProjectEntity(any(FuturedProjectRequest.class))).thenReturn(new FuturedProjectEntity());
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close();
     }
 
     @Test
@@ -72,6 +80,8 @@ class FuturedProjectServiceTest {
         when(futuredProjectRepository.save(any())).thenReturn(entity);
 
         futuredProjectService.futuredProjectIdDelete(1L);
+
+        verify(futuredProjectRepository).save(entity);
     }
 
     @Test
@@ -99,6 +109,8 @@ class FuturedProjectServiceTest {
         when(futuredProjectRepository.save(any())).thenReturn(entity);
 
         futuredProjectService.futuredProjectIdPut(1L, request);
+
+        verify(futuredProjectRepository).save(entity);
     }
 
     @Test
