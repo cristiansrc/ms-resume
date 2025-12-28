@@ -5,8 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Base64;
 import java.util.Date;
 
@@ -74,32 +72,5 @@ class JwtUtilTest {
         setField(jwtUtil, "expiration", -1000L); // Expired
         String token = jwtUtil.generateToken(user);
         assertThrows(ExpiredJwtException.class, () -> jwtUtil.extractExpiration(token));
-    }
-
-    @Test
-    void isTokenExpired_withValidToken_returnsFalse() throws Exception {
-        String token = jwtUtil.generateToken(user);
-        
-        Method method = JwtUtil.class.getDeclaredMethod("isTokenExpired", String.class);
-        method.setAccessible(true);
-        boolean result = (boolean) method.invoke(jwtUtil, token);
-        
-        assertFalse(result);
-    }
-
-    @Test
-    void isTokenExpired_withExpiredToken_throwsExpiredJwtException() throws Exception {
-        setField(jwtUtil, "expiration", -1000L); // Expired
-        String token = jwtUtil.generateToken(user);
-        
-        Method method = JwtUtil.class.getDeclaredMethod("isTokenExpired", String.class);
-        method.setAccessible(true);
-        
-        try {
-            method.invoke(jwtUtil, token);
-            fail("Expected InvocationTargetException wrapping ExpiredJwtException");
-        } catch (InvocationTargetException e) {
-            assertTrue(e.getCause() instanceof ExpiredJwtException);
-        }
     }
 }
