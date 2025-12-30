@@ -5,8 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Setter
@@ -84,5 +87,15 @@ public class BasicDataEntity extends AuditBasicEntity {
     @Column(name = "description_eng", nullable = false)
     @NotNull
     private String descriptionEng;
+
+    @Column(nullable = false)
+    @NotNull
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> wrapper;
+
+    @Column(name = "wrapper_eng", nullable = false)
+    @NotNull
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> wrapperEng;
 
 }
