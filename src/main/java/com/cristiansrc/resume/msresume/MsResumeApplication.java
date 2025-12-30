@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public final class MsResumeApplication {
+public class MsResumeApplication {
 
 	private MsResumeApplication() {
 	}

@@ -8,9 +8,9 @@ CREATE TABLE futured_project
     name_eng                VARCHAR(255)                            NOT NULL,
     experience_id           BIGINT                                  NOT NULL,
     description_short       VARCHAR(255)                            NOT NULL,
-    description             VARCHAR(255)                            NOT NULL,
+    description             TEXT                                    NOT NULL,
     description_short_eng   VARCHAR(255)                            NOT NULL,
-    description_eng         VARCHAR(255)                            NOT NULL,
+    description_eng         TEXT                                    NOT NULL,
     image_list_url_id       BIGINT                                  NOT NULL,
     image_url_id            BIGINT                                  NOT NULL,
     CONSTRAINT              pk_futured_project PRIMARY KEY (id)

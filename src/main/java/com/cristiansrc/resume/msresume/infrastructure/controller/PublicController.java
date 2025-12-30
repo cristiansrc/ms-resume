@@ -13,7 +13,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PublicController implements PublicApi {
 
-    private final IBasicDataService basicDataService;
     private final IBlogService blogService;
     private final IBlogTypeService blogTypeService;
     private final IPublicService publicService;

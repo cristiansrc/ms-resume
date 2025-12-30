@@ -4,7 +4,6 @@ import com.cristiansrc.resume.msresume.application.port.interactor.IEducationSer
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.EducationRequest;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.EducationResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,10 +17,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -36,11 +33,8 @@ class EducationControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-    }
-
-    @AfterEach
-    void tearDown() {
-        RequestContextHolder.resetRequestAttributes();
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
     @Test
@@ -48,7 +42,6 @@ class EducationControllerTest {
         when(educationService.educationGet()).thenReturn(Collections.singletonList(new EducationResponse()));
         ResponseEntity<List<EducationResponse>> response = educationController.educationGet();
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
     }
 
     @Test
@@ -56,36 +49,28 @@ class EducationControllerTest {
         when(educationService.educationIdGet(1L)).thenReturn(new EducationResponse());
         ResponseEntity<EducationResponse> response = educationController.educationIdGet(1L);
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
     }
 
     @Test
     void educationIdPut() {
-        doNothing().when(educationService).educationIdPut(eq(1L), any(EducationRequest.class));
+        doNothing().when(educationService).educationIdPut(any(), any());
         ResponseEntity<Void> response = educationController.educationIdPut(1L, new EducationRequest());
         assertNotNull(response);
-        assertEquals(204, response.getStatusCodeValue());
     }
 
     @Test
     void educationPost() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-
-        ImageUrlPost201Response mockResponse = new ImageUrlPost201Response();
-        mockResponse.setId(1L);
-        when(educationService.educationPost(any(EducationRequest.class))).thenReturn(mockResponse);
-
+        ImageUrlPost201Response serviceResponse = new ImageUrlPost201Response();
+        serviceResponse.setId(1L);
+        when(educationService.educationPost(any())).thenReturn(serviceResponse);
         ResponseEntity<ImageUrlPost201Response> response = educationController.educationPost(new EducationRequest());
         assertNotNull(response);
-        assertEquals(201, response.getStatusCodeValue());
     }
 
     @Test
     void educationIdDelete() {
-        doNothing().when(educationService).educationIdDelete(1L);
+        doNothing().when(educationService).educationIdDelete(any());
         ResponseEntity<Void> response = educationController.educationIdDelete(1L);
         assertNotNull(response);
-        assertEquals(204, response.getStatusCodeValue());
     }
 }

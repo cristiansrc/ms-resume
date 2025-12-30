@@ -4,6 +4,7 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.Education
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.EducationResponse;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.EducationEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
