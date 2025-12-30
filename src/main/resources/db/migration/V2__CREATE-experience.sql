@@ -7,7 +7,7 @@ CREATE TABLE experience
     year_start      date                                    NOT NULL,
     year_end        date                                    NOT NULL,
     company         VARCHAR(255)                            NOT NULL,
-    description     VARCHAR(255)                            NOT NULL,
-    description_eng VARCHAR(255)                            NOT NULL,
+    description     TEXT                                    NOT NULL,
+    description_eng TEXT                                    NOT NULL,
     CONSTRAINT pk_experience PRIMARY KEY (id)
 );

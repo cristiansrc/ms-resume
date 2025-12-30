@@ -20,6 +20,8 @@ create table basic_data (
                             others_name varchar(255) not null,
                             others_sur_name varchar(255) not null,
                             x varchar(255) not null,
+                            wrapper text null,
+                            wrapper_eng text null,
                             primary key (id)
 );
 
@@ -59,8 +61,10 @@ create table experience (
                             id integer,
                             updated timestamp not null,
                             company varchar(255) not null,
-                            description varchar(255) not null,
-                            description_eng varchar(255) not null,
+                            position varchar(255) not null,
+                            position_eng varchar(255) not null,
+                            description TEXT not null,
+                            description_eng TEXT not null,
                             primary key (id)
 );
 
@@ -195,5 +199,24 @@ create table video_url (
                            name varchar(255) not null,
                            name_eng varchar(255) not null,
                            url varchar(255) not null,
+                           primary key (id)
+);
+
+create table education (
+                           deleted boolean not null,
+                           start_date date not null,
+                           end_date date not null,
+                           created timestamp not null,
+                           id integer,
+                           updated timestamp not null,
+                           institution varchar(255) not null,
+                           area varchar(255) not null,
+                           area_eng varchar(255) not null,
+                           degree varchar(255) not null,
+                           degree_eng varchar(255) not null,
+                           location varchar(255) not null,
+                           location_eng varchar(255) not null,
+                           highlights TEXT not null,
+                           highlights_eng TEXT not null,
                            primary key (id)
 );

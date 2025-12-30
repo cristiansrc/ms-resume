@@ -62,102 +62,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  # Basic Data Endpoints
-  /public/basic-data/{id}:
-    get:
-      tags:
-        - Basic Data Public
-      summary: Obtener datos básicos por ID
-      description: Recupera la información básica del perfil profesional
-      security: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Datos básicos obtenidos exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BasicDataResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/label:
-    get:
-      tags:
-        - Label Public
-      summary: Obtener todas las etiquetas
-      description: Recupera la lista completa de etiquetas que se visualizan en el home
-      security: []
-      responses:
-        '200':
-          description: Lista de etiquetas obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LabelResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/label/{id}:
-    get:
-      tags:
-        - Label Public
-      summary: Obtener etiqueta por ID
-      description: Recupera una etiqueta específica por su identificador
-      security: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Etiqueta obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LabelResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/home/{id}:
-    get:
-      tags:
-        - Home Public
-      summary: Obtener información del home
-      description: Recupera la información configurada para la página de inicio
-      security: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Información del home obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HomeResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
   /public/blog:
     get:
       tags:
@@ -273,231 +177,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /public/skill-type:
-    get:
-      tags:
-        - Skill Type Public
-      summary: Obtener todos los tipos de habilidades
-      description: Recupera la lista completa de categorías de habilidades técnicas
-      security: []
-      responses:
-        '200':
-          description: Lista de tipos de habilidades obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SkillTypeResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/skill-type/{id}:
-    get:
-      tags:
-        - Skill Type Public
-      summary: Obtener tipo de habilidad por ID
-      description: Recupera un tipo de habilidad específico por su identificador
-      security: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Tipo de habilidad obtenido exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SkillTypeResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/skill:
-    get:
-      tags:
-        - Skill Public
-      summary: Obtener todas las habilidades
-      description: Recupera la lista completa de habilidades técnicas registradas
-      security: []
-      responses:
-        '200':
-          description: Lista de habilidades obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SkillResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/skill/{id}:
-    get:
-      tags:
-        - Skill Public
-      summary: Obtener habilidad por ID
-      description: Recupera una habilidad específica por su identificador
-      security: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Habilidad obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SkillResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/skill-son:
-    get:
-      tags:
-        - Skill Son Public
-      summary: Obtener todas las especializaciones de habilidades
-      description: Recupera la lista completa de especializaciones y tecnologías específicas
-      security: []
-      responses:
-        '200':
-          description: Lista de especializaciones obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SkillSonResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/skill-son/{id}:
-    get:
-      tags:
-        - Skill Son Public
-      summary: Obtener especialización por ID
-      description: Recupera una especialización específica por su identificador
-      security: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Especialización obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SkillSonResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/experience:
-    get:
-      tags:
-        - Experience Public
-      summary: Obtener todas las experiencias laborales
-      description: Recupera la lista completa de experiencias laborales registradas
-      security: []
-      responses:
-        '200':
-          description: Lista de experiencias laborales obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ExperienceResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/experience/{id}:
-    get:
-      tags:
-        - Experience Public
-      summary: Obtener experiencia laboral por ID
-      description: Recupera una experiencia laboral específica por su identificador
-      security: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Experiencia laboral obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExperienceResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/futured-project:
-    get:
-      tags:
-        - Futured Project Public
-      summary: Obtener todos los proyectos destacados
-      description: Recupera la lista completa de proyectos destacados del portfolio
-      security: []
-      responses:
-        '200':
-          description: Lista de proyectos destacados obtenida exitosamente
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FuturedProjectResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /public/futured-project/{id}:
-    get:
-      tags:
-        - Futured Project Public
-      summary: Obtener proyecto destacado por ID
-      description: Recupera un proyecto destacado específico por su identificador
-      security: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Proyecto destacado obtenido exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FuturedProjectResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
   /public/curriculum:
     get:
       tags:
@@ -505,6 +184,16 @@ paths:
       summary: Descargar curriculum en PDF
       description: Genera y descarga el curriculum vitae en formato PDF basado en la información almacenada en la base de datos
       security: []
+      parameters:
+        - name: language
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - english
+              - spanish
+          description: Idioma del curriculum (english o spanish)
       responses:
         '200':
           description: Curriculum PDF generado y descargado exitosamente
@@ -527,6 +216,24 @@ paths:
               schema:
                 type: integer
               description: Tamaño del archivo en bytes
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /public/info-page:
+    get:
+      tags:
+        - Info Page Public
+      summary: Obtener información completa de la página
+      description: Recupera un objeto con la información de Home, BasicData, SkillTypes, Experiences y Educations
+      security: []
+      responses:
+        '200':
+          description: Información completa de la página obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfoPageResponse'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1735,6 +1442,134 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Education Endpoints
+  /education:
+    get:
+      tags:
+        - Education
+      summary: Obtener todas las educaciones
+      description: Recupera la lista completa de educaciones registradas
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '200':
+          description: Lista de educaciones obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EducationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Education
+      summary: Crear nueva educación
+      description: Registra una nueva educación en el sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EducationRequest'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '201':
+          description: Educación creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /education/{id}:
+    get:
+      tags:
+        - Education
+      summary: Obtener educación por ID
+      description: Recupera una educación específica por su identificador
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '200':
+          description: Educación obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EducationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Education
+      summary: Actualizar educación
+      description: Actualiza una educación existente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EducationRequest'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '204':
+          description: Educación actualizada exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Education
+      summary: Eliminar educación
+      description: Elimina una educación del sistema
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '204':
+          description: Educación eliminada exitosamente
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # Futured Project Endpoints
   /futured-project:
     get:
@@ -1862,41 +1697,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  # Curriculum Endpoints
-  /curriculum:
-    get:
-      tags:
-        - Curriculum
-      summary: Descargar curriculum en PDF
-      description: Genera y descarga el curriculum vitae en formato PDF basado en la información almacenada en la base de datos
-      responses:
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '200':
-          description: Curriculum PDF generado y descargado exitosamente
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
-                description: Archivo PDF del curriculum vitae
-          headers:
-            Content-Disposition:
-              schema:
-                type: string
-              description: Encabezado para forzar la descarga del archivo
-            Content-Type:
-              schema:
-                type: string
-              description: Tipo de contenido del archivo
-            Content-Length:
-              schema:
-                type: integer
-              description: Tamaño del archivo en bytes
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
 
 components:
   schemas:
@@ -1980,6 +1780,22 @@ components:
           type: string
           description: Descripción profesional
           maxLength: 1000
+        wrapper:
+          type: array
+          description: Descripción de roles
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+            maxLength: 200
+        wrapperEng:
+          type: array
+          description: Descripción de roles en ingles
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+            maxLength: 200
 
     ImageUrlRequest:
       type: object
@@ -2266,22 +2082,113 @@ components:
           description: Nombre de la empresa
           minLength: 1
           maxLength: 100
+        position:
+          type: string
+          description: Nombre de la posicion
+          minLength: 1
+          maxLength: 100
+        positionEng:
+          type: string
+          description: Nombre de la posicion en ingles
+          minLength: 1
+          maxLength: 100
         description:
-          type: string
-          description: Descripción de las responsabilidades y logros
-          minLength: 1
-          maxLength: 1000
+          type: array
+          description: Lista de responsabilidades y logros
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+            maxLength: 200
         descriptionEng:
-          type: string
+          type: array
           description: Descripción de las responsabilidades y logros en ingles
-          minLength: 1
-          maxLength: 1000
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+            maxLength: 200
         skillSonIds:
           type: array
           description: IDs de las tecnologías utilizadas
           items:
             type: integer
             format: int64
+
+    EducationRequest:
+      type: object
+      description: Estructura para registrar educaciones
+      required:
+        - institution
+        - area
+        - areaEng
+        - degree
+        - degreeEng
+        - startDate
+        - location
+        - locationEng
+        - highlights
+        - highlightsEng
+      properties:
+        institution:
+          type: string
+          description: Nombre de la institución
+          minLength: 1
+          maxLength: 100
+        area:
+          type: string
+          description: Área de estudio
+          minLength: 1
+          maxLength: 100
+        areaEng:
+          type: string
+          description: Área de estudio en ingles
+          minLength: 1
+          maxLength: 100
+        degree:
+          type: string
+          description: Grado obtenido
+          minLength: 1
+          maxLength: 100
+        degreeEng:
+          type: string
+          description: Grado obtenido en ingles
+          minLength: 1
+          maxLength: 100
+        startDate:
+          type: string
+          format: date
+          description: Fecha de inicio de la educación
+        endDate:
+          type: string
+          format: date
+          description: Fecha de finalización de la educación
+        location:
+          type: string
+          description: Ubicación de la institución
+          minLength: 1
+          maxLength: 100
+        locationEng:
+          type: string
+          description: Ubicación de la institución en ingles
+          minLength: 1
+          maxLength: 100
+        highlights:
+          type: array
+          description: Lista de logros destacados
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+            maxLength: 200
+        highlightsEng:
+          type: array
+          description: Lista de logros destacados en ingles
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+            maxLength: 200
 
     FuturedProjectRequest:
       type: object
@@ -2401,6 +2308,16 @@ components:
         descriptionEng:
           type: string
           description: Descripción profesional
+        wrapper:
+          type: array
+          description: Lista de roles que puedo desempeñar
+          items:
+            type: string
+        wrapperEng:
+          type: array
+          description: Lista de roles que puedo desempeñar en ingles
+          items:
+            type: string
 
     ImageUrlResponse:
       type: object
@@ -2682,17 +2599,75 @@ components:
         company:
           type: string
           description: Nombre de la empresa
+        position:
+          type: string
+          description: Nombre de la posicion
+        positionEng:
+          type: string
+          description: Nombre de la posicion en ingles
         description:
-          type: string
-          description: Descripción de las responsabilidades y logros
+          type: array
+          description: Lista de responsabilidades y logros
+          items:
+            type: string
         descriptionEng:
-          type: string
+          type: array
           description: Descripción de las responsabilidades y logros en ingles
+          items:
+            type: string
         skillSons:
           type: array
           description: Tecnologías utilizadas
           items:
             $ref: '#/components/schemas/SkillSonResponse'
+
+    EducationResponse:
+      type: object
+      description: Educaciones consultadas desde la base de datos
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único
+        institution:
+          type: string
+          description: Nombre de la institución
+        area:
+          type: string
+          description: Área de estudio
+        areaEng:
+          type: string
+          description: Área de estudio en ingles
+        degree:
+          type: string
+          description: Grado obtenido
+        degreeEng:
+          type: string
+          description: Grado obtenido en ingles
+        startDate:
+          type: string
+          format: date
+          description: Fecha de inicio de la educación
+        endDate:
+          type: string
+          format: date
+          description: Fecha de finalización de la educación
+        location:
+          type: string
+          description: Ubicación de la institución
+        locationEng:
+          type: string
+          description: Ubicación de la institución en ingles
+        highlights:
+          type: array
+          description: Lista de logros destacados
+          items:
+            type: string
+        highlightsEng:
+          type: array
+          description: Lista de logros destacados en ingles
+          items:
+            type: string
 
     FuturedProjectResponse:
       type: object
@@ -2726,6 +2701,27 @@ components:
           $ref: '#/components/schemas/ImageUrlResponse'
         imageUrl:
           $ref: '#/components/schemas/ImageUrlResponse'
+
+    InfoPageResponse:
+      type: object
+      description: Información completa de la página incluyendo Home, BasicData, SkillTypes, Experiences y Educations
+      properties:
+        home:
+          $ref: '#/components/schemas/HomeResponse'
+        basicData:
+          $ref: '#/components/schemas/BasicDataResponse'
+        skillTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillTypeResponse'
+        experiences:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExperienceResponse'
+        educations:
+          type: array
+          items:
+            $ref: '#/components/schemas/EducationResponse'
 
     # Error Response Schema
     ErrorResponse:

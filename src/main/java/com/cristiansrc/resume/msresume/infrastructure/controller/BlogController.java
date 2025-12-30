@@ -2,10 +2,7 @@ package com.cristiansrc.resume.msresume.infrastructure.controller;
 
 import com.cristiansrc.resume.msresume.application.port.input.controller.BlogApi;
 import com.cristiansrc.resume.msresume.application.port.interactor.IBlogService;
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogPageResponse;
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogRequest;
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogResponse;
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.ImageUrlPost201Response;
+import com.cristiansrc.resume.msresume.infrastructure.controller.model.*;
 import com.cristiansrc.resume.msresume.infrastructure.util.UrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
