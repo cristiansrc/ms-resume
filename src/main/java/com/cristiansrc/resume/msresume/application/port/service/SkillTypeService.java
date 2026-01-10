@@ -8,6 +8,7 @@ import com.cristiansrc.resume.msresume.infrastructure.controller.model.SkillType
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.SkillTypeResponse;
 import com.cristiansrc.resume.msresume.infrastructure.mapper.ISkillTypeMapper;
 import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.SkillTypeEntity;
+import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity.SkillTypeRelationalEntity;
 import com.cristiansrc.resume.msresume.infrastructure.util.MessageResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,11 +92,20 @@ public class SkillTypeService implements ISkillTypeService {
                         .orElseThrow(() -> messageResolver.notFound("skill.not.found", skillId)))
                 .toList();
 
-        if (entity.getSkills() == null) {
-            entity.setSkills(new ArrayList<>());
+        if (entity.getSkillTypeRelations() == null) {
+            entity.setSkillTypeRelations(new ArrayList<>());
         }
-        entity.getSkills().clear();
-        entity.getSkills().addAll(skillEntities);
+        entity.getSkillTypeRelations().clear();
+        
+        var newRelations = skillEntities.stream()
+                .map(skill -> SkillTypeRelationalEntity.builder()
+                        .skill(skill)
+                        .skillType(entity)
+                        .build())
+                .toList();
+                
+        entity.getSkillTypeRelations().addAll(newRelations);
+
         var savedEntity = skillTypeRepository.save(entity);
         return savedEntity.getId();
     }

@@ -2,6 +2,7 @@ package com.cristiansrc.resume.msresume.infrastructure.util;
 
 import com.cristiansrc.resume.msresume.application.exception.InvalidCredentialsException;
 import com.cristiansrc.resume.msresume.application.exception.PreconditionFailedException;
+import com.cristiansrc.resume.msresume.application.exception.RenderCvServiceException;
 import com.cristiansrc.resume.msresume.application.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -30,5 +31,10 @@ public class MessageResolver {
     public PreconditionFailedException preconditionFailed(String key, Object... args) {
         String msg = getMessage(key, args);
         return new PreconditionFailedException(msg);
+    }
+
+    public RenderCvServiceException renderCvService(String key, Object... args) {
+        String msg = getMessage(key, args);
+        return new RenderCvServiceException(msg);
     }
 }

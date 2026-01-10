@@ -177,7 +177,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /public/curriculum:
+  /public/curriculum/{language}:
     get:
       tags:
         - Curriculum Public
@@ -186,7 +186,7 @@ paths:
       security: []
       parameters:
         - name: language
-          in: query
+          in: path
           required: true
           schema:
             type: string
@@ -1775,27 +1775,29 @@ components:
         description:
           type: string
           description: Descripción profesional
-          maxLength: 1000
         descriptionEng:
           type: string
           description: Descripción profesional
-          maxLength: 1000
+        descriptionPdf:
+          type: array
+          description: Descripción profesional pdf
+          items:
+            type: string
+        descriptionPdfEng:
+          type: array
+          description: Descripción profesional pdf en ingles
+          items:
+            type: string
         wrapper:
           type: array
           description: Descripción de roles
-          minItems: 1
           items:
             type: string
-            minLength: 1
-            maxLength: 200
         wrapperEng:
           type: array
           description: Descripción de roles en ingles
-          minItems: 1
           items:
             type: string
-            minLength: 1
-            maxLength: 200
 
     ImageUrlRequest:
       type: object
@@ -2092,22 +2094,46 @@ components:
           description: Nombre de la posicion en ingles
           minLength: 1
           maxLength: 100
-        description:
+        location:
+          type: string
+          description: Localizacion
+          minLength: 1
+          maxLength: 100
+        locationEng:
+          type: string
+          description: Localizacion en ingles
+          minLength: 1
+          maxLength: 100
+        summary:
+          type: string
+          description: Descripción pdf
+          minLength: 1
+        summaryEng:
+          type: string
+          description: Descripción pdf en ingles
+          minLength: 1
+        summaryPdf:
+          type: string
+          description: Descripción pdf
+          minLength: 1
+        summaryPdfEng:
+          type: string
+          description: Descripción pdf en ingles
+          minLength: 1
+        descriptionItemsPdf:
           type: array
           description: Lista de responsabilidades y logros
           minItems: 1
           items:
             type: string
             minLength: 1
-            maxLength: 200
-        descriptionEng:
+        descriptionItemsPdfEng:
           type: array
           description: Descripción de las responsabilidades y logros en ingles
           minItems: 1
           items:
             type: string
             minLength: 1
-            maxLength: 200
         skillSonIds:
           type: array
           description: IDs de las tecnologías utilizadas
@@ -2176,19 +2202,13 @@ components:
         highlights:
           type: array
           description: Lista de logros destacados
-          minItems: 1
           items:
             type: string
-            minLength: 1
-            maxLength: 200
         highlightsEng:
           type: array
           description: Lista de logros destacados en ingles
-          minItems: 1
           items:
             type: string
-            minLength: 1
-            maxLength: 200
 
     FuturedProjectRequest:
       type: object
@@ -2308,6 +2328,16 @@ components:
         descriptionEng:
           type: string
           description: Descripción profesional
+        descriptionPdf:
+          type: array
+          description: Lista de descripciones para pdf
+          items:
+            type: string
+        descriptionPdfEng:
+          type: array
+          description: Lista de descripciones para pdf en ingles
+          items:
+            type: string
         wrapper:
           type: array
           description: Lista de roles que puedo desempeñar
@@ -2599,18 +2629,36 @@ components:
         company:
           type: string
           description: Nombre de la empresa
+        location:
+          type: string
+          description: Localizacion de la empresa
+        locationEng:
+          type: string
+          description: Localizacion de la empresa en ingles
         position:
           type: string
           description: Nombre de la posicion
         positionEng:
           type: string
           description: Nombre de la posicion en ingles
-        description:
+        summary:
+          type: string
+          description: Descripción pdf
+        summaryEng:
+          type: string
+          description: Descripción pdf en ingles
+        summaryPdf:
+          type: string
+          description: Descripción pdf
+        summaryPdfEng:
+          type: string
+          description: Descripción pdf en ingles
+        descriptionItemsPdf:
           type: array
           description: Lista de responsabilidades y logros
           items:
             type: string
-        descriptionEng:
+        descriptionItemsPdfEng:
           type: array
           description: Descripción de las responsabilidades y logros en ingles
           items:

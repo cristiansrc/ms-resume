@@ -183,6 +183,14 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(HttpStatus.PRECONDITION_FAILED, msg, request);
     }
 
+    @ExceptionHandler(RenderCvServiceException.class)
+    public ResponseEntity<ErrorResponse> handleRenderCvServiceException(
+            final RenderCvServiceException exception, final HttpServletRequest request) {
+        LOGGER.error("RenderCV service error: ", exception);
+        final String msg = "No se pudo crear el archivo PDF";
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, msg, request);
+    }
+
     private ResponseEntity<ErrorResponse> buildResponseEntity(final HttpStatus status, final String message, final HttpServletRequest request) {
         return ResponseEntity.status(status).body(createErrorResponse(status, message, request));
     }

@@ -1,5 +1,6 @@
 package com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity;
 
+import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.converter.LocalDateStringConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -20,15 +21,21 @@ public class ExperienceEntity extends AuditBasicEntity {
 
     @Column(name = "year_start", nullable = false)
     @NotNull
+    @Convert(converter = LocalDateStringConverter.class)
     private LocalDate yearStart;
 
     @Column(name = "year_end", nullable = false)
     @NotNull
+    @Convert(converter = LocalDateStringConverter.class)
     private LocalDate yearEnd;
 
     @Column(nullable = false)
     @NotNull
     private String company;
+
+    @Column(name = "company_eng", nullable = false)
+    @NotNull
+    private String companyEng;
 
     @Column(nullable = false)
     @NotNull
@@ -40,13 +47,37 @@ public class ExperienceEntity extends AuditBasicEntity {
 
     @Column(nullable = false)
     @NotNull
-    @JdbcTypeCode(SqlTypes.JSON)
-    private List<String> description;
+    private String location;
 
-    @Column(name = "description_eng", nullable = false)
+    @Column(name = "location_eng", nullable = false)
+    @NotNull
+    private String locationEng;
+
+    @Column(nullable = false)
+    @NotNull
+    private String summary;
+
+    @Column(name = "summary_eng", nullable = false)
+    @NotNull
+    private String summaryEng;
+
+    @Column(name = "summary_pdf", nullable = false)
+    @NotNull
+    private String summaryPdf;
+
+    @Column(name = "summary_pdf_eng", nullable = false)
+    @NotNull
+    private String summaryPdfEng;
+
+    @Column(name = "description_items_pdf", nullable = false)
     @NotNull
     @JdbcTypeCode(SqlTypes.JSON)
-    private List<String> descriptionEng;
+    private List<String> descriptionItems;
+
+    @Column(name = "description_items_pdf_eng", nullable = false)
+    @NotNull
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> descriptionItemsEng;
 
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExperienceSkillEntity> experienceSkills;
