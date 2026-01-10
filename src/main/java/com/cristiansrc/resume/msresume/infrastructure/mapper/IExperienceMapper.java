@@ -15,19 +15,27 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface IExperienceMapper {
 
-    @Mapping(target = "yearStart", source = "yearStart")
-    @Mapping(target = "yearEnd", source = "yearEnd")
-    @Mapping(target = "company", source = "company")
-    @Mapping(target = "description", source = "description")
     @Mapping(target = "experienceSkills", ignore = true)
+    @Mapping(target = "descriptionItems", source = "descriptionItemsPdf")
+    @Mapping(target = "descriptionItemsEng", source = "descriptionItemsPdfEng")
+    @Mapping(target = "companyEng", source = "company")
+    @Mapping(target = "location", source = "location")
+    @Mapping(target = "locationEng", source = "locationEng")
     ExperienceEntity toExperienceEntity(ExperienceRequest experienceRequest);
     
     @Mapping(target = "experienceSkills", ignore = true)
+    @Mapping(target = "descriptionItems", source = "descriptionItemsPdf")
+    @Mapping(target = "descriptionItemsEng", source = "descriptionItemsPdfEng")
+    @Mapping(target = "companyEng", source = "company")
+    @Mapping(target = "location", source = "location")
+    @Mapping(target = "locationEng", source = "locationEng")
     void updateExperienceEntityFromRequest(
             ExperienceRequest experienceRequest, @MappingTarget ExperienceEntity experienceEntity);
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "skillSons", source = "experienceSkills")
+    @Mapping(target = "descriptionItemsPdf", source = "descriptionItems")
+    @Mapping(target = "descriptionItemsPdfEng", source = "descriptionItemsEng")
     ExperienceResponse toExperienceResponse(ExperienceEntity experienceEntity);
     
     List<ExperienceResponse> toExperienceResponseList(List<ExperienceEntity> experienceEntities);

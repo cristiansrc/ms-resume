@@ -1,6 +1,8 @@
 package com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity;
 
+import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.converter.LocalDateStringConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -38,6 +40,7 @@ public class BasicDataEntity extends AuditBasicEntity {
 
     @Column(name = "date_birth", nullable = false)
     @NotNull
+    @Convert(converter = LocalDateStringConverter.class)
     private LocalDate dateBirth;
 
     @Column(nullable = false)
@@ -50,6 +53,7 @@ public class BasicDataEntity extends AuditBasicEntity {
 
     @Column(name = "start_working_date", nullable = false)
     @NotNull
+    @Convert(converter = LocalDateStringConverter.class)
     private LocalDate startWorkingDate;
 
     @Column(nullable = false)
@@ -88,6 +92,16 @@ public class BasicDataEntity extends AuditBasicEntity {
     @NotNull
     private String descriptionEng;
 
+    @Column(name = "description_pdf", nullable = false)
+    @NotNull
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> descriptionPdf;
+
+    @Column(name = "description_pdf_eng", nullable = false)
+    @NotNull
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> descriptionPdfEng;
+
     @Column(nullable = false)
     @NotNull
     @JdbcTypeCode(SqlTypes.JSON)
@@ -97,5 +111,4 @@ public class BasicDataEntity extends AuditBasicEntity {
     @NotNull
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> wrapperEng;
-
 }

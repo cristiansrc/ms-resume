@@ -1,7 +1,7 @@
 create table basic_data (
-                            date_birth date not null,
+                            date_birth TEXT not null,
                             deleted boolean not null,
-                            start_working_date date not null,
+                            start_working_date TEXT not null,
                             created timestamp not null,
                             id integer,
                             updated timestamp not null,
@@ -22,6 +22,8 @@ create table basic_data (
                             x varchar(255) not null,
                             wrapper text null,
                             wrapper_eng text null,
+                            description_pdf TEXT null,
+                            description_pdf_eng TEXT null,
                             primary key (id)
 );
 
@@ -55,16 +57,23 @@ create table blog_type (
 
 create table experience (
                             deleted boolean not null,
-                            year_end date not null,
-                            year_start date not null,
+                            year_end TEXT not null,
+                            year_start TEXT not null,
                             created timestamp not null,
                             id integer,
                             updated timestamp not null,
                             company varchar(255) not null,
+                            company_eng varchar(255) not null,
+                            location varchar(255) not null,
+                            location_eng varchar(255) not null,
                             position varchar(255) not null,
                             position_eng varchar(255) not null,
-                            description TEXT not null,
-                            description_eng TEXT not null,
+                            summary text not null,
+                            summary_eng text not null,
+                            summary_pdf text not null,
+                            summary_pdf_eng text not null,
+                            description_items_pdf text not null,
+                            description_items_pdf_eng text not null,
                             primary key (id)
 );
 
@@ -204,8 +213,8 @@ create table video_url (
 
 create table education (
                            deleted boolean not null,
-                           start_date date not null,
-                           end_date date not null,
+                           start_date TEXT not null,
+                           end_date TEXT not null,
                            created timestamp not null,
                            id integer,
                            updated timestamp not null,

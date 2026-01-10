@@ -5,9 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface IHomeRepository extends JpaRepository<HomeEntity, Long> {
     boolean existsByImageUrlIdAndDeletedFalse(Long imageId);
 
     @Query("SELECT COUNT(h) > 0 FROM HomeEntity h JOIN h.homeLabelRelations r JOIN r.label l WHERE l.id = :labelId AND h.deleted = false")
     boolean existsByLabelIdAndDeletedFalse(@Param("labelId") Long labelId);
+
+    Optional<HomeEntity> findFirstByOrderByCreatedDesc();
 }

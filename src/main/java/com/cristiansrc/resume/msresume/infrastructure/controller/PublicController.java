@@ -4,6 +4,7 @@ import com.cristiansrc.resume.msresume.application.port.input.controller.PublicA
 import com.cristiansrc.resume.msresume.application.port.interactor.*;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,6 +45,12 @@ public class PublicController implements PublicApi {
     @Override
     public ResponseEntity<InfoPageResponse> publicInfoPageGet() {
         var response = publicService.getInfoPage();
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Resource> publicCurriculumLanguageGet(String language) {
+        var response = publicService.publicCurriculumGet(language);
         return ResponseEntity.ok(response);
     }
 }

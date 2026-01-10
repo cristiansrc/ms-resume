@@ -1,5 +1,6 @@
 package com.cristiansrc.resume.msresume.infrastructure.repository.jpa.entity;
 
+import com.cristiansrc.resume.msresume.infrastructure.repository.jpa.converter.LocalDateStringConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -40,10 +41,12 @@ public class EducationEntity extends AuditBasicEntity {
 
     @Column(name = "start_date", nullable = false)
     @NotNull
+    @Convert(converter = LocalDateStringConverter.class)
     private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
     @NotNull
+    @Convert(converter = LocalDateStringConverter.class)
     private LocalDate endDate;
 
     @Column(nullable = false)
