@@ -1,5 +1,6 @@
 package com.cristiansrc.resume.msresume.infrastructure.client.rendercv.in;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -15,11 +16,11 @@ public class Experience {
     private String position;
 
     @JsonProperty("start_date")
-    @DateTimeFormat(pattern = "yyyy-MM")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
     private LocalDate startDate;
 
     @JsonProperty("end_date")
-    @DateTimeFormat(pattern = "yyyy-MM")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
     private LocalDate endDate;
 
     private String location;

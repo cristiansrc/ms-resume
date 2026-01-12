@@ -1,5 +1,6 @@
 package com.cristiansrc.resume.msresume.infrastructure.client.rendercv.in;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +17,11 @@ public class Education {
     private String degree;
 
     @JsonProperty("start_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
     private LocalDate startDate;
 
     @JsonProperty("end_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
     private LocalDate endDate;
 
     private String location;

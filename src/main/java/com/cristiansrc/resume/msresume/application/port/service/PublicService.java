@@ -12,6 +12,7 @@ import com.cristiansrc.resume.msresume.infrastructure.constants.InfoCvConstants;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.*;
 import com.cristiansrc.resume.msresume.infrastructure.mapper.IBasicDataMapper;
 import com.cristiansrc.resume.msresume.infrastructure.mapper.IHomeMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,6 +42,7 @@ public class PublicService implements IPublicService {
     private final IBasicDataMapper basicDataMapper;
     private final IS3Service s3Service;
     private final IRenderCvClient renderCvClient;
+    private final ObjectMapper objectMapper;
 
     @Value("${config.rendercv.website}")
     private String webSite;
@@ -57,6 +61,15 @@ public class PublicService implements IPublicService {
 
     @Value("${config.instagram.url}")
     private String instagramUrl;
+
+    @Value("${config.rendercv.debug.enabled:false}")
+    private boolean debugEnabled;
+
+    @Value("${config.rendercv.debug.path:/tmp/}")
+    private String debugPath;
+
+    @Value("${config.rendercv.debug.filename:rendercv-debug.json}")
+    private String debugFilename;
 
     @Transactional(readOnly = true)
     @Override
@@ -100,6 +113,20 @@ public class PublicService implements IPublicService {
         customerCvIn.setCv(infoCv);
         customerCvIn.setDesign(Design.builder().theme(theme).build());
         customerCvIn.setLocale(Locale.builder().language(language).build());
+
+        if (debugEnabled) {
+            try {
+                File directory = new File(debugPath);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+                File file = new File(directory, debugFilename);
+                objectMapper.writeValue(file, customerCvIn);
+                log.info("JSON debug file written to: {}", file.getAbsolutePath());
+            } catch (IOException e) {
+                log.error("Error writing JSON debug file", e);
+            }
+        }
 
         var customerCvOut = renderCvClient.renderCv(customerCvIn);
 
@@ -168,30 +195,50 @@ public class PublicService implements IPublicService {
         }
     }
 
-    private List<Education> getEducations() {
+    private List<Education> getEducations(boolean isSpanish) {
         return educationService.educationGet().stream()
                 .map(e -> Education.builder()
                         .institution(e.getInstitution())
-                        .area(e.getArea())
-                        .degree(e.getDegree())
+                        .area(resolveText(isSpanish, e.getArea(), e.getAreaEng()))
+                        .degree(resolveText(isSpanish, e.getDegree(), e.getDegreeEng()))
                         .startDate(e.getStartDate())
                         .endDate(e.getEndDate())
                         .highlights(e.getHighlights())
+                        .location(resolveText(isSpanish, e.getLocation(), e.getLocationEng()))
                         .build())
                 .toList();
     }
 
     private List<Experience> getExperiences(boolean isSpanish) {
         return experienceService.experienceGet().stream()
-                .map(e -> Experience.builder()
-                        .company(e.getCompany())
-                        .position(e.getPosition())
-                        .startDate(e.getYearStart())
-                        .endDate(e.getYearEnd())
-                        .location(isSpanish ? e.getLocation() : e.getLocationEng())
-                        .summary(isSpanish ? e.getSummary() : e.getSummaryEng())
-                        .highlights(isSpanish ? e.getDescriptionItemsPdf() : e.getDescriptionItemsPdfEng())
-                        .build())
+                .map(e -> {
+
+                    var highlights = isSpanish ? e.getDescriptionItemsPdf() : e.getDescriptionItemsPdfEng();
+
+                    var stringSkills = e.getSkillSons().stream()
+                            .map( s -> resolveText(isSpanish, s.getName(), s.getNameEng()))
+                            .filter(name -> name != null && !name.isBlank())
+                            .collect(Collectors.joining(", "));
+
+                    highlights.add(
+                            resolveText(isSpanish, InfoCvConstants.TECH_SPA, InfoCvConstants.TECH_ENG) + stringSkills);
+
+                    var company = "";
+
+                    if (e.getCompany() != null){
+                        company = isSpanish ? e.getCompany(): e.getCompany().replace("Cliente", "Customer");
+                    }
+
+                    return Experience.builder()
+                            .company(company)
+                            .position(resolveText(isSpanish, e.getPosition(), e.getPositionEng()))
+                            .startDate(e.getYearStart())
+                            .endDate(e.getYearEnd())
+                            .location(resolveText(isSpanish, e.getLocation(), e.getLocationEng()))
+                            .summary(resolveText(isSpanish, e.getSummaryPdf(), e.getSummaryPdfEng()))
+                            .highlights(highlights)
+                            .build();
+                })
                 .toList();
     }
 
@@ -223,7 +270,7 @@ public class PublicService implements IPublicService {
     private LinkedHashMap<String, Object> getSections(BasicDataResponse basicData, String language) {
         validateBasicDataForCv(basicData);
         boolean isSpanish = InfoCvConstants.LANGUAGE_SPANISH.equals(language);
-        var educations = getEducations();
+        var educations = getEducations(isSpanish);
         var experiences = getExperiences(isSpanish);
         var skills = getSkills(isSpanish);
         var selectedHonors = getSelectedHonors(isSpanish, basicData);

@@ -2123,14 +2123,12 @@ components:
         descriptionItemsPdf:
           type: array
           description: Lista de responsabilidades y logros
-          minItems: 1
           items:
             type: string
             minLength: 1
         descriptionItemsPdfEng:
           type: array
           description: Descripción de las responsabilidades y logros en ingles
-          minItems: 1
           items:
             type: string
             minLength: 1

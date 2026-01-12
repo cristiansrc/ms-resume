@@ -24,6 +24,9 @@ public class InfoCvConstants {
     public static final String HONOR_ENG = "selected_honor";
     public static final String HONOR_SPA = "honores";
 
+    public static final String TECH_ENG = "Technologies used: ";
+    public static final String TECH_SPA = "Tecnologías utilizadas: ";
+
     private InfoCvConstants() {
     }
 }
