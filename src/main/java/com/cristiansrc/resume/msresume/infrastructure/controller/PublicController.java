@@ -16,7 +16,9 @@ public class PublicController implements PublicApi {
 
     private final IBlogService blogService;
     private final IBlogTypeService blogTypeService;
-    private final IPublicService publicService;
+    private final IInfoPageService infoPageService;
+    private final ICvService cvService;
+    private final IContactService contactService;
 
     @Override
     public ResponseEntity<BlogPageResponse> publicBlogGet(Integer page, Integer size, String sort) {
@@ -44,19 +46,19 @@ public class PublicController implements PublicApi {
 
     @Override
     public ResponseEntity<InfoPageResponse> publicInfoPageGet() {
-        var response = publicService.getInfoPage();
+        var response = infoPageService.getInfoPage();
         return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<Resource> publicCurriculumLanguageGet(String language) {
-        var response = publicService.publicCurriculumGet(language);
+        var response = cvService.generateCurriculum(language);
         return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<Void> publicContactPost(ContactRequest contactRequest) {
-        publicService.sendContactMessage(contactRequest);
+        contactService.sendContactMessage(contactRequest);
         return ResponseEntity.ok().build();
     }
 }
