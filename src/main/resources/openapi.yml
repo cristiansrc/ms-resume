@@ -238,6 +238,26 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /public/contact:
+    post:
+      tags:
+        - Contact Public
+      summary: Enviar mensaje de contacto
+      description: Recibe nombre, email y mensaje para enviarlos al chatbot de Telegram
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+      responses:
+        '200':
+          description: Mensaje enviado exitosamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /basic-data/{id}:
     get:
       tags:
@@ -1701,6 +1721,29 @@ paths:
 components:
   schemas:
     # Request Schemas
+    ContactRequest:
+      type: object
+      description: Estructura para enviar mensaje de contacto
+      required:
+        - name
+        - email
+        - message
+      properties:
+        name:
+          type: string
+          description: Nombre del remitente
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          description: Correo electrónico del remitente
+        message:
+          type: string
+          description: Mensaje de contacto
+          minLength: 1
+          maxLength: 2000
+
     BasicDataRequest:
       type: object
       description: Estructura de datos básicos del perfil profesional incluyendo información personal y redes sociales
@@ -2756,10 +2799,10 @@ components:
           $ref: '#/components/schemas/HomeResponse'
         basicData:
           $ref: '#/components/schemas/BasicDataResponse'
-        skillTypes:
+        skills:
           type: array
           items:
-            $ref: '#/components/schemas/SkillTypeResponse'
+            $ref: '#/components/schemas/SkillResponse'
         experiences:
           type: array
           items:

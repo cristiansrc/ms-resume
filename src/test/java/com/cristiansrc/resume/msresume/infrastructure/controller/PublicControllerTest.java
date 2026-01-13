@@ -1,18 +1,15 @@
 package com.cristiansrc.resume.msresume.infrastructure.controller;
 
-import com.cristiansrc.resume.msresume.application.port.interactor.IBlogService;
-import com.cristiansrc.resume.msresume.application.port.interactor.IBlogTypeService;
-import com.cristiansrc.resume.msresume.application.port.interactor.IPublicService;
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogPageResponse;
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogResponse;
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogTypeResponse;
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.InfoPageResponse;
+import com.cristiansrc.resume.msresume.application.port.interactor.*;
+import com.cristiansrc.resume.msresume.infrastructure.controller.model.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -33,7 +30,13 @@ class PublicControllerTest {
     private IBlogTypeService blogTypeService;
 
     @Mock
-    private IPublicService publicService;
+    private IInfoPageService infoPageService;
+
+    @Mock
+    private ICvService cvService;
+
+    @Mock
+    private IContactService contactService;
 
     @InjectMocks
     private PublicController publicController;
@@ -105,13 +108,40 @@ class PublicControllerTest {
     @Test
     void publicInfoPageGet() {
         InfoPageResponse mockResponse = new InfoPageResponse();
-        when(publicService.getInfoPage()).thenReturn(mockResponse);
+        when(infoPageService.getInfoPage()).thenReturn(mockResponse);
 
         ResponseEntity<InfoPageResponse> response = publicController.publicInfoPageGet();
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(mockResponse, response.getBody());
-        verify(publicService).getInfoPage();
+        verify(infoPageService).getInfoPage();
+    }
+
+    @Test
+    void publicCurriculumLanguageGet() {
+        Resource mockResource = new ByteArrayResource(new byte[0]);
+        when(cvService.generateCurriculum("english")).thenReturn(mockResource);
+
+        ResponseEntity<Resource> response = publicController.publicCurriculumLanguageGet("english");
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockResource, response.getBody());
+        verify(cvService).generateCurriculum("english");
+    }
+
+    @Test
+    void publicContactPost() {
+        ContactRequest contactRequest = new ContactRequest();
+        contactRequest.setName("Test");
+        contactRequest.setEmail("test@test.com");
+        contactRequest.setMessage("Message");
+
+        ResponseEntity<Void> response = publicController.publicContactPost(contactRequest);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(contactService).sendContactMessage(contactRequest);
     }
 }

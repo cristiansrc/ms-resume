@@ -1,17 +1,18 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
 import com.cristiansrc.resume.msresume.application.exception.RenderCvServiceException;
-import com.cristiansrc.resume.msresume.application.port.interactor.*;
+import com.cristiansrc.resume.msresume.application.port.interactor.ICvService;
+import com.cristiansrc.resume.msresume.application.port.interactor.IEducationService;
+import com.cristiansrc.resume.msresume.application.port.interactor.IExperienceService;
+import com.cristiansrc.resume.msresume.application.port.interactor.ISkillService;
 import com.cristiansrc.resume.msresume.application.port.output.client.IRenderCvClient;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IBasicDataRepository;
-import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IHomeRepository;
 import com.cristiansrc.resume.msresume.infrastructure.client.rendercv.in.*;
 import com.cristiansrc.resume.msresume.infrastructure.client.rendercv.in.Locale;
 import com.cristiansrc.resume.msresume.infrastructure.client.rendercv.out.CustomerCvOut;
 import com.cristiansrc.resume.msresume.infrastructure.constants.InfoCvConstants;
-import com.cristiansrc.resume.msresume.infrastructure.controller.model.*;
+import com.cristiansrc.resume.msresume.infrastructure.controller.model.BasicDataResponse;
 import com.cristiansrc.resume.msresume.infrastructure.mapper.IBasicDataMapper;
-import com.cristiansrc.resume.msresume.infrastructure.mapper.IHomeMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,17 +30,13 @@ import java.util.stream.Stream;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class PublicService implements IPublicService {
+public class CvService implements ICvService {
 
-    private final IHomeRepository homeRepository;
     private final IBasicDataRepository basicDataRepository;
-    private final ISkillTypeService skillTypeService;
     private final ISkillService skillService;
     private final IExperienceService experienceService;
     private final IEducationService educationService;
-    private final IHomeMapper homeMapper;
     private final IBasicDataMapper basicDataMapper;
-    private final IS3Service s3Service;
     private final IRenderCvClient renderCvClient;
     private final ObjectMapper objectMapper;
 
@@ -71,32 +67,10 @@ public class PublicService implements IPublicService {
     @Value("${config.rendercv.debug.filename:rendercv-debug.json}")
     private String debugFilename;
 
-    @Transactional(readOnly = true)
     @Override
-    public InfoPageResponse getInfoPage() {
-        log.info("Fetching public info page data");
-
-        var homeResponse = getHomeResponse();
-        var basicDataResponse = getBasicDataResponse();
-        var skillTypes = skillTypeService.skillTypeGet();
-        var experiences = experienceService.experienceGet();
-        var educations = educationService.educationGet();
-
-        log.info("Fetched public info page data successfully");
-
-        var infoPageResponse = new InfoPageResponse();
-        infoPageResponse.setHome(homeResponse);
-        infoPageResponse.setBasicData(basicDataResponse);
-        infoPageResponse.setSkillTypes(skillTypes);
-        infoPageResponse.setExperiences(experiences);
-        infoPageResponse.setEducations(educations);
-
-        return infoPageResponse;
-    }
-
-    @Override
-    public Resource publicCurriculumGet(String language) {
+    public Resource generateCurriculum(String language) {
         log.info("Fetching resume cv data for language: {}", language);
+        boolean isSpanish = InfoCvConstants.LANGUAGE_SPANISH.equals(language);
 
         var basicDataResponse = getBasicDataResponse();
         if (basicDataResponse == null) {
@@ -104,9 +78,9 @@ public class PublicService implements IPublicService {
             throw new RenderCvServiceException("Basic data not found", null);
         }
 
-        var infoCv = getInfoCv(basicDataResponse);
-        var sections = getSections(basicDataResponse, language);
-        
+        var infoCv = getInfoCv(basicDataResponse, isSpanish);
+        var sections = getSections(basicDataResponse, isSpanish);
+
         infoCv.setSections(sections);
 
         var customerCvIn = new CustomerCvIn();
@@ -137,7 +111,7 @@ public class PublicService implements IPublicService {
                 .orElseThrow(() -> new RenderCvServiceException("Failed to generate PDF content", null));
     }
 
-    private InfoCv getInfoCv(BasicDataResponse basicDataResponse) {
+    private InfoCv getInfoCv(BasicDataResponse basicDataResponse, boolean isSpanish) {
 
         String fullName = Stream.of(
                         basicDataResponse.getFirstName(),
@@ -149,7 +123,10 @@ public class PublicService implements IPublicService {
 
         return InfoCv.builder()
                 .name(fullName)
-                .location(basicDataResponse.getLocated())
+                .location(resolveText(
+                        isSpanish,
+                        basicDataResponse.getLocated(),
+                        basicDataResponse.getLocatedEng()))
                 .email(basicDataResponse.getEmail())
                 .website(webSite)
                 .socialNetworks(getSocialNetworks(basicDataResponse))
@@ -225,9 +202,9 @@ public class PublicService implements IPublicService {
 
                     var company = "";
 
-                    if (e.getCompany() != null){
+                    if (e.getCompany() != null)
                         company = isSpanish ? e.getCompany(): e.getCompany().replace("Cliente", "Customer");
-                    }
+
 
                     return Experience.builder()
                             .company(company)
@@ -267,15 +244,15 @@ public class PublicService implements IPublicService {
                 .toList();
     }
 
-    private LinkedHashMap<String, Object> getSections(BasicDataResponse basicData, String language) {
+    private LinkedHashMap<String, Object> getSections(BasicDataResponse basicData, boolean isSpanish) {
         validateBasicDataForCv(basicData);
-        boolean isSpanish = InfoCvConstants.LANGUAGE_SPANISH.equals(language);
+
         var educations = getEducations(isSpanish);
         var experiences = getExperiences(isSpanish);
         var skills = getSkills(isSpanish);
         var selectedHonors = getSelectedHonors(isSpanish, basicData);
         var sections = new LinkedHashMap<String, Object>();
-        
+
         // Profile Section
         var profileLabel = isSpanish ? InfoCvConstants.PROFILE_RESUME_SPA : InfoCvConstants.PROFILE_RESUME_ENG;
         sections.put(profileLabel, isSpanish ? basicData.getDescriptionPdf() : basicData.getDescriptionPdfEng());
@@ -300,12 +277,6 @@ public class PublicService implements IPublicService {
         if (basicData.getDescription() == null || basicData.getDescriptionEng() == null) {
             throw new RenderCvServiceException("Basic Data descriptions cannot be null for CV generation", null);
         }
-    }
-
-    private HomeResponse getHomeResponse() {
-        return homeRepository.findFirstByOrderByCreatedDesc()
-                .map(entity -> homeMapper.toResponse(entity, s3Service))
-                .orElse(null);
     }
 
     private BasicDataResponse getBasicDataResponse() {
