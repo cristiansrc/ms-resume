@@ -82,7 +82,7 @@ class SkillTypeServiceTest {
     @Test
     void skillTypeIdPut() {
         SkillTypeEntity entity = new SkillTypeEntity();
-        entity.setSkills(new ArrayList<>());
+        entity.setSkillTypeRelations((new ArrayList<>()));
         SkillTypeRequest request = new SkillTypeRequest();
         request.setSkillIds(Collections.singletonList(1L));
         when(skillTypeRepository.findByIdAndNotDeleted(1L)).thenReturn(Optional.of(entity));
@@ -96,7 +96,7 @@ class SkillTypeServiceTest {
     @Test
     void skillTypePost() {
         SkillTypeEntity entity = new SkillTypeEntity();
-        entity.setSkills(new ArrayList<>());
+        entity.setSkillTypeRelations(new ArrayList<>());
         SkillTypeRequest request = new SkillTypeRequest();
         request.setSkillIds(Collections.singletonList(1L));
         when(skillTypeMapper.toEntity(request)).thenReturn(entity);

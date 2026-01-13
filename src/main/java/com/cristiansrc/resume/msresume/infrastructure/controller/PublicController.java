@@ -53,4 +53,10 @@ public class PublicController implements PublicApi {
         var response = publicService.publicCurriculumGet(language);
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<Void> publicContactPost(ContactRequest contactRequest) {
+        publicService.sendContactMessage(contactRequest);
+        return ResponseEntity.ok().build();
+    }
 }

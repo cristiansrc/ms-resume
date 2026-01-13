@@ -6,6 +6,7 @@ import com.cristiansrc.resume.msresume.application.port.interactor.IPublicServic
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogPageResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BlogTypeResponse;
+import com.cristiansrc.resume.msresume.infrastructure.controller.model.ContactRequest;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.InfoPageResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,5 +114,19 @@ class PublicControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(mockResponse, response.getBody());
         verify(publicService).getInfoPage();
+    }
+
+    @Test
+    void publicContactPost() {
+        ContactRequest contactRequest = new ContactRequest();
+        contactRequest.setName("Test");
+        contactRequest.setEmail("test@test.com");
+        contactRequest.setMessage("Message");
+
+        ResponseEntity<Void> response = publicController.publicContactPost(contactRequest);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(publicService).sendContactMessage(contactRequest);
     }
 }

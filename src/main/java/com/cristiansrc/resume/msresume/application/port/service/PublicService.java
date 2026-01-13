@@ -3,6 +3,7 @@ package com.cristiansrc.resume.msresume.application.port.service;
 import com.cristiansrc.resume.msresume.application.exception.RenderCvServiceException;
 import com.cristiansrc.resume.msresume.application.port.interactor.*;
 import com.cristiansrc.resume.msresume.application.port.output.client.IRenderCvClient;
+import com.cristiansrc.resume.msresume.application.port.output.client.ITelegramClient;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IBasicDataRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IHomeRepository;
 import com.cristiansrc.resume.msresume.infrastructure.client.rendercv.in.*;
@@ -34,7 +35,6 @@ public class PublicService implements IPublicService {
 
     private final IHomeRepository homeRepository;
     private final IBasicDataRepository basicDataRepository;
-    private final ISkillTypeService skillTypeService;
     private final ISkillService skillService;
     private final IExperienceService experienceService;
     private final IEducationService educationService;
@@ -42,6 +42,7 @@ public class PublicService implements IPublicService {
     private final IBasicDataMapper basicDataMapper;
     private final IS3Service s3Service;
     private final IRenderCvClient renderCvClient;
+    private final ITelegramClient telegramClient;
     private final ObjectMapper objectMapper;
 
     @Value("${config.rendercv.website}")
@@ -78,7 +79,7 @@ public class PublicService implements IPublicService {
 
         var homeResponse = getHomeResponse();
         var basicDataResponse = getBasicDataResponse();
-        var skillTypes = skillTypeService.skillTypeGet();
+        var skills = skillService.skillGet();
         var experiences = experienceService.experienceGet();
         var educations = educationService.educationGet();
 
@@ -87,7 +88,7 @@ public class PublicService implements IPublicService {
         var infoPageResponse = new InfoPageResponse();
         infoPageResponse.setHome(homeResponse);
         infoPageResponse.setBasicData(basicDataResponse);
-        infoPageResponse.setSkillTypes(skillTypes);
+        infoPageResponse.setSkills(skills);
         infoPageResponse.setExperiences(experiences);
         infoPageResponse.setEducations(educations);
 
@@ -97,6 +98,7 @@ public class PublicService implements IPublicService {
     @Override
     public Resource publicCurriculumGet(String language) {
         log.info("Fetching resume cv data for language: {}", language);
+        boolean isSpanish = InfoCvConstants.LANGUAGE_SPANISH.equals(language);
 
         var basicDataResponse = getBasicDataResponse();
         if (basicDataResponse == null) {
@@ -104,8 +106,8 @@ public class PublicService implements IPublicService {
             throw new RenderCvServiceException("Basic data not found", null);
         }
 
-        var infoCv = getInfoCv(basicDataResponse);
-        var sections = getSections(basicDataResponse, language);
+        var infoCv = getInfoCv(basicDataResponse, isSpanish);
+        var sections = getSections(basicDataResponse, isSpanish);
         
         infoCv.setSections(sections);
 
@@ -137,7 +139,19 @@ public class PublicService implements IPublicService {
                 .orElseThrow(() -> new RenderCvServiceException("Failed to generate PDF content", null));
     }
 
-    private InfoCv getInfoCv(BasicDataResponse basicDataResponse) {
+    @Override
+    public void sendContactMessage(ContactRequest contactRequest) {
+        log.info("Sending contact message from: {}", contactRequest.getEmail());
+        String message = String.format(
+                "Oye, Cris. Despierta, joder. Tenemos una ciudad que quemar. \uD83D\uDD25: %n%nName: %s%nEmail: %s%nMessage: %s",
+                contactRequest.getName(),
+                contactRequest.getEmail(),
+                contactRequest.getMessage()
+        );
+        telegramClient.sendMessage(message);
+    }
+
+    private InfoCv getInfoCv(BasicDataResponse basicDataResponse, boolean isSpanish) {
 
         String fullName = Stream.of(
                         basicDataResponse.getFirstName(),
@@ -149,7 +163,10 @@ public class PublicService implements IPublicService {
 
         return InfoCv.builder()
                 .name(fullName)
-                .location(basicDataResponse.getLocated())
+                .location(resolveText(
+                        isSpanish,
+                        basicDataResponse.getLocated(),
+                        basicDataResponse.getLocatedEng()))
                 .email(basicDataResponse.getEmail())
                 .website(webSite)
                 .socialNetworks(getSocialNetworks(basicDataResponse))
@@ -225,9 +242,9 @@ public class PublicService implements IPublicService {
 
                     var company = "";
 
-                    if (e.getCompany() != null){
+                    if (e.getCompany() != null)
                         company = isSpanish ? e.getCompany(): e.getCompany().replace("Cliente", "Customer");
-                    }
+
 
                     return Experience.builder()
                             .company(company)
@@ -267,9 +284,9 @@ public class PublicService implements IPublicService {
                 .toList();
     }
 
-    private LinkedHashMap<String, Object> getSections(BasicDataResponse basicData, String language) {
+    private LinkedHashMap<String, Object> getSections(BasicDataResponse basicData, boolean isSpanish) {
         validateBasicDataForCv(basicData);
-        boolean isSpanish = InfoCvConstants.LANGUAGE_SPANISH.equals(language);
+
         var educations = getEducations(isSpanish);
         var experiences = getExperiences(isSpanish);
         var skills = getSkills(isSpanish);
