@@ -1,7 +1,7 @@
 # ==========================================
 # ETAPA 1: BUILD (El Constructor) 🏗️
 # ==========================================
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # 1. Copiamos el POM y el código fuente
@@ -17,7 +17,7 @@ RUN mvn clean package -DskipTests
 # ==========================================
 # ETAPA 2: RUN (El Ejecutor) 🚀
 # ==========================================
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # 1. Copiamos SOLO el JAR final desde la etapa de construcción
