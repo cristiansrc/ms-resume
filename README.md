@@ -3,6 +3,7 @@
 [![Coverage](https://coveralls.io/repos/github/cristiansrc/ms-resume/badge.svg)](https://coveralls.io/github/cristiansrc/ms-resume)
 [![Version](https://img.shields.io/maven-central/v/com.cristiansrc.shop/ms-resume)](https://search.maven.org/artifact/com.cristiansrc.shop/ms-resume)
 
+
 Backend Java Spring Boot para la gestión y exposición del currículum, experiencia profesional, habilidades, proyectos y blog tecnológico del sitio [cristiansrc.com](https://cristiansrc.com).
 
 Este proyecto provee una API RESTful para la administración centralizada de toda la información de la página personal, incluyendo descargas de CV en PDF, integración de imágenes, videos, etiquetas, habilidades, proyectos destacados y artículos de blog.  
