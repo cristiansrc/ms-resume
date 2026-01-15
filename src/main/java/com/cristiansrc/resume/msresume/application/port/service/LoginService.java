@@ -1,6 +1,7 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
 import com.cristiansrc.resume.msresume.application.exception.InvalidCredentialsException;
+import com.cristiansrc.resume.msresume.application.port.interactor.IAltchaService;
 import com.cristiansrc.resume.msresume.application.port.interactor.ILoginService;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LoginPost200Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LoginPostRequest;
@@ -28,12 +29,16 @@ public class LoginService implements ILoginService {
     private final MessageResolver messageResolver;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final IAltchaService altchaService;
 
     @Override
     public LoginPost200Response loginPost(final LoginPostRequest loginPostRequest) {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Login attempt for user: {}", loginPostRequest.getUser());
         }
+        
+        altchaService.validateChallenge(loginPostRequest.getAltcha());
+
         if (loginPostRequest.getUser().equals(user) && passwordEncoder.matches(loginPostRequest.getPassword(), pass)) {
             final String token = jwtUtil.generateToken(loginPostRequest.getUser());
             final LoginPost200Response response = new LoginPost200Response();
