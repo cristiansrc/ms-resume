@@ -19,6 +19,7 @@ public class PublicController implements PublicApi {
     private final IInfoPageService infoPageService;
     private final ICvService cvService;
     private final IContactService contactService;
+    private final IAltchaService altchaService;
 
     @Override
     public ResponseEntity<BlogPageResponse> publicBlogGet(Integer page, Integer size, String sort) {
@@ -41,6 +42,12 @@ public class PublicController implements PublicApi {
     @Override
     public ResponseEntity<BlogTypeResponse> publicBlogTypeIdGet(Long id) {
         var response = blogTypeService.blogTypeIdGet(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<AltchaChallengeResponse> publicChallengeGet() {
+        var response = altchaService.createChallenge();
         return ResponseEntity.ok(response);
     }
 

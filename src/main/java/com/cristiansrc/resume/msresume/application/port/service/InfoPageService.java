@@ -26,6 +26,7 @@ public class InfoPageService implements IInfoPageService {
     private final IHomeMapper homeMapper;
     private final IBasicDataMapper basicDataMapper;
     private final IS3Service s3Service;
+    private final IAltchaService altchaService;
 
     @Transactional(readOnly = true)
     @Override
@@ -37,6 +38,7 @@ public class InfoPageService implements IInfoPageService {
         var skills = skillService.skillGet();
         var experiences = experienceService.experienceGet();
         var educations = educationService.educationGet();
+        var altchaChallengeResponse = altchaService.createChallenge();
 
         log.info("Fetched public info page data successfully");
 
@@ -46,6 +48,7 @@ public class InfoPageService implements IInfoPageService {
         infoPageResponse.setSkills(skills);
         infoPageResponse.setExperiences(experiences);
         infoPageResponse.setEducations(educations);
+        infoPageResponse.setAltchaChallenge(altchaChallengeResponse);
 
         return infoPageResponse;
     }

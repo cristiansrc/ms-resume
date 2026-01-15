@@ -191,6 +191,15 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(HttpStatus.BAD_REQUEST, msg, request);
     }
 
+    @ExceptionHandler(AltchaValidationException.class)
+    public ResponseEntity<ErrorResponse> handleAltchaValidationException(
+            final AltchaValidationException exception, final HttpServletRequest request) {
+        if (LOGGER.isWarnEnabled()) {
+            LOGGER.warn("Altcha validation failed: {}", exception.getMessage());
+        }
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
+    }
+
     private ResponseEntity<ErrorResponse> buildResponseEntity(final HttpStatus status, final String message, final HttpServletRequest request) {
         return ResponseEntity.status(status).body(createErrorResponse(status, message, request));
     }

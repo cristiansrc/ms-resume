@@ -34,6 +34,7 @@ paths:
               required:
                 - user
                 - password
+                - altcha
               properties:
                 user:
                   type: string
@@ -41,6 +42,9 @@ paths:
                 password:
                   type: string
                   description: Contraseña del usuario
+                altcha:
+                  type: string
+                  description: Respuesta del challenge de Altcha
       responses:
         '200':
           description: Autenticación exitosa, token JWT generado
@@ -256,6 +260,22 @@ paths:
           description: Mensaje enviado exitosamente
         '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /public/challenge:
+    get:
+      tags:
+        - Challenge Public
+      summary: Obtener challenge de Altcha
+      description: Genera un nuevo challenge para validación de captcha
+      security: []
+      responses:
+        '200':
+          description: Challenge generado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AltchaChallengeResponse'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /basic-data/{id}:
@@ -1728,6 +1748,7 @@ components:
         - name
         - email
         - message
+        - altcha
       properties:
         name:
           type: string
@@ -1743,6 +1764,9 @@ components:
           description: Mensaje de contacto
           minLength: 1
           maxLength: 2000
+        altcha:
+          type: string
+          description: Respuesta del challenge de Altcha
 
     BasicDataRequest:
       type: object
@@ -1761,7 +1785,6 @@ components:
         othersName:
           type: string
           description: Nombres adicionales
-          maxLength: 100
         firstSurName:
           type: string
           description: Primer apellido
@@ -2811,6 +2834,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EducationResponse'
+        altchaChallenge:
+          $ref: '#/components/schemas/AltchaChallengeResponse'
+
+
+    AltchaChallengeResponse:
+      type: object
+      description: Respuesta del challenge de Altcha
+      properties:
+        algorithm:
+          type: string
+          description: Algoritmo utilizado
+        challenge:
+          type: string
+          description: Challenge generado
+        salt:
+          type: string
+          description: Salt utilizado
+        signature:
+          type: string
+          description: Firma del challenge
 
     # Error Response Schema
     ErrorResponse:
