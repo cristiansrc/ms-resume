@@ -31,8 +31,6 @@ La arquitectura y el diseño siguen las mejores prácticas REST, OpenAPI 3.1.0 y
 
 ## Estructura de carpetas
 
-> **Nota:** El proyecto está en proceso de migración hacia una Arquitectura Hexagonal. La estructura actual refleja una organización por capas tradicional de Spring Boot, que evolucionará para separar completamente el dominio de la infraestructura.
-
 ```
 src/
 ├── main/
