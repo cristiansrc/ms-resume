@@ -10,13 +10,13 @@ import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IB
 import com.cristiansrc.resume.msresume.infrastructure.client.rendercv.in.*;
 import com.cristiansrc.resume.msresume.infrastructure.client.rendercv.in.Locale;
 import com.cristiansrc.resume.msresume.infrastructure.client.rendercv.out.CustomerCvOut;
+import com.cristiansrc.resume.msresume.infrastructure.constants.CvConstants;
 import com.cristiansrc.resume.msresume.infrastructure.constants.InfoCvConstants;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BasicDataResponse;
 import com.cristiansrc.resume.msresume.infrastructure.mapper.IBasicDataMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -39,33 +39,8 @@ public class CvService implements ICvService {
     private final IBasicDataMapper basicDataMapper;
     private final IRenderCvClient renderCvClient;
     private final ObjectMapper objectMapper;
+    private final CvConstants cvConstants;
 
-    @Value("${config.rendercv.website}")
-    private String webSite;
-
-    @Value("${config.rendercv.theme}")
-    private String theme;
-
-    @Value("${config.linkedin.url}")
-    private String linkedinUrl;
-
-    @Value("${config.github.url}")
-    private String githubUrl;
-
-    @Value("${config.x.url}")
-    private String xUrl;
-
-    @Value("${config.instagram.url}")
-    private String instagramUrl;
-
-    @Value("${config.rendercv.debug.enabled:false}")
-    private boolean debugEnabled;
-
-    @Value("${config.rendercv.debug.path:/tmp/}")
-    private String debugPath;
-
-    @Value("${config.rendercv.debug.filename:rendercv-debug.json}")
-    private String debugFilename;
 
     @Override
     public Resource generateCurriculum(String language) {
@@ -85,16 +60,16 @@ public class CvService implements ICvService {
 
         var customerCvIn = new CustomerCvIn();
         customerCvIn.setCv(infoCv);
-        customerCvIn.setDesign(Design.builder().theme(theme).build());
+        customerCvIn.setDesign(Design.builder().theme(cvConstants.theme).build());
         customerCvIn.setLocale(Locale.builder().language(language).build());
 
-        if (debugEnabled) {
+        if (cvConstants.debugEnabled) {
             try {
-                File directory = new File(debugPath);
+                File directory = new File(cvConstants.debugPath);
                 if (!directory.exists()) {
                     directory.mkdirs();
                 }
-                File file = new File(directory, debugFilename);
+                File file = new File(directory, cvConstants.debugFilename);
                 objectMapper.writeValue(file, customerCvIn);
                 log.info("JSON debug file written to: {}", file.getAbsolutePath());
             } catch (IOException e) {
@@ -107,7 +82,14 @@ public class CvService implements ICvService {
         return Optional.ofNullable(customerCvOut)
                 .map(CustomerCvOut::getPdfBase)
                 .map(Base64.getDecoder()::decode)
-                .map(ByteArrayResource::new)
+                .map(bytes -> (Resource) new ByteArrayResource(bytes) {
+                    @Override
+                    public String getFilename() {
+                        return isSpanish ?
+                                cvConstants.filenameSpanish :
+                                cvConstants.filenameEnglish;
+                    }
+                })
                 .orElseThrow(() -> new RenderCvServiceException("Failed to generate PDF content", null));
     }
 
@@ -128,7 +110,7 @@ public class CvService implements ICvService {
                         basicDataResponse.getLocated(),
                         basicDataResponse.getLocatedEng()))
                 .email(basicDataResponse.getEmail())
-                .website(webSite)
+                .website(cvConstants.webSite)
                 .socialNetworks(getSocialNetworks(basicDataResponse))
                 .build();
     }
@@ -140,25 +122,25 @@ public class CvService implements ICvService {
                 socialNetworks,
                 InfoCvConstants.NETWORK_GITHUB,
                 basicData.getGithub(),
-                githubUrl);
+                cvConstants.githubUrl);
 
         addSocialNetworkIfPresent(
                 socialNetworks,
                 InfoCvConstants.NETWORK_LINKEDIN,
                 basicData.getLinkedin(),
-                linkedinUrl);
+                cvConstants.linkedinUrl);
 
         addSocialNetworkIfPresent(
                 socialNetworks,
                 InfoCvConstants.NETWORK_X,
                 basicData.getX(),
-                xUrl);
+                cvConstants.xUrl);
 
         addSocialNetworkIfPresent(
                 socialNetworks,
                 InfoCvConstants.NETWORK_INSTAGRAM,
                 basicData.getInstagram(),
-                instagramUrl);
+                cvConstants.instagramUrl);
 
         return socialNetworks;
     }
