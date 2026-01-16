@@ -15,16 +15,17 @@ La arquitectura y el diseño siguen las mejores prácticas REST, OpenAPI 3.1.0 y
 
 - **Spring Boot 3.5.3**, Java 21+
 - **Maven** como sistema de construcción
-- **PostgreSQL 16.9** como base de datos relacional
+- **SQLite** como base de datos relacional (Configuración actual)
 - API documentada con **OpenAPI 3.1.0 (Swagger)**
-- Descarga directa del CV en formato PDF
+- Descarga directa del CV en formato PDF (Integración con RenderCV)
 - Manejo robusto de errores y validaciones
 - Relacionamiento anidado en entidades clave
 - Endpoints para imágenes, videos, etiquetas, habilidades, proyectos y blog con paginación
 - Internacionalización de mensajes (i18n)
 - Validaciones automáticas desde OpenAPI
 - Arquitectura Hexagonal (Ports & Adapters)
-- Preparado para despliegue en Docker, Heroku, AWS u otros proveedores
+- Notificaciones vía Telegram Bot
+- Preparado para despliegue en Docker
 
 ---
 
@@ -126,7 +127,6 @@ mvn openapi-generator:generate
 
 - Java 21 o superior
 - Maven 3.9.9+
-- PostgreSQL 16.9
 
 ### **Clonar el repositorio**
 
@@ -135,24 +135,48 @@ git clone https://github.com/cristiansrc/ms-resume.git
 cd ms-resume
 ```
 
-### **Configuración del proyecto en AWS**
+### **Configuración del proyecto (Producción/Docker)**
 
-Edita el archivo `src/main/resources/application.properties`:
+Edita el archivo `src/main/resources/application.properties` o usa variables de entorno:
 
 ```properties
 spring.application.name=ms-resume
-spring.flyway.enabled=true
-spring.flyway.locations=classpath:db/migration,classpath:db/callback
-spring.datasource.url=${DB_URL}
-spring.datasource.driver-class-name=org.postgresql.Driver
-spring.datasource.username=${DB_USER}
-spring.datasource.password=${DB_PASS}
-spring.jpa.open-in-view=false
 logging.level.root=WARN
-spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.show-sql=false
-spring.datasource.hikari.maximum-pool-size=10
-spring.datasource.hikari.minimum-idle=2
+spring.main.allow-bean-definition-overriding=true
+
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration/sqlite,classpath:db/callback
+
+# Base de datos SQLite
+spring.datasource.url=jdbc:sqlite:${DB_PATH:/data/ms-resume.db}
+spring.datasource.driver-class-name=org.sqlite.JDBC
+
+spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+spring.jpa.open-in-view=false
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# AWS S3
+aws.s3.access-key=${AWS_ACCESS_KEY}
+aws.s3.secret-key=${AWS_SECRET_KEY}
+aws.s3.region=${AWS_REGION}
+aws.s3.bucket=${AWS_BUCKET}
+
+# Login
+auth.user=${AUTH_USER}
+auth.pass=${AUTH_PASS}
+jwt.secret=${JWT_SECRET}
+jwt.expiration=86400000
+
+# RenderCV
+config.rendercv.url=${RENDER_CV_URL}
+config.rendercv.website=https://cristiansrc.com
+config.rendercv.theme=classic
+
+# Telegram
+config.telegram.bot.token=${TELEGRAM_BOT_TOKEN}
+config.telegram.chat.id=${TELEGRAM_CHAT_ID}
 ```
 
 ### **Configuración del proyecto para desarrollo local**
@@ -161,20 +185,23 @@ Edita el archivo `src/main/resources/application-local.properties`:
 
 ```properties
 spring.application.name=ms-resume
-spring.flyway.enabled=true
-spring.flyway.locations=classpath:db/migration,classpath:db/callback
-spring.datasource.url=jdbc:postgresql://localhost:5432/ms-resume
-spring.datasource.driver-class-name=org.postgresql.Driver
-spring.datasource.username=postgres
-spring.datasource.password=1234
-spring.jpa.open-in-view=false
 logging.level.root=info
-spring.jpa.hibernate.ddl-auto=validate
+spring.main.allow-bean-definition-overriding=true
+
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration/sqlite,classpath:db/callback
+
+spring.datasource.url=jdbc:sqlite:ms-resume.db
+spring.datasource.driver-class-name=org.sqlite.JDBC
+
+spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+spring.jpa.open-in-view=false
+spring.jpa.hibernate.ddl-auto=none
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 ```
 
-### **Configuración del proyecto para ejcutar las pruebas unitarias*
+### **Configuración del proyecto para ejecutar las pruebas unitarias**
 
 Edita el archivo `src/main/resources/application-test.properties`:
 
@@ -197,7 +224,7 @@ spring.test.database.replace=NONE
 
 ### **Ejecutar migraciones (Flyway)**
 
-Asegúrate que el usuario tenga permisos de creación/modificación de tablas.
+Las migraciones se ejecutan automáticamente al iniciar la aplicación si `spring.flyway.enabled=true`.
 
 ### **Construcción y ejecución**
 
@@ -211,10 +238,17 @@ El API estará disponible en `http://localhost:8080`.
 ### Docker
 Este servicio incluye un Dockerfile para crear una imagen del contenedor:
 ```dockerfile
-FROM eclipse-temurin:21-jdk
-WORKDIR /app
-COPY target/ms-resume-0.0.1-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+# Usamos una imagen ligera de Java 21 (Eclipse Temurin es la recomendada para prod)
+FROM eclipse-temurin:21-jre-alpine
+
+# Creamos un volumen temporal (buena práctica en Spring Boot)
+VOLUME /tmp
+
+# Copiamos el JAR que GitHub nos enviará
+COPY app.jar app.jar
+
+# Configuración de inicio
+ENTRYPOINT ["java","-jar","/app.jar"]
 ```
 
 Con docker-compose:
@@ -226,10 +260,20 @@ services:
     build: .
     ports:
       - "8080:8080"
+    volumes:
+      - ./data:/data
     environment:
-      - DB_URL=${DB_URL}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
+      - DB_PATH=/data/ms-resume.db
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_BUCKET=${AWS_BUCKET}
+      - AUTH_USER=${AUTH_USER}
+      - AUTH_PASS=${AUTH_PASS}
+      - JWT_SECRET=${JWT_SECRET}
+      - RENDER_CV_URL=${RENDER_CV_URL}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
 ```
 
 ---
@@ -299,10 +343,17 @@ El esquema `ErrorResponse` se define en `components.schemas.ErrorResponse`:
 ## Variables de entorno
 | Nombre         | Descripción                             | Ejemplo                   |
 |---------------|-----------------------------------------|---------------------------|
-| DB_URL        | URL de conexión a PostgreSQL            | jdbc:postgresql://...     |
-| DB_USER       | Usuario de la base de datos             | postgres                  |
-| DB_PASS       | Contraseña de la base de datos          | ********                  |
-| AWS_S3_BUCKET | Nombre del bucket S3 para assets        | my-portfolio-bucket       |
+| DB_PATH       | Ruta al archivo de base de datos SQLite | /data/ms-resume.db        |
+| AWS_ACCESS_KEY| Access Key de AWS                       | AKIA...                   |
+| AWS_SECRET_KEY| Secret Key de AWS                       | wJalr...                  |
+| AWS_REGION    | Región de AWS                           | us-east-2                 |
+| AWS_BUCKET    | Nombre del bucket S3                    | cristiansrc.shop          |
+| AUTH_USER     | Usuario para autenticación              | admin                     |
+| AUTH_PASS     | Contraseña para autenticación           | secret                    |
+| JWT_SECRET    | Secreto para firmar tokens JWT          | base64_secret...          |
+| RENDER_CV_URL | URL del servicio RenderCV               | http://rendercv-service...|
+| TELEGRAM_BOT_TOKEN | Token del bot de Telegram          | 123456:ABC-DEF...         |
+| TELEGRAM_CHAT_ID | ID del chat de Telegram              | 123456789                 |
 | SPRING_PROFILES_ACTIVE | Perfil de Spring (local/test/prod) | local                     |
 
 ---
@@ -458,9 +509,9 @@ server.tomcat.accept-count=100
 
 1. **Error de Conexión a BD**
    ```
-   Caused by: org.postgresql.util.PSQLException: Connection refused
+   Caused by: org.sqlite.SQLiteException: [SQLITE_CANTOPEN] Unable to open the database file
    ```
-   **Solución**: Verificar credenciales y conectividad a PostgreSQL
+   **Solución**: Verificar permisos de escritura en el directorio de la base de datos o ruta correcta.
 
 2. **OutOfMemoryError**
    ```
