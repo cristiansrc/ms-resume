@@ -8,6 +8,7 @@ import com.cristiansrc.resume.msresume.application.port.output.client.IRenderCvC
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IBasicDataRepository;
 import com.cristiansrc.resume.msresume.infrastructure.client.rendercv.in.CustomerCvIn;
 import com.cristiansrc.resume.msresume.infrastructure.client.rendercv.out.CustomerCvOut;
+import com.cristiansrc.resume.msresume.infrastructure.constants.CvConstants;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.BasicDataResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.EducationResponse;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ExperienceResponse;
@@ -58,6 +59,9 @@ class CvServiceTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private CvConstants cvConstants;
+
     @InjectMocks
     private CvService cvService;
 
@@ -66,12 +70,17 @@ class CvServiceTest {
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(cvService, "webSite", "https://example.com");
-        ReflectionTestUtils.setField(cvService, "theme", "classic");
-        ReflectionTestUtils.setField(cvService, "linkedinUrl", "https://linkedin.com/in/");
-        ReflectionTestUtils.setField(cvService, "githubUrl", "https://github.com/");
-        ReflectionTestUtils.setField(cvService, "xUrl", "https://x.com/");
-        ReflectionTestUtils.setField(cvService, "instagramUrl", "https://instagram.com/");
+        
+        // Mock CvConstants fields
+        ReflectionTestUtils.setField(cvConstants, "webSite", "https://example.com");
+        ReflectionTestUtils.setField(cvConstants, "theme", "classic");
+        ReflectionTestUtils.setField(cvConstants, "linkedinUrl", "https://linkedin.com/in/");
+        ReflectionTestUtils.setField(cvConstants, "githubUrl", "https://github.com/");
+        ReflectionTestUtils.setField(cvConstants, "xUrl", "https://x.com/");
+        ReflectionTestUtils.setField(cvConstants, "instagramUrl", "https://instagram.com/");
+        ReflectionTestUtils.setField(cvConstants, "debugEnabled", false);
+        ReflectionTestUtils.setField(cvConstants, "filenameSpanish", "cv_es.pdf");
+        ReflectionTestUtils.setField(cvConstants, "filenameEnglish", "cv_en.pdf");
     }
 
     @AfterEach

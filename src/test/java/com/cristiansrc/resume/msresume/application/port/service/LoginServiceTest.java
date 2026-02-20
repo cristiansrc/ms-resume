@@ -1,6 +1,7 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
 import com.cristiansrc.resume.msresume.application.exception.InvalidCredentialsException;
+import com.cristiansrc.resume.msresume.application.port.interactor.IAltchaService;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LoginPost200Response;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.LoginPostRequest;
 import com.cristiansrc.resume.msresume.infrastructure.security.JwtUtil;
@@ -29,6 +30,9 @@ class LoginServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private IAltchaService altchaService;
+
     @InjectMocks
     private LoginService loginService;
 
@@ -44,6 +48,7 @@ class LoginServiceTest {
         LoginPostRequest request = new LoginPostRequest();
         request.setUser("testuser");
         request.setPassword("password");
+        request.setAltcha("valid-altcha");
 
         when(passwordEncoder.matches(any(), any())).thenReturn(true);
         when(jwtUtil.generateToken(any())).thenReturn("test-token");

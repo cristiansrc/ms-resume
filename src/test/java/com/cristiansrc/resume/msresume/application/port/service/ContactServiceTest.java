@@ -1,5 +1,6 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
+import com.cristiansrc.resume.msresume.application.port.interactor.IAltchaService;
 import com.cristiansrc.resume.msresume.application.port.output.client.ITelegramClient;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.ContactRequest;
 import org.junit.jupiter.api.AfterEach;
@@ -16,6 +17,9 @@ class ContactServiceTest {
 
     @Mock
     private ITelegramClient telegramClient;
+
+    @Mock
+    private IAltchaService altchaService;
 
     @InjectMocks
     private ContactService contactService;
@@ -39,11 +43,13 @@ class ContactServiceTest {
         contactRequest.setName("John Doe");
         contactRequest.setEmail("john.doe@example.com");
         contactRequest.setMessage("Hello");
+        contactRequest.setAltcha("valid-altcha");
 
         // Act
         contactService.sendContactMessage(contactRequest);
 
         // Assert
+        verify(altchaService).validateChallenge("valid-altcha");
         verify(telegramClient).sendMessage(anyString());
     }
 }
