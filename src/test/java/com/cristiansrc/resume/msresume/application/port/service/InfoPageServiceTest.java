@@ -1,9 +1,6 @@
 package com.cristiansrc.resume.msresume.application.port.service;
 
-import com.cristiansrc.resume.msresume.application.port.interactor.IEducationService;
-import com.cristiansrc.resume.msresume.application.port.interactor.IExperienceService;
-import com.cristiansrc.resume.msresume.application.port.interactor.IS3Service;
-import com.cristiansrc.resume.msresume.application.port.interactor.ISkillService;
+import com.cristiansrc.resume.msresume.application.port.interactor.*;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IBasicDataRepository;
 import com.cristiansrc.resume.msresume.application.port.output.repository.jpa.IHomeRepository;
 import com.cristiansrc.resume.msresume.infrastructure.controller.model.*;
@@ -52,6 +49,9 @@ class InfoPageServiceTest {
     @Mock
     private IS3Service s3Service;
 
+    @Mock
+    private IAltchaService altchaService;
+
     @InjectMocks
     private InfoPageService infoPageService;
 
@@ -77,6 +77,7 @@ class InfoPageServiceTest {
         List<SkillResponse> skills = Collections.singletonList(new SkillResponse());
         List<ExperienceResponse> experiences = Collections.singletonList(new ExperienceResponse());
         List<EducationResponse> educations = Collections.singletonList(new EducationResponse());
+        AltchaChallengeResponse altchaChallengeResponse = new AltchaChallengeResponse();
 
         when(homeRepository.findFirstByOrderByCreatedDesc()).thenReturn(Optional.of(homeEntity));
         when(homeMapper.toResponse(homeEntity, s3Service)).thenReturn(homeResponse);
@@ -85,6 +86,7 @@ class InfoPageServiceTest {
         when(skillService.skillGet()).thenReturn(skills);
         when(experienceService.experienceGet()).thenReturn(experiences);
         when(educationService.educationGet()).thenReturn(educations);
+        when(altchaService.createChallenge()).thenReturn(altchaChallengeResponse);
 
         // Act
         InfoPageResponse response = infoPageService.getInfoPage();
@@ -96,11 +98,13 @@ class InfoPageServiceTest {
         assertEquals(skills, response.getSkills());
         assertEquals(experiences, response.getExperiences());
         assertEquals(educations, response.getEducations());
+        assertEquals(altchaChallengeResponse, response.getAltchaChallenge());
 
         verify(homeRepository).findFirstByOrderByCreatedDesc();
         verify(basicDataRepository).findFirstByOrderByCreatedDesc();
         verify(skillService).skillGet();
         verify(experienceService).experienceGet();
         verify(educationService).educationGet();
+        verify(altchaService).createChallenge();
     }
 }
