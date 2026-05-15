@@ -13,6 +13,6 @@ public interface IExperienceRepository extends JpaRepository<ExperienceEntity, L
     @Query("SELECT e FROM ExperienceEntity e WHERE e.id = :id AND e.deleted = false")
     Optional<ExperienceEntity> findByIdAndDeletedFalse(@Param("id") Long identifier);
 
-    @Query("SELECT e FROM ExperienceEntity e WHERE e.deleted = false")
+    @Query("SELECT e FROM ExperienceEntity e WHERE e.deleted = false ORDER BY e.yearStart DESC")
     List<ExperienceEntity> findAllByDeletedFalse();
 }
